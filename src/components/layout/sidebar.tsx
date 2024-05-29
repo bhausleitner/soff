@@ -35,7 +35,7 @@ export default function Sidebar({ className }: SidebarProps) {
 				)}
 				onClick={handleToggle}
 			/>
-			<div className="space-y-4 py-4">
+			<div className="space-y-4 py-4 font-sans antialiased">
 				<div className="px-3 py-2">
 					<div className="mt-3 space-y-1">
 						<DashboardNav items={navItems} />
