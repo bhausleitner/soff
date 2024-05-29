@@ -13,6 +13,8 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { useUser } from "@clerk/nextjs"
 import { useClerk } from '@clerk/nextjs'
+import { startCase, toLower } from 'lodash';
+
 
 export function UserNav() {
   const user = useUser();
@@ -28,7 +30,7 @@ export function UserNav() {
                 src={user?.user?.username ?? ''}
                 alt={user?.user?.username ?? ''}
               />
-              <AvatarFallback>BH</AvatarFallback>
+              <AvatarFallback>{startCase(toLower(user?.user?.username?.[0]))}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
