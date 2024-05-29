@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <div className={cn("supports-backdrop-blur:bg-background/60 fixed left-0 right-0 top-0 z-20 border-b bg-background/95 backdrop-blur font-sans antialiased", fontInter.variable)}>
       <nav className="flex h-14 items-center justify-between px-4">
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-3">
           <Link
             href={'https://soff.ai/'}
             target="_blank"
