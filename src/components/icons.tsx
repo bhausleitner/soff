@@ -1,6 +1,8 @@
 import {
 	AlertTriangle,
 	ArrowRight,
+	Bell,
+	BookUser,
 	Check,
 	ChevronLeft,
 	ChevronRight,
@@ -35,6 +37,7 @@ export type Icon = LucideIcon;
 
 export const Icons = {
 	dashboard: LayoutDashboardIcon,
+	supplier: BookUser,
 	logo: Command,
 	login: LogIn,
 	close: X,
@@ -53,6 +56,7 @@ export const Icons = {
 	ellipsis: MoreVertical,
 	add: Plus,
 	warning: AlertTriangle,
+	notifications: Bell,
 	user: User,
 	arrowRight: ArrowRight,
 	help: HelpCircle,

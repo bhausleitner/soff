@@ -20,9 +20,6 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight">
               Hi Blake, Welcome back 👋
             </h2>
-            <div className="hidden items-center space-x-2 md:flex">
-              <Button>Download</Button>
-            </div>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>

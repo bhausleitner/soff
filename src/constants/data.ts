@@ -4,37 +4,31 @@ import { NavItem } from "~/types/types";
 export const navItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/dashboard',
+    href: '/',
     icon: 'dashboard',
     label: 'Dashboard'
   },
   {
-    title: 'User',
-    href: '/dashboard/user',
-    icon: 'user',
-    label: 'user'
+    title: 'Supplier',
+    href: '/supplier',
+    icon: 'supplier',
+    label: 'supplier'
   },
   {
-    title: 'Employee',
+    title: 'Quotes',
     href: '/dashboard/employee',
     icon: 'employee',
     label: 'employee'
   },
   {
-    title: 'Profile',
-    href: '/dashboard/profile',
-    icon: 'profile',
-    label: 'profile'
-  },
-  {
-    title: 'Kanban',
-    href: '/dashboard/kanban',
-    icon: 'kanban',
-    label: 'kanban'
+    title: 'Notifications',
+    href: '/notifications',
+    icon: 'notifications',
+    label: 'notifications'
   },
   {
     title: 'Login',
-    href: '/',
+    href: '/login',
     icon: 'login',
     label: 'login'
   }
