@@ -9,10 +9,10 @@ export const navItems: NavItem[] = [
     label: 'Dashboard'
   },
   {
-    title: 'Supplier',
-    href: '/supplier',
-    icon: 'supplier',
-    label: 'supplier'
+    title: 'Suppliers',
+    href: '/suppliers',
+    icon: 'suppliers',
+    label: 'suppliers'
   },
   {
     title: 'Quotes',
