@@ -2,7 +2,7 @@
 
 ## Running migrations
 
-Add table in `prisma/schema.prisma` and run `npx prisma migrate -m [migration identifier message]`
+Add table in `prisma/schema.prisma` and run `npx prisma migrate -m [migration identifier message]`.
 
 ## Setup linting and formatting
 
