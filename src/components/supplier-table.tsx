@@ -61,7 +61,7 @@ const data: Payment[] = [
         email: "Silas22@gmail.com",
     },
     {
-        title: "Corwn Equipment Corporation",
+        title: "Crown Equipment Corporation",
         amount: 721,
         status: "active",
         email: "carmella@hotmail.com",
