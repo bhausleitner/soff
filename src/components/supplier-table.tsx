@@ -37,41 +37,41 @@ import {
 
 const data: Payment[] = [
     {
-        id: "m5gr84i9",
+        title: "Jungheinrich",
         amount: 316,
-        status: "success",
+        status: "active",
         email: "ken99@yahoo.com",
     },
     {
-        id: "3u1reuv4",
+        title: "Precision Tik",
         amount: 242,
-        status: "success",
+        status: "active",
         email: "Abe45@gmail.com",
     },
     {
-        id: "derv1ws0",
+        title: "Liebherr-International AG",
         amount: 837,
-        status: "processing",
+        status: "onboarding",
         email: "Monserrat44@gmail.com",
     },
     {
-        id: "5kma53ae",
+        title: "Andreas Stihl AG & Co",
         amount: 874,
-        status: "success",
+        status: "inactive",
         email: "Silas22@gmail.com",
     },
     {
-        id: "bhqecj4p",
+        title: "Corwn Equipment Corporation",
         amount: 721,
-        status: "failed",
+        status: "active",
         email: "carmella@hotmail.com",
     },
 ]
 
 export type Payment = {
-    id: string
+    title: string
     amount: number
-    status: "pending" | "processing" | "success" | "failed"
+    status: "active" | "onboarding" | "completed" | "inactive"
     email: string
 }
 
@@ -97,6 +97,13 @@ export const columns: ColumnDef<Payment>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+    },
+    {
+        accessorKey: "title",
+        header: "Title",
+        cell: ({ row }) => (
+            <div>{row.getValue("title")}</div>
+        )
     },
     {
         accessorKey: "status",
@@ -152,7 +159,7 @@ export const columns: ColumnDef<Payment>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(payment.id)}
+                            onClick={() => navigator.clipboard.writeText(payment.email)}
                         >
                             Copy payment ID
                         </DropdownMenuItem>
@@ -199,9 +206,9 @@ export function SupplierTable() {
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter supplier..."
-                    value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("title")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
