@@ -5,8 +5,11 @@ import Header from "./header"
 import { fontInter } from "~/constants/font"
 import Head from "next/head";
 
+import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs"
+
 
 export const PageLayout = (props: PropsWithChildren) => {
+  const user = useUser();
   return (
     <>
       <Head>
@@ -14,13 +17,17 @@ export const PageLayout = (props: PropsWithChildren) => {
         <meta name="description" content="Built somewhere inbetween Hayes & Glen Park" />
         <link rel="icon" href="/beaver.ico" />
       </Head>
-      <Header />
-      <div className={cn("flex h-screen overflow-hidden", fontInter.variable)}>
-        <Sidebar />
-        <main className="w-full pt-16 font-sans antialiased">
-          {props.children}
-        </main>
-      </div>
+      {!!user.isSignedIn &&
+        <>
+          <Header />
+          <div className={cn("flex h-screen overflow-hidden", fontInter.variable)}>
+            <Sidebar />
+            <main className="w-full pt-16 font-sans antialiased">
+              {props.children}
+            </main>
+          </div>
+        </>}
+      {!user.isSignedIn && <SignInButton />}
     </>
   )
 } 

@@ -12,9 +12,11 @@ import {
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu';
 import { useUser } from "@clerk/nextjs"
+import { useClerk } from '@clerk/nextjs'
 
 export function UserNav() {
   const user = useUser();
+  const { signOut } = useClerk();
 
   if (user) {
     return (
@@ -58,8 +60,7 @@ export function UserNav() {
             <DropdownMenuItem>New Team</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-          //   Todo specifc LogOut Functionality on click
+          <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/' })}
           >
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
