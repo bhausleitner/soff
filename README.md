@@ -12,8 +12,6 @@ Go to your `settings.json` in VSCODE and extend it with:
 
 ```json
 {
-    ...
     "editor.formatOnSave": true
-    ...
 }
 ```
