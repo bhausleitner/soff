@@ -4,7 +4,7 @@ import { NavItem } from "~/types/types";
 export const navItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: 'dashboard',
     label: 'Dashboard'
   },
@@ -25,11 +25,5 @@ export const navItems: NavItem[] = [
     href: '/notifications',
     icon: 'notifications',
     label: 'notifications'
-  },
-  {
-    title: 'Login',
-    href: '/login',
-    icon: 'login',
-    label: 'login'
   }
 ];

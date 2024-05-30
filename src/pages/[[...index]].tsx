@@ -2,15 +2,11 @@
 import { api } from "~/utils/api";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
-import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { Card, CardTitle, CardContent, CardHeader } from "~/components/ui/card"
 
 export default function Home() {
-  const hello = api.post.hello.useQuery({ text: "from tRPC" });
-  const user = useUser();
-  console.log("Rendering home component")
 
   return (
     <>
