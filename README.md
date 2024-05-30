@@ -15,3 +15,7 @@ Go to your `settings.json` in VSCODE and extend it with:
     "editor.formatOnSave": true
 }
 ```
+
+## Auth
+
+Using https://clerk.com/ for user authentication. Reach out for clerk user creds if necessary.
