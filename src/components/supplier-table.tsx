@@ -35,47 +35,44 @@ import {
     TableRow,
 } from "~/components/ui/table"
 
-const data: Payment[] = [
+import { api } from "~/utils/api";
+import { Supplier } from "~/server/api/routers/supplier"
+
+const data: Supplier[] = [
     {
         title: "Jungheinrich",
-        amount: 316,
-        status: "active",
+        status: "ACTIVE",
         email: "ken99@yahoo.com",
     },
     {
         title: "Precision Tik",
-        amount: 242,
-        status: "active",
+        status: "ACTIVE",
         email: "Abe45@gmail.com",
     },
     {
         title: "Liebherr-International AG",
-        amount: 837,
-        status: "onboarding",
+        status: "ONBOARDING",
         email: "Monserrat44@gmail.com",
     },
     {
         title: "Andreas Stihl AG & Co",
-        amount: 874,
-        status: "inactive",
+        status: "INACTIVE",
         email: "Silas22@gmail.com",
     },
     {
         title: "Crown Equipment Corporation",
-        amount: 721,
-        status: "active",
+        status: "ACTIVE",
         email: "carmella@hotmail.com",
     },
 ]
 
-export type Payment = {
-    title: string
-    amount: number
-    status: "active" | "onboarding" | "completed" | "inactive"
-    email: string
-}
+// export type Supplier = {
+//     title: string
+//     status: Status
+//     email: string
+// }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Supplier>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -109,7 +106,7 @@ export const columns: ColumnDef<Payment>[] = [
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("status")}</div>
+            <div>{row.getValue("status")}</div>
         ),
     },
     {
@@ -128,25 +125,10 @@ export const columns: ColumnDef<Payment>[] = [
         cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
     },
     {
-        accessorKey: "amount",
-        header: () => <div className="text-right">Amount</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("amount"))
-
-            // Format the amount as a dollar amount
-            const formatted = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-            }).format(amount)
-
-            return <div className="text-right font-medium">{formatted}</div>
-        },
-    },
-    {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const payment = row.original
+            const supplier = row.original
 
             return (
                 <DropdownMenu>
@@ -159,13 +141,13 @@ export const columns: ColumnDef<Payment>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(payment.email)}
+                            onClick={() => navigator.clipboard.writeText(supplier.email)}
                         >
                             Copy supplier Email
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>View supplier</DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
+                        <DropdownMenuItem>View supplier details</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
@@ -181,6 +163,9 @@ export function SupplierTable() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+
+    // const supplierData = api.supplier.debug.useQuery({ val: "great" });
+    const supplierData = api.supplier.getAllSuppliers.useQuery();
 
     const table = useReactTable({
         data,
