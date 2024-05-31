@@ -1,16 +1,16 @@
-import Link from "next/link";
+import { type Dispatch, type SetStateAction } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 import { Icons } from "~/components/icons";
 import { cn } from "~/lib/utils";
-import { NavItem } from "~/types/types";
-import { Dispatch, SetStateAction } from "react";
+import { type NavItem } from "~/types/types";
 import { useSidebar } from "~/hooks/useSidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from "~/components/ui/tooltip";
 
 interface DashboardNavProps {
@@ -22,7 +22,7 @@ interface DashboardNavProps {
 export function DashboardNav({
   items,
   setOpen,
-  isMobileNav = false,
+  isMobileNav = false
 }: DashboardNavProps) {
   const path = usePathname();
   const { isMinimized } = useSidebar();
@@ -47,7 +47,7 @@ export function DashboardNav({
                     className={cn(
                       "flex items-center gap-2 overflow-hidden rounded-md py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                       path === item.href ? "bg-accent" : "transparent",
-                      item.disabled && "cursor-not-allowed opacity-80",
+                      item.disabled && "cursor-not-allowed opacity-80"
                     )}
                     onClick={() => {
                       if (setOpen) setOpen(false);

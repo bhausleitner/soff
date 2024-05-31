@@ -1,4 +1,7 @@
 "use client";
+import { useUser } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
+import { startCase, toLower } from "lodash";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,11 +12,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu";
-import { useUser } from "@clerk/nextjs";
-import { useClerk } from "@clerk/nextjs";
-import { startCase, toLower } from "lodash";
 
 export function UserNav() {
   const user = useUser();

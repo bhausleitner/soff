@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import { DashboardNav } from "~/components/dashboard-nav";
 import { navItems } from "~/constants/data";
 import { cn } from "~/lib/utils";
-import { ChevronLeft } from "lucide-react";
 import { useSidebar } from "~/hooks/useSidebar";
 
 type SidebarProps = {
@@ -25,13 +25,13 @@ export default function Sidebar({ className }: SidebarProps) {
         `relative hidden h-screen border-r pt-20 md:block`,
         status && "duration-500",
         !isMinimized ? "w-72" : "w-[72px]",
-        className,
+        className
       )}
     >
       <ChevronLeft
         className={cn(
           "absolute -right-3 top-20 cursor-pointer rounded-full border bg-background text-3xl text-foreground",
-          !isMinimized && "rotate-180",
+          !isMinimized && "rotate-180"
         )}
         onClick={handleToggle}
       />

@@ -1,17 +1,10 @@
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedOut,
-  SignedIn,
-  SignIn,
-} from "@clerk/nextjs";
+import { ClerkProvider, SignedOut, SignedIn } from "@clerk/nextjs";
 import { type AppType } from "next/app";
-
+import Head from "next/head";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { PageLayout } from "~/components/layout/layout";
 import AuthenticationPage from "~/components/layout/auth-landing";
-import Head from "next/head";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
@@ -19,8 +12,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <ClerkProvider
         appearance={{
           elements: {
-            footer: "hidden",
-          },
+            footer: "hidden"
+          }
         }}
       >
         <Head>

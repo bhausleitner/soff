@@ -1,6 +1,3 @@
-import { api } from "~/utils/api";
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
-
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { Card, CardTitle, CardContent, CardHeader } from "~/components/ui/card";

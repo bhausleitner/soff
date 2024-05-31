@@ -17,8 +17,8 @@ import {
   LayoutDashboardIcon,
   Loader2,
   LogIn,
-  LucideIcon,
-  LucideProps,
+  type LucideIcon,
+  type LucideProps,
   Moon,
   MoreVertical,
   Pizza,
@@ -30,7 +30,7 @@ import {
   User,
   User2Icon,
   UserX2Icon,
-  X,
+  X
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -82,5 +82,5 @@ export const Icons = {
     </svg>
   ),
   twitter: Twitter,
-  check: Check,
+  check: Check
 };

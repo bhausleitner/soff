@@ -26,6 +26,11 @@ const config = {
             pattern: "react",
             group: "external",
             position: "before"
+          },
+          {
+            pattern: "next/.",
+            group: "external",
+            position: "after"
           }
         ],
         pathGroupsExcludedImportTypes: ["react"]
