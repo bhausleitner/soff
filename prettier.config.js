@@ -2,7 +2,8 @@
 const config = {
   plugins: [await import("prettier-plugin-tailwindcss")],
   tabWidth: 2,
-  singleQuote: false
+  singleQuote: false,
+  semi: true
 };
 
 export default config;
