@@ -1,8 +1,8 @@
-import type { PropsWithChildren } from "react"
-import { cn } from "~/lib/utils"
-import Sidebar from "./sidebar"
-import Header from "./header"
-import { fontInter } from "~/constants/font"
+import type { PropsWithChildren } from "react";
+import { cn } from "~/lib/utils";
+import Sidebar from "./sidebar";
+import Header from "./header";
+import { fontInter } from "~/constants/font";
 
 export const PageLayout = (props: PropsWithChildren) => {
   return (
@@ -15,5 +15,5 @@ export const PageLayout = (props: PropsWithChildren) => {
         </main>
       </div>
     </>
-  )
-} 
+  );
+};

@@ -1,6 +1,6 @@
-'use client';
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
+"use client";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +9,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuTrigger
-} from '~/components/ui/dropdown-menu';
-import { useUser } from "@clerk/nextjs"
-import { useClerk } from '@clerk/nextjs'
-import { startCase, toLower } from 'lodash';
-
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { useUser } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
+import { startCase, toLower } from "lodash";
 
 export function UserNav() {
   const user = useUser();
@@ -27,10 +26,12 @@ export function UserNav() {
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
               <AvatarImage
-                src={user?.user?.username ?? ''}
-                alt={user?.user?.username ?? ''}
+                src={user?.user?.username ?? ""}
+                alt={user?.user?.username ?? ""}
               />
-              <AvatarFallback>{startCase(toLower(user?.user?.username?.[0]))}</AvatarFallback>
+              <AvatarFallback>
+                {startCase(toLower(user?.user?.username?.[0]))}
+              </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -62,8 +63,7 @@ export function UserNav() {
             <DropdownMenuItem>New Team</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/' })}
-          >
+          <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>

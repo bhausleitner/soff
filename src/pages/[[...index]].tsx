@@ -1,13 +1,11 @@
-
 import { api } from "~/utils/api";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
-import { Card, CardTitle, CardContent, CardHeader } from "~/components/ui/card"
+import { Card, CardTitle, CardContent, CardHeader } from "~/components/ui/card";
 
 export default function Home() {
-
   return (
     <>
       <ScrollArea className="h-full">
@@ -20,9 +18,7 @@ export default function Home() {
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics">
-                Analytics
-              </TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -128,7 +124,6 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </div>
-
             </TabsContent>
             <TabsContent value="analytics" className="space-y-4">
               <p> Still building this one out</p>
