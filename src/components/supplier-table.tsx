@@ -12,6 +12,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { Status } from "@prisma/client";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -36,35 +37,6 @@ import {
 
 import { api } from "~/utils/api";
 import { type Supplier } from "~/server/api/routers/supplier";
-import { Status } from "@prisma/client";
-
-const supplierData: Supplier[] = [
-  {
-    title: "Jungheinrich",
-    status: Status.ACTIVE,
-    email: "ken99@yahoo.com"
-  },
-  {
-    title: "Precision Tik",
-    status: Status.ACTIVE,
-    email: "Abe45@gmail.com"
-  },
-  {
-    title: "Liebherr-International AG",
-    status: Status.ONBOARDING,
-    email: "Monserrat44@gmail.com"
-  },
-  {
-    title: "Andreas Stihl AG & Co",
-    status: Status.INACTIVE,
-    email: "Silas22@gmail.com"
-  },
-  {
-    title: "Crown Equipment Corporation",
-    status: Status.ACTIVE,
-    email: "carmella@hotmail.com"
-  }
-];
 
 export const columns: ColumnDef<Supplier>[] = [
   {
