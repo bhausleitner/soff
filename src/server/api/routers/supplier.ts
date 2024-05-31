@@ -6,7 +6,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 const supplierSchema = z.object({
   title: z.string(),
   status: z.nativeEnum(Status),
-  email: z.string().email(),
+  email: z.string().email()
 });
 
 const supplierArraySchema = z.array(supplierSchema);
@@ -21,13 +21,13 @@ export const supplierRouter = createTRPCRouter({
       select: {
         title: true,
         email: true,
-        status: true,
-      },
+        status: true
+      }
     });
     // validate data using schema
     supplierArraySchema.parse(supplierData);
 
     // return
     return supplierData;
-  }),
+  })
 });
