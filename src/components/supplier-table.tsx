@@ -109,6 +109,7 @@ export const columns: ColumnDef<Supplier>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View supplier</DropdownMenuItem>
             <DropdownMenuItem>View supplier details</DropdownMenuItem>
+            <DropdownMenuItem>New Order</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
