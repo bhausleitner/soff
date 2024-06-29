@@ -19,3 +19,11 @@ Go to your `settings.json` in VSCODE and extend it with:
 ## Auth
 
 Using https://clerk.com/ for user authentication. Reach out for clerk user creds if necessary.
+
+## Deployment
+
+Using https://vercel.com/soffs-projects/soff
+
+## Database
+
+Using https://supabase.com/dashboard/projects
