@@ -10,7 +10,7 @@ export const PageLayout = (props: PropsWithChildren) => {
       <Header />
       <div className={cn("flex h-screen overflow-hidden", fontInter.variable)}>
         <Sidebar />
-        <main className="w-full pt-16 font-sans antialiased">
+        <main className="w-full flex-1 overflow-y-auto pt-16 font-sans antialiased">
           {props.children}
         </main>
       </div>

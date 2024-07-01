@@ -1,8 +1,13 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
-import { ScrollArea } from "~/components/ui/scroll-area";
+import { useUser } from "@clerk/nextjs";
+import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
+import { userData } from "~/static/data";
 
 export default function Order() {
+  const user = useUser();
+  const [selectedUser, setSelectedUser] = useState(userData[0]);
   const router = useRouter();
   const { id } = router.query;
 
@@ -18,17 +23,16 @@ export default function Order() {
   });
 
   return (
-    <>
-      <ScrollArea>
-        <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Order</h2>
-          </div>
-          <div>
-            <p>This is the Supplier Name: {data?.title}</p>
-          </div>
-        </div>
-      </ScrollArea>
-    </>
+    <div className="flex h-full flex-col space-y-4 p-4 pt-6 md:p-8">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Order</h2>
+      </div>
+      <div>
+        <p>This is the Supplier Name: {data?.title}</p>
+      </div>
+      {selectedUser && (
+        <Chat messages={selectedUser.messages} selectedUser={selectedUser} />
+      )}
+    </div>
   );
 }
