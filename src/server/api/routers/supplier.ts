@@ -3,7 +3,8 @@ import { Status } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 // define schema
-const supplierSchema = z.object({
+export const supplierSchema = z.object({
+  id: z.number(),
   title: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email()
@@ -21,6 +22,7 @@ export const supplierRouter = createTRPCRouter({
     // fetch data from db
     const supplierData = await ctx.db.supplier.findMany({
       select: {
+        id: true,
         title: true,
         email: true,
         status: true
