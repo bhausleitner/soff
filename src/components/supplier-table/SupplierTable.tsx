@@ -11,8 +11,10 @@ import {
   getSortedRowModel,
   useReactTable
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/router";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { api } from "~/utils/api";
+import { SupplierAction } from "./SupplierAction";
+import { type Supplier } from "~/server/api/routers/supplier";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -20,9 +22,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
@@ -34,9 +33,6 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-
-import { api } from "~/utils/api";
-import { type Supplier } from "~/server/api/routers/supplier";
 
 export const columns: ColumnDef<Supplier>[] = [
   {
@@ -89,42 +85,7 @@ export const columns: ColumnDef<Supplier>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const supplier = row.original;
-
-      const router = useRouter();
-
-      const handleNavigation = (path: string) => {
-        router.push(path);
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(supplier.email)}
-            >
-              Copy supplier Email
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View supplier</DropdownMenuItem>
-            <DropdownMenuItem>View supplier details</DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => handleNavigation(`/order/${supplier.id}`)}
-            >
-              New Order
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
+    cell: ({ row }) => <SupplierAction row={row} />
   }
 ];
 

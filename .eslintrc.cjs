@@ -12,45 +12,6 @@ const config = {
     "prettier"
   ],
   rules: {
-    "import/order": [
-      "error",
-      {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          ["parent", "sibling", "index"]
-        ],
-        pathGroups: [
-          {
-            pattern: "~/static/data",
-            group: "internal",
-            position: "before"
-          },
-          {
-            pattern: "~/lib/utils",
-            group: "internal",
-            position: "before"
-          },
-          {
-            pattern: "../ui/button",
-            group: "internal",
-            position: "after"
-          },
-          {
-            pattern: "react",
-            group: "external",
-            position: "before"
-          },
-          {
-            pattern: "next/.",
-            group: "external",
-            position: "after"
-          }
-        ],
-        pathGroupsExcludedImportTypes: ["react"]
-      }
-    ],
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/consistent-type-imports": [

@@ -1,4 +1,4 @@
-import { SupplierTable } from "~/components/supplier-table";
+import { SupplierTable } from "~/components/supplier-table/SupplierTable";
 
 export default function Supplier() {
   return (

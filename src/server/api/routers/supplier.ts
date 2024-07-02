@@ -3,7 +3,7 @@ import { Status } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 // define schema
-const supplierSchema = z.object({
+export const supplierSchema = z.object({
   id: z.number(),
   title: z.string(),
   status: z.nativeEnum(Status),
