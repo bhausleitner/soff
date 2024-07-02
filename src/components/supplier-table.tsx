@@ -12,6 +12,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/router";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -91,6 +92,12 @@ export const columns: ColumnDef<Supplier>[] = [
     cell: ({ row }) => {
       const supplier = row.original;
 
+      const router = useRouter();
+
+      const handleNavigation = (path: string) => {
+        router.push(path);
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -109,7 +116,11 @@ export const columns: ColumnDef<Supplier>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View supplier</DropdownMenuItem>
             <DropdownMenuItem>View supplier details</DropdownMenuItem>
-            <DropdownMenuItem>New Order</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleNavigation(`/order/${supplier.id}`)}
+            >
+              New Order
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
