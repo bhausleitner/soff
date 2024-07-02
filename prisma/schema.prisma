@@ -34,6 +34,7 @@ model Supplier {
     contactPerson String
     email         String
     status        Status   @default(ACTIVE)
+    response_time Int
 
     @@index([title])
 }
