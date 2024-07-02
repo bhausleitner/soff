@@ -5,18 +5,16 @@ import {
   Paperclip,
   PlusCircle,
   SendHorizontal,
-  Smile,
   ThumbsUp
 } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { type Message, loggedInUserData } from "~/static/data";
+import { cn } from "~/lib/utils";
 import { buttonVariants } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { Input } from "../ui/input";
 import { EmojiPicker } from "./emoji-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "~/lib/utils";
-import { type Message, loggedInUserData } from "~/static/data";
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: Message) => void;

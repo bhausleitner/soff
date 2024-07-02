@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, AvatarImage } from "../ui/avatar";
 import { type Message, type UserData } from "~/static/data";
 import { cn } from "~/lib/utils";
+import { Avatar, AvatarImage } from "../ui/avatar";
 
 interface ChatListProps {
   messages?: Message[];

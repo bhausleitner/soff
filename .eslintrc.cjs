@@ -23,6 +23,21 @@ const config = {
         ],
         pathGroups: [
           {
+            pattern: "~/static/data",
+            group: "internal",
+            position: "before"
+          },
+          {
+            pattern: "~/lib/utils",
+            group: "internal",
+            position: "before"
+          },
+          {
+            pattern: "../ui/button",
+            group: "internal",
+            position: "after"
+          },
+          {
             pattern: "react",
             group: "external",
             position: "before"

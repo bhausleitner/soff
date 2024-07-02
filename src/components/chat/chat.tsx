@@ -1,10 +1,8 @@
 import React from "react";
+import { type Message, type UserData } from "~/static/data";
 import ChatTopbar from "./chat-topbar";
 import { ChatList } from "./chat-list";
 import ChatBottombar from "./chat-bottombar";
-import { Textarea } from "../ui/textarea";
-import { Input } from "../ui/input";
-import { type Message, type UserData } from "~/static/data";
 
 interface ChatProps {
   messages?: Message[];

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
+import { cn } from "~/lib/utils";
 import Header from "~/components/layout/header";
 import Sidebar from "~/components/layout/sidebar";
-import { cn } from "~/lib/utils";
 import { fontInter } from "~/constants/font";
 
 export const PageLayout = (props: PropsWithChildren) => {

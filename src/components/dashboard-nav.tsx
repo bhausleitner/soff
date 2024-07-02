@@ -2,8 +2,8 @@ import { type Dispatch, type SetStateAction } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-import { Icons } from "~/components/icons";
 import { cn } from "~/lib/utils";
+import { Icons } from "~/components/icons";
 import { type NavItem } from "~/types/types";
 import { useSidebar } from "~/hooks/useSidebar";
 import {

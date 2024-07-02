@@ -1,10 +1,10 @@
 import React from "react";
 import { Info, Phone, Video } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { buttonVariants } from "../ui/button";
 import { type UserData } from "~/static/data";
 import { cn } from "~/lib/utils";
+import { buttonVariants } from "../ui/button";
+import { Avatar, AvatarImage } from "../ui/avatar";
 
 interface ChatTopbarProps {
   selectedUser: UserData;

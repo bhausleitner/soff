@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
-import { fontInter } from "~/constants/font";
 import { cn } from "~/lib/utils";
+import { fontInter } from "~/constants/font";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -28,7 +28,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
       "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 font-sans text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
       fontInter.variable,
       inset && "pl-8",
-      className,
+      className
     )}
     {...props}
   >
@@ -48,7 +48,7 @@ const DropdownMenuSubContent = React.forwardRef<
     className={cn(
       "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 font-sans text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       fontInter.variable,
-      className,
+      className
     )}
     {...props}
   />
@@ -67,7 +67,7 @@ const DropdownMenuContent = React.forwardRef<
       className={cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 font-sans text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         fontInter.variable,
-        className,
+        className
       )}
       {...props}
     />
@@ -87,7 +87,7 @@ const DropdownMenuItem = React.forwardRef<
       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 font-sans text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       fontInter.variable,
-      className,
+      className
     )}
     {...props}
   />
@@ -103,7 +103,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 font-sans text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       fontInter.variable,
-      className,
+      className
     )}
     checked={checked}
     {...props}
@@ -128,7 +128,7 @@ const DropdownMenuRadioItem = React.forwardRef<
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 font-sans text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       fontInter.variable,
-      className,
+      className
     )}
     {...props}
   >
@@ -154,7 +154,7 @@ const DropdownMenuLabel = React.forwardRef<
       "px-2 py-1.5 font-sans text-sm font-semibold",
       inset && "pl-8",
       fontInter.variable,
-      className,
+      className
     )}
     {...props}
   />
@@ -170,7 +170,7 @@ const DropdownMenuSeparator = React.forwardRef<
     className={cn(
       "-mx-1 my-1 h-px bg-muted font-sans",
       fontInter.variable,
-      className,
+      className
     )}
     {...props}
   />
@@ -186,7 +186,7 @@ const DropdownMenuShortcut = ({
       className={cn(
         "ml-auto font-sans text-xs tracking-widest opacity-60",
         fontInter.variable,
-        className,
+        className
       )}
       {...props}
     />
@@ -209,5 +209,5 @@ export {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
+  DropdownMenuRadioGroup
 };

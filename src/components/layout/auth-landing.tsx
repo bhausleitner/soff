@@ -1,11 +1,11 @@
 import { SignIn } from "@clerk/nextjs";
-import { Metadata } from "next";
-import { fontInter } from "~/constants/font";
+import type { Metadata } from "next";
 import { cn } from "~/lib/utils";
+import { fontInter } from "~/constants/font";
 
 export const metadata: Metadata = {
   title: "Authentication",
-  description: "Authentication forms built using the components.",
+  description: "Authentication forms built using the components."
 };
 
 export default function AuthenticationPage() {
@@ -13,7 +13,7 @@ export default function AuthenticationPage() {
     <div
       className={cn(
         "relative h-screen flex-col items-center justify-center font-sans md:grid lg:max-w-none lg:grid-cols-2 lg:px-0",
-        fontInter.variable,
+        fontInter.variable
       )}
     >
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">

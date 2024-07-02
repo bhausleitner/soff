@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { useUser } from "@clerk/nextjs";
+import { userData } from "~/static/data";
 import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
-import { userData } from "~/static/data";
 
 export default function Order() {
-  const user = useUser();
   const [selectedUser, setSelectedUser] = useState(userData[0]);
   const router = useRouter();
   const { id } = router.query;
