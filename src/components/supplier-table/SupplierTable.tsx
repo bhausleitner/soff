@@ -51,7 +51,7 @@ export const columns: ColumnDef<Supplier>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select rows"
+        aria-label="Select row"
       />
     ),
     enableSorting: false,
