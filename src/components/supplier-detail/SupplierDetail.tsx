@@ -10,7 +10,7 @@ export function SupplierDetail({ supplierId }: SupplierDetailProps) {
   // const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({ supplierId});
 
   const data = {
-    title: "Supplier 1",
+    title: "Example Supplier",
     email: "supplier.email",
     status: "Active",
     response_time: 5
@@ -36,12 +36,12 @@ export function SupplierDetail({ supplierId }: SupplierDetailProps) {
             <CardTitle className="text-sm font-medium">{data.title}</CardTitle>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-xs text-muted-foreground">Email: {data.email}</p>
             <p className="text-xs text-muted-foreground">
               Status: {data.status}
             </p>
+            <p className="text-xs text-muted-foreground">Supplier grade: A</p>
             <p className="text-xs text-muted-foreground">
-              Response Time: {data.response_time ?? "N/A"}
+              Response Time: {data.response_time ?? "N/A"}h
             </p>
           </CardContent>
         </Card>
@@ -49,19 +49,33 @@ export function SupplierDetail({ supplierId }: SupplierDetailProps) {
       <div className="flex flex-col">
         <Card className="flex h-full flex-col">
           <CardHeader className="flex flex-row items-center">
-            <CardTitle className="text-sm font-medium">
-              Certifications
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Communication</CardTitle>
           </CardHeader>
-          <CardContent className="flex-grow"></CardContent>
+          <CardContent className="flex-grow">
+            <p className="text-xs text-muted-foreground">
+              Email: example.n@email.com
+            </p>
+            <p className="text-xs text-muted-foreground">Phone: 123-456-7890</p>
+            <p className="text-xs text-muted-foreground">
+              Address: 123 Main St
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Communication history
+            </p>
+          </CardContent>
         </Card>
       </div>
       <div className="flex flex-col">
         <Card className="flex h-full flex-col">
           <CardHeader className="flex flex-row items-center">
-            <CardTitle className="text-sm font-medium"></CardTitle>
+            <CardTitle className="text-sm font-medium">Documents</CardTitle>
           </CardHeader>
-          <CardContent className="flex-grow"></CardContent>
+          <CardContent className="flex-grow">
+            <p className="text-xs text-muted-foreground">NDA</p>
+            <p className="text-xs text-muted-foreground">Terms & Conditions</p>
+            <p className="text-xs text-muted-foreground">Billing history</p>
+            <p className="text-xs text-muted-foreground">Certificates</p>
+          </CardContent>
         </Card>
       </div>
     </div>
