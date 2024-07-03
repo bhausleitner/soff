@@ -1,8 +1,16 @@
 
+import React from "react";
 import { SupplierDetail } from "../../components/supplier-detail/SupplierDetail";
 
-export default function Supplier() {
+
+
+const Supplier = () => {
+
+  const supplierId = 4;
+
   return (
-        <SupplierDetail />
+        <SupplierDetail supplierId={supplierId} />
   );
 }
+
+export default Supplier;
