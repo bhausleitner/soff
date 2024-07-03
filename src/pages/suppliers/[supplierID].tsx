@@ -7,16 +7,16 @@ import { SupplierDetail } from "../../components/supplier-detail/SupplierDetail"
 
 const SupplierPage = () => {
   const router = useRouter();
-  const {supplierID} = router.query;
+  const {supplierId} = router.query;
 
-  if (!supplierID) {
+  if (!supplierId) {
     return <p>Loading...</p>;
   }
 
-  const supplierId = parseInt(supplierID as string, 10);
+  const supplierID = parseInt(supplierId as string, 10);
 
   return (
-        <SupplierDetail supplierId={supplierId} />
+        <SupplierDetail supplierId={supplierID} />
   );
 }
 
