@@ -1,11 +1,22 @@
-import { Card } from "~/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 export function SupplierDetail() {
   return (
-    <Card>
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Supplier Detail </h2>
-      </div>
-    </Card>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center ">
+          <CardTitle className="text-sm font-medium">
+            Total Revenue
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-muted-foreground">
+            Testing this
+          </p>
+        </CardContent>
+      </Card>
+    </>
+    
   );
 }
