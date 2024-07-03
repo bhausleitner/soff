@@ -1,17 +1,20 @@
+import React, { useState, useEffect } from "react";
 import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState
+  useReactTable
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { api } from "~/utils/api";
+import { SupplierAction } from "./SupplierAction";
+import { type Supplier } from "~/server/api/routers/supplier";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -30,9 +33,6 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import { type Supplier } from "~/server/api/routers/supplier";
-import { api } from "~/utils/api";
-import { SupplierAction } from "./SupplierAction";
 
 export const columns: ColumnDef<Supplier>[] = [
   {
