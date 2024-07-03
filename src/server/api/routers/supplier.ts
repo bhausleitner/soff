@@ -8,7 +8,7 @@ export const supplierSchema = z.object({
   title: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email(),
-  response_time: z.number(),
+  response_time: z.number().nullable(),
 });
 
 const supplierArraySchema = z.array(supplierSchema);
