@@ -62,8 +62,8 @@ export const columns: ColumnDef<Supplier>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => (
-      <Link legacyBehavior href={`/suppliers/${row.original.id}`} >
-        <a className="text-blue-600 hover:text-blue-800">{row.getValue("title")}</a>
+      <Link href={`/suppliers/${row.original.id}`} >
+        {row.getValue("title")}
       </Link>
     )
   },
