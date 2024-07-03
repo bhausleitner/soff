@@ -27,7 +27,7 @@ export function SupplierDetail({supplierId}: SupplierDetailProps) {
       <Card>
         <CardHeader className="flex flex-row items-center ">
           <CardTitle className="text-sm font-medium">
-            Total Revenue
+            Supplier
           </CardTitle>
         </CardHeader>
         <CardContent>
