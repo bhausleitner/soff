@@ -59,9 +59,19 @@ export const columns: ColumnDef<Supplier>[] = [
     enableHiding: false
   },
   {
+<<<<<<< HEAD
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => <div>{row.getValue("name")}</div>
+=======
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => (
+      <Link href={`/suppliers/${row.original.id}`} className="text-blue-600 hover:text-blue-800">
+        {row.getValue("title")}
+      </Link>
+    )
+>>>>>>> ce3f01d (changed [supplierID] to [supplierId])
   },
   {
     accessorKey: "status",
