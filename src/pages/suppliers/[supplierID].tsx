@@ -16,7 +16,12 @@ const SupplierPage = () => {
   const supplierID = parseInt(supplierId as string, 10);
 
   return (
+    <>
+      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
         <SupplierDetail supplierId={supplierID} />
+      </div>
+    </>
+        
   );
 }
 
