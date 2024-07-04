@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -71,6 +72,7 @@ export const columns: ColumnDef<Supplier>[] = [
     accessorKey: "title",
     header: "Title",
 <<<<<<< HEAD
+<<<<<<< HEAD
     cell: ({ row }) => (
       <Link href={`/suppliers/${row.original.id}`} className="text-blue-600 hover:text-blue-800">
         {row.getValue("title")}
@@ -80,6 +82,17 @@ export const columns: ColumnDef<Supplier>[] = [
 =======
     cell: ({ row }) => <div>{row.getValue("title")}</div>
 >>>>>>> 546ed01 (playing with flexboxes)
+=======
+    cell: ({ row }) => (
+      <Link
+        href={`/suppliers/${row.original.id}`}
+        passHref
+        className="text-blue-600 hover:text-blue-800"
+      >
+        {row.getValue("title")}
+      </Link>
+    )
+>>>>>>> 7425426 (make suppliers in table clickable)
   },
   {
     accessorKey: "status",
