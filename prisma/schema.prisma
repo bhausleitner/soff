@@ -38,3 +38,14 @@ model Supplier {
 
     @@index([title])
 }
+
+model Part {
+  id         Int      @id @default(autoincrement())
+  partNumber String   @map("Part Number")
+  partName   String   @map("Part Name")
+  supplier   String
+  price      Float
+  cadFile    String   @map("CAD file")
+
+  @@index([supplier])
+}
