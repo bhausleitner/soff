@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 =======
 import { api } from "~/utils/api";
 import { SupplierAction } from "./SupplierAction";
+import { SupplierLink } from "./SupplierLink";
 import { type Supplier } from "~/server/api/routers/supplier";
 >>>>>>> 546ed01 (playing with flexboxes)
 import Spinner from "~/components/spinner";
@@ -73,6 +74,7 @@ export const columns: ColumnDef<Supplier>[] = [
     header: "Title",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     cell: ({ row }) => (
       <Link href={`/suppliers/${row.original.id}`} className="text-blue-600 hover:text-blue-800">
         {row.getValue("title")}
@@ -93,6 +95,9 @@ export const columns: ColumnDef<Supplier>[] = [
       </Link>
     )
 >>>>>>> 7425426 (make suppliers in table clickable)
+=======
+    cell: ({ row }) => <SupplierLink row={row} />
+>>>>>>> 43e99d4 (added SupplierLink to remove Link usage and use handleNavigation)
   },
   {
     accessorKey: "status",
