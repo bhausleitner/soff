@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { SupplierDetail } from "../../components/supplier-detail/SupplierDetail";
+import { SupplierInfo } from "../../components/supplier-detail/SupplierInfo";
 import { api } from "~/utils/api";
 
 import {
@@ -55,7 +55,7 @@ const SupplierPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <SupplierDetail data={data} />
+      <SupplierInfo data={data} />
     </div>
   );
 };

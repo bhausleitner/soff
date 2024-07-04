@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
-interface SupplierDetailProps {
+interface SupplierInfoProps {
   data: {
     title: string;
     email: string;
@@ -10,7 +10,7 @@ interface SupplierDetailProps {
   };
 }
 
-export function SupplierDetail({ data }: SupplierDetailProps) {
+export function SupplierInfo({ data }: SupplierInfoProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="flex flex-col">
