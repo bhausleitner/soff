@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { SupplierDetail } from "../../components/supplier-detail/SupplierDetail";
+import { api } from "~/utils/api";
 
 import {
   Breadcrumb,
@@ -21,27 +22,41 @@ const SupplierPage = () => {
 
   const supplierID = parseInt(supplierId as string, 10);
 
+  const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({
+    supplierId: supplierID
+  });
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
+
+  if (!data) {
+    return <p>No supplier found.</p>;
+  }
+
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/components">Suppliers</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <SupplierDetail supplierId={supplierID} />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/components">Suppliers</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{data.title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <SupplierDetail data={data} />
+    </div>
   );
 };
 
