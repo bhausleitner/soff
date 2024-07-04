@@ -7,7 +7,8 @@ export const supplierSchema = z.object({
   id: z.number(),
   title: z.string(),
   status: z.nativeEnum(Status),
-  email: z.string().email()
+  email: z.string().email(),
+  response_time: z.number().nullable()
 });
 
 const supplierArraySchema = z.array(supplierSchema);
@@ -25,7 +26,8 @@ export const supplierRouter = createTRPCRouter({
         id: true,
         title: true,
         email: true,
-        status: true
+        status: true,
+        response_time: true
       }
     });
     // validate data using schema
