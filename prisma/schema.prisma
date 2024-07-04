@@ -50,14 +50,3 @@ model Part {
 
   @@index([partName])
 }
-
-model Part {
-    id         Int        @id @default(autoincrement())
-    partNumber String?
-    partName   String
-    price      Float?
-    cadFile    String?
-    suppliers  Supplier[] @relation("SupplierParts")
-
-    @@index([partName])
-}
