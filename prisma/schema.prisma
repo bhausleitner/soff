@@ -40,12 +40,12 @@ model Supplier {
 }
 
 model Part {
-  id         Int      @id @default(autoincrement())
-  partNumber String   @map("Part Number")
-  partName   String   @map("Part Name")
-  supplier   String
-  price      Float
-  cadFile    String   @map("CAD file")
+  id         Int            @id @default(autoincrement())
+  partNumber String?
+  partName   String
+  price      Float?
+  cadFile    String?
+  suppliers  Supplier[]     @relation("SupplierParts")
 
-  @@index([supplier])
+  @@index([partName])
 }
