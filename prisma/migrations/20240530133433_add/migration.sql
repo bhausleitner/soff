@@ -20,7 +20,6 @@ CREATE TABLE "Supplier" (
     "contactPerson" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
-    "response_time" INTEGER DEFAULT 48,
 
     CONSTRAINT "Supplier_pkey" PRIMARY KEY ("id")
 );
