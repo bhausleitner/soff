@@ -7,26 +7,21 @@ interface SupplierDetailProps {
 }
 
 export function SupplierDetail({ supplierId }: SupplierDetailProps) {
-  // const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({ supplierId});
+  const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({
+    supplierId
+  });
 
-  const data = {
-    title: "Example Supplier",
-    email: "supplier.email",
-    status: "Active",
-    response_time: 5
-  };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
-  // if (isLoading) {
-  //   return <p>Loading...</p>;
-  // }
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
 
-  // if (error) {
-  //   return <p>Error: {error.message}</p>;
-  // }
-
-  // if (!data) {
-  //   return <p>No supplier found.</p>;
-  // }
+  if (!data) {
+    return <p>No supplier found.</p>;
+  }
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -52,9 +47,7 @@ export function SupplierDetail({ supplierId }: SupplierDetailProps) {
             <CardTitle className="text-sm font-medium">Communication</CardTitle>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-xs text-muted-foreground">
-              Email: example.n@email.com
-            </p>
+            <p className="text-xs text-muted-foreground">Email: {data.email}</p>
             <p className="text-xs text-muted-foreground">Phone: 123-456-7890</p>
             <p className="text-xs text-muted-foreground">
               Address: 123 Main St
