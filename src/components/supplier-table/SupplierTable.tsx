@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -60,7 +61,15 @@ export const columns: ColumnDef<Supplier>[] = [
   {
     accessorKey: "title",
     header: "Title",
-    cell: ({ row }) => <div>{row.getValue("title")}</div>
+    cell: ({ row }) => (
+      <Link
+        href={`/suppliers/${row.original.id}`}
+        passHref
+        className="text-blue-600 hover:text-blue-800"
+      >
+        {row.getValue("title")}
+      </Link>
+    )
   },
   {
     accessorKey: "status",

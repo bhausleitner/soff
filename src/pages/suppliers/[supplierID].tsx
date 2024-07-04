@@ -47,7 +47,7 @@ const SupplierPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/components">Suppliers</BreadcrumbLink>
+            <BreadcrumbLink href="/suppliers">Suppliers</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
