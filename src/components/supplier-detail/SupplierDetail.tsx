@@ -1,28 +1,16 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { api } from "~/utils/api";
 
 interface SupplierDetailProps {
-  supplierId: number;
+  data: {
+    title: string;
+    email: string;
+    status: string;
+    response_time?: number;
+  };
 }
 
-export function SupplierDetail({ supplierId }: SupplierDetailProps) {
-  const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({
-    supplierId
-  });
-
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
-
-  if (!data) {
-    return <p>No supplier found.</p>;
-  }
-
+export function SupplierDetail({ data }: SupplierDetailProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="flex flex-col">
