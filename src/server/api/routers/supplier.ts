@@ -1,5 +1,5 @@
-import { Status } from "@prisma/client";
 import { z } from "zod";
+import { Status } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 // define schema
@@ -8,7 +8,7 @@ export const supplierSchema = z.object({
   title: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email(),
-  response_time: z.number().nullable(),
+  response_time: z.number().nullable()
 });
 
 const supplierArraySchema = z.array(supplierSchema);
@@ -27,7 +27,7 @@ export const supplierRouter = createTRPCRouter({
         title: true,
         email: true,
         status: true,
-        response_time: true,
+        response_time: true
       }
     });
     // validate data using schema
