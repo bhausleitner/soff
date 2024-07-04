@@ -15,6 +15,7 @@ import {
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { api } from "~/utils/api";
 import { SupplierAction } from "./SupplierAction";
+import { SupplierLink } from "./SupplierLink";
 import { type Supplier } from "~/server/api/routers/supplier";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
@@ -61,15 +62,7 @@ export const columns: ColumnDef<Supplier>[] = [
   {
     accessorKey: "title",
     header: "Title",
-    cell: ({ row }) => (
-      <Link
-        href={`/suppliers/${row.original.id}`}
-        passHref
-        className="text-blue-600 hover:text-blue-800"
-      >
-        {row.getValue("title")}
-      </Link>
-    )
+    cell: ({ row }) => <SupplierLink row={row} />
   },
   {
     accessorKey: "status",
