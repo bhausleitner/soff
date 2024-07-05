@@ -6,7 +6,7 @@ interface SupplierInfoProps {
     title: string;
     email: string;
     status: string;
-    responseTime?: number;
+    responseTime?: number | null;
   };
 }
 
