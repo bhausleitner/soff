@@ -1,6 +1,16 @@
 import { useRouter } from "next/router";
+import { type z } from "zod";
 
-export function SupplierLink({ row }) {
+import { type supplierSchema } from "~/server/api/routers/supplier";
+type SupplierType = z.infer<typeof supplierSchema>;
+
+interface SupplierLinkProps {
+  row: {
+    original: SupplierType;
+  };
+}
+
+export function SupplierLink({ row }: SupplierLinkProps) {
   const supplier = row.original;
   const router = useRouter();
 
