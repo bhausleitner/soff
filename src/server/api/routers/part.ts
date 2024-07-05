@@ -11,8 +11,6 @@ export const partSchema = z.object({
 
 export const partArraySchema = z.array(partSchema);
 
-const supplierIdSchema = z.object({ supplierId: z.number() });
-
 // infer type from schema to keep frontend aligned
 export type Part = z.infer<typeof partSchema>;
 
@@ -28,6 +26,7 @@ export const partRouter = createTRPCRouter({
         cadFile: true
       }
     });
+
     // validate data using schema
     partArraySchema.parse(partsData);
 
