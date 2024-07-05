@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { type Message, type UserData } from "~/static/data";
 import { cn } from "~/lib/utils";
@@ -7,12 +7,13 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 interface ChatListProps {
   messages?: Message[];
   selectedUser: UserData;
+  isSending: boolean;
 }
 
-export function ChatList({ messages, selectedUser }: ChatListProps) {
+export function ChatList({ messages, selectedUser, isSending }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
@@ -58,9 +59,12 @@ export function ChatList({ messages, selectedUser }: ChatListProps) {
                     />
                   </Avatar>
                 )}
-                <span className="max-w-xs rounded-md bg-accent p-3">
+                {!isSending && <span className="max-w-xs rounded-md bg-accent p-3">
                   {message.message}
-                </span>
+                </span>}
+                {isSending && <span className="max-w-xs rounded-md bg-cyan-600 p-3">
+                  {message.message}
+                </span>}
                 {message.name !== selectedUser.name && (
                   <Avatar className="flex items-center justify-center">
                     <AvatarImage
