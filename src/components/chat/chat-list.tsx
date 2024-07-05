@@ -7,10 +7,9 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 interface ChatListProps {
   messages?: Message[];
   selectedUser: UserData;
-  isSending: boolean;
 }
 
-export function ChatList({ messages, selectedUser, isSending }: ChatListProps) {
+export function ChatList({ messages, selectedUser }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,16 +58,9 @@ export function ChatList({ messages, selectedUser, isSending }: ChatListProps) {
                     />
                   </Avatar>
                 )}
-                {!isSending && (
-                  <span className="max-w-xs rounded-md bg-accent p-3">
-                    {message.message}
-                  </span>
-                )}
-                {isSending && (
-                  <span className="max-w-xs rounded-md bg-cyan-600 p-3">
-                    {message.message}
-                  </span>
-                )}
+                <span className="max-w-xs rounded-md bg-accent p-3">
+                  {message.message}
+                </span>
                 {message.name !== selectedUser.name && (
                   <Avatar className="flex items-center justify-center">
                     <AvatarImage

@@ -7,8 +7,11 @@ export const chatRouter = createTRPCRouter({
   sendChat: publicProcedure.input(messageSchema).mutation(async ({ input }) => {
     console.log(`Received message: ${input.message}`);
     await new Promise((resolve) => {
-      setTimeout(resolve, 5000); // 5 seconds delay
+      setTimeout(resolve, 1000); // 1 seconds delay
     });
-    return "OK";
+    if (input.message === "fail") {
+      throw Error;
+    }
+    return { success: true };
   })
 });

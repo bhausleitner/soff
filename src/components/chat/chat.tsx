@@ -4,6 +4,9 @@ import ChatTopbar from "./chat-topbar";
 import { ChatList } from "./chat-list";
 import ChatBottombar from "./chat-bottombar";
 import { api } from "~/utils/api";
+import { toast } from "sonner";
+import { getCurrentDateTime } from "~/utils/time";
+import { ensureError } from "~/utils/errorHandling";
 
 interface ChatProps {
   messages?: Message[];
@@ -11,25 +14,34 @@ interface ChatProps {
 }
 
 export function Chat({ messages, selectedUser }: ChatProps) {
-  const [messagesState, setMessages] = useState<Message[]>(
-    messages ?? []
-  );
-  const [ isSending, setIsSending ] = useState<boolean>(false);
+  const [messagesState, setMessages] = useState<Message[]>(messages ?? []);
 
   // Initialize Mutation
   const sendChat = api.chat.sendChat.useMutation();
 
   const sendMessage = async (newMessage: Message) => {
-    setIsSending(true);
     setMessages([...messagesState, newMessage]);
-    await sendChat.mutateAsync(newMessage)
-    setIsSending(false);
+    try {
+      const sendChatPromise = sendChat.mutateAsync(newMessage);
+
+      toast.promise(sendChatPromise, {
+        loading: "Sending E-Mail...",
+        success: "E-Mail sent!",
+        error: "Failed sending E-Mail. Please try again.",
+        description: getCurrentDateTime()
+      });
+
+      await sendChatPromise;
+    } catch (err) {
+      const error = ensureError(err);
+      console.error("Catched the error", error);
+    }
   };
 
   return (
     <>
       <ChatTopbar selectedUser={selectedUser} />
-      <ChatList messages={messagesState} selectedUser={selectedUser} isSending={isSending} />
+      <ChatList messages={messagesState} selectedUser={selectedUser} />
       <ChatBottombar sendMessage={sendMessage} />
     </>
   );
