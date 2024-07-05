@@ -25,49 +25,6 @@ export const userData = [
         name: "Jane Doe",
         message: "How are you?"
       },
-      {
-        id: 4,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jakob Hoeg",
-        message: "I am good, you?"
-      },
-      {
-        id: 5,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jane Doe",
-        message: "I am good too!"
-      },
-      {
-        id: 6,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jakob Hoeg",
-        message: "That is good to hear!"
-      },
-      {
-        id: 7,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jane Doe",
-        message: "How has your day been so far?"
-      },
-      {
-        id: 8,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jakob Hoeg",
-        message:
-          "It has been good. I went for a run this morning and then had a nice breakfast. How about you?"
-      },
-      {
-        id: 9,
-        avatar:
-          "https://gravatar.com/avatar/cdcee25bb6af17a4dd96bde5beec31dd?s=400&d=robohash&r=x",
-        name: "Jane Doe",
-        message: "I had a relaxing day. Just catching up on some reading."
-      }
     ],
     name: "Jane Doe"
   },

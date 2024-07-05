@@ -5,7 +5,7 @@ import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
 
 export default function Order() {
-  const [selectedUser, setSelectedUser] = useState(userData[0]);
+  const [selectedUser] = useState(userData[0]);
   const router = useRouter();
   const { id } = router.query;
 
@@ -16,7 +16,7 @@ export default function Order() {
     return <div>Invalid Supplier ID</div>;
   }
 
-  const { data, isLoading } = api.supplier.getSupplierById.useQuery({
+  const { data } = api.supplier.getSupplierById.useQuery({
     supplierId
   });
 
