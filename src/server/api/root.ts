@@ -1,6 +1,7 @@
 import { supplierRouter } from "~/server/api/routers/supplier";
 import { chatRouter } from "~/server/api/routers/chat";
 import { postRouter } from "~/server/api/routers/post";
+import { partRouter } from "~/server/api/routers/part";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
