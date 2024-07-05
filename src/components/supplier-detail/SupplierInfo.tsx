@@ -6,7 +6,7 @@ interface SupplierInfoProps {
     title: string;
     email: string;
     status: string;
-    response_time?: number;
+    responseTime?: number;
   };
 }
 
@@ -24,7 +24,7 @@ export function SupplierInfo({ data }: SupplierInfoProps) {
             </p>
             <p className="text-xs text-muted-foreground">Supplier grade: A</p>
             <p className="text-xs text-muted-foreground">
-              Response Time: {data.response_time ?? "N/A"}h
+              Response Time: {data.responseTime ?? "N/A"}h
             </p>
           </CardContent>
         </Card>
