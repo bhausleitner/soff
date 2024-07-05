@@ -35,7 +35,7 @@ model Supplier {
     email         String
     status        Status   @default(ACTIVE)
     responseTime  Int?     @default(48)
-    parts         Part[]   @relation("SupplierParts")
+    parts         SupplierPart[]  
 
     @@index([title])
 }
@@ -46,7 +46,16 @@ model Part {
   partName   String
   price      Float?
   cadFile    String?
-  suppliers  Supplier[]     @relation("SupplierParts")
+  suppliers  SupplierPart[]     
 
   @@index([partName])
+}
+
+model SupplierPart {
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId Int
+  part       Part @relation(fields: [partId], references: [id])
+  partId     Int
+
+  @@id([supplierId, partId])
 }
