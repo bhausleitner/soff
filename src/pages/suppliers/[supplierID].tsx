@@ -12,7 +12,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "~/components/ui/breadcrumb";
-import Supplier from ".";
 
 const SupplierPage = () => {
   const router = useRouter();
