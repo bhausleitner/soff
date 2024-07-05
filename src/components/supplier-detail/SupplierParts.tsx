@@ -13,9 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { api } from "~/utils/api";
-import { SupplierAction } from "~/components/supplier-table/SupplierAction";
-import { SupplierLink } from "~/components/supplier-table/SupplierLink";
-import { type Supplier } from "~/server/api/routers/supplier";
+import { type Part } from "~/server/api/routers/part";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -35,7 +33,7 @@ import {
   TableRow
 } from "~/components/ui/table";
 
-export const columns: ColumnDef<Supplier>[] = [
+export const columns: ColumnDef<Part>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -59,34 +57,9 @@ export const columns: ColumnDef<Supplier>[] = [
     enableHiding: false
   },
   {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => <SupplierLink row={row} />
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <div>{row.getValue("status")}</div>
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => <SupplierAction row={row} />
+    accessorKey: "partName",
+    header: "Part Name",
+    cell: ({ row }) => <div>{row.getValue("partName")}</div>
   }
 ];
 
@@ -95,9 +68,9 @@ export function SupplierParts() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [tableData, setTableData] = useState<Supplier[]>([]);
+  const [tableData, setTableData] = useState<Part[]>([]);
 
-  const { data, isLoading } = api.supplier.getAllSuppliers.useQuery();
+  const { data, isLoading } = api.part.partsBySupplier.useQuery();
 
   useEffect(() => {
     if (data) {
@@ -128,7 +101,7 @@ export function SupplierParts() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter supplier..."
+          placeholder="Filter part..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("title")?.setFilterValue(event.target.value)
