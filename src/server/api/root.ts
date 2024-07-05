@@ -12,7 +12,8 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   supplier: supplierRouter,
-  chat: chatRouter
+  chat: chatRouter,
+  part: partRouter
 });
 
 // export type definition of API
