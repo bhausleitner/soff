@@ -59,12 +59,16 @@ export function ChatList({ messages, selectedUser, isSending }: ChatListProps) {
                     />
                   </Avatar>
                 )}
-                {!isSending && <span className="max-w-xs rounded-md bg-accent p-3">
-                  {message.message}
-                </span>}
-                {isSending && <span className="max-w-xs rounded-md bg-cyan-600 p-3">
-                  {message.message}
-                </span>}
+                {!isSending && (
+                  <span className="max-w-xs rounded-md bg-accent p-3">
+                    {message.message}
+                  </span>
+                )}
+                {isSending && (
+                  <span className="max-w-xs rounded-md bg-cyan-600 p-3">
+                    {message.message}
+                  </span>
+                )}
                 {message.name !== selectedUser.name && (
                   <Avatar className="flex items-center justify-center">
                     <AvatarImage
