@@ -23,7 +23,7 @@ export function SupplierLink({ row }: SupplierLinkProps) {
       onClick={handleNavigation}
       className="cursor-pointer text-blue-600 hover:text-blue-800"
     >
-      {supplier.title}
+      {supplier.name}
     </p>
   );
 }

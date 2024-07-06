@@ -9,10 +9,10 @@ import {
 } from "~/components/ui/breadcrumb";
 
 interface SupplierBreadcrumbProps {
-  supplierName: string;
+  name: string;
 }
 
-export function SupplierBreadcrumb({ supplierName }: SupplierBreadcrumbProps) {
+export function SupplierBreadcrumb({ name }: SupplierBreadcrumbProps) {
   return (
     <>
       <Breadcrumb>
@@ -26,7 +26,7 @@ export function SupplierBreadcrumb({ supplierName }: SupplierBreadcrumbProps) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{supplierName}</BreadcrumbPage>
+            <BreadcrumbPage>{name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

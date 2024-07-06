@@ -3,7 +3,7 @@ import { SupplierInfoCard } from "./SupplierInfoCard";
 
 interface SupplierInfoProps {
   data: {
-    supplierName: string;
+    name: string;
     email: string;
     status: string;
     responseTime?: number | null;
@@ -14,7 +14,7 @@ export function SupplierInfo({ data }: SupplierInfoProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <SupplierInfoCard
-        title={data.supplierName}
+        title={data.name}
         lines={[
           `Status: ${data.status}`,
           `Supplier grade: A`,

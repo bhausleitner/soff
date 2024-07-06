@@ -31,17 +31,12 @@ const SupplierPage = () => {
     return <p>No supplier found.</p>;
   }
 
-  const transformedData = {
-    supplierName: data.title,
-    email: data.email,
-    status: data.status,
-    responseTime: data.responseTime
-  };
+  console.log(data.name);
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <SupplierBreadcrumb supplierName={data.title} />
-      <SupplierInfo data={transformedData} />
+      <SupplierBreadcrumb name={data.name} />
+      <SupplierInfo data={data} />
       <SupplierTabs />
     </div>
   );

@@ -11,7 +11,6 @@ import {
   type VisibilityState
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
@@ -34,6 +33,7 @@ import {
 import { type Supplier } from "~/server/api/routers/supplier";
 import { api } from "~/utils/api";
 import { SupplierAction } from "./SupplierAction";
+import { SupplierLink } from "./SupplierLink";
 
 export const columns: ColumnDef<Supplier>[] = [
   {
@@ -61,7 +61,7 @@ export const columns: ColumnDef<Supplier>[] = [
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => <div>{row.getValue("name")}</div>
+    cell: ({ row }) => <SupplierLink row={row} />
   },
   {
     accessorKey: "status",
