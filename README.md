@@ -1,4 +1,4 @@
-<img src="https://github.com/bhausleitner/soff/assets/58265021/40b428ec-cf52-43df-a64a-51d70e1f5466" alt="Alt Text" width="300" height="200" />
+<img src="https://github.com/bhausleitner/soff/assets/58265021/40b428ec-cf52-43df-a64a-51d70e1f5466" alt="Alt Text" height="200" />
 
 # Soff
 
