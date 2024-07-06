@@ -1,4 +1,5 @@
 # Soff
+![soff](https://github.com/bhausleitner/soff/assets/58265021/5af74c6c-bbbb-4a70-9762-bb9b46076f8a)
 
 ## Running migrations
 
