@@ -20,11 +20,11 @@ Go to your `settings.json` in VSCODE and extend it with:
 
 ## File Naming Conventions
 
-| File Type                | Naming Convention                      | Example             |
-|--------------------------|----------------------------------------|---------------------|
-| React Component Files    | PascalCase                             | `SupplierTable.tsx` |
-| Utility Files or Helpers | camelCase                              | `supplierUtils.tsx` |
-| json Files               | kebab-case                             | `package-lock.json` |
+| File Type                          | Naming Convention                      | Example             |
+|------------------------------------|----------------------------------------|---------------------|
+| React Component Files and Types    | PascalCase                             | `SupplierTable.tsx` |
+| Utility Files or Helpers           | camelCase                              | `supplierUtils.tsx` |
+| json Files                         | kebab-case                             | `package-lock.json` |
 
 
 ## Auth
