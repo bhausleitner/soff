@@ -28,8 +28,7 @@ model Post {
 
 model Supplier {
     id            Int      @id @default(autoincrement())
-    title         String
-    name          String   @default("")
+    name          String   
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
     contactPerson String
@@ -38,7 +37,7 @@ model Supplier {
     responseTime  Int?     @default(48)
     parts         SupplierPart[]  
 
-    @@index([title])
+    @@index([name])
 }
 
 model Part {
