@@ -2,7 +2,7 @@
 <img src="https://github.com/bhausleitner/soff/assets/58265021/40b428ec-cf52-43df-a64a-51d70e1f5466" alt="Alt Text" height="70" />
 
 <div style="display: flex; align-items: center;">
-    <img src="[path/to/your/image.jpg](https://github.com/bhausleitner/soff/assets/58265021/40b428ec-cf52-43df-a64a-51d70e1f5466)" alt="Description of the image" style="height: 70px; margin-right: 10px;">
+    <img src="https://github.com/bhausleitner/soff/assets/58265021/40b428ec-cf52-43df-a64a-51d70e1f5466" alt="Description of the image" style="height: 70px; margin-right: 10px;">
     <p>Your headline text goes here.</p>
 </div>
 
