@@ -29,6 +29,7 @@ model Post {
 model Supplier {
     id            Int      @id @default(autoincrement())
     title         String
+    name          String   @default("")
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
     contactPerson String
