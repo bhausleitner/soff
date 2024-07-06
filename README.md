@@ -22,7 +22,7 @@ Go to your `settings.json` in VSCODE and extend it with:
 
 | File Type                | Naming Convention                      | Example             |
 |--------------------------|----------------------------------------|---------------------|
-| Component Files          | PascalCase                             | `SupplierTable.tsx` |
+| React Component Files    | PascalCase                             | `SupplierTable.tsx` |
 | Utility Files or Helpers | camelCase                              | `supplierUtils.tsx` |
 | json Files               | kebab-case                             | `package-lock.json` |
 
