@@ -3,15 +3,7 @@ import React from "react";
 import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "~/components/ui/breadcrumb";
+import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 
 const SupplierPage = () => {
   const router = useRouter();
@@ -41,21 +33,7 @@ const SupplierPage = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/suppliers">Suppliers</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{data.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SupplierBreadcrumb supplierName={data.title} />
       <SupplierInfo data={data} />
       <SupplierTabs />
     </div>
