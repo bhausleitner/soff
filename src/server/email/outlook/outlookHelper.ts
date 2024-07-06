@@ -27,7 +27,6 @@ const settings: AppSettings = {
   graphUserScopes: ["user.read", "mail.read", "mail.send"]
 };
 
-let _settings: AppSettings | undefined = undefined;
 let _deviceCodeCredential: DeviceCodeCredential | undefined = undefined;
 let _userClient: Client | undefined = undefined;
 
@@ -38,8 +37,6 @@ export function initializeGraphForUserAuth(
   if (!settings) {
     throw new Error("Settings cannot be undefined");
   }
-
-  _settings = settings;
 
   _deviceCodeCredential = new DeviceCodeCredential({
     clientId: settings.clientId,
@@ -64,10 +61,11 @@ export async function getUserAsync(): Promise<User> {
     throw new Error("Graph has not been initialized for user auth");
   }
 
+  // adding "as Promise<User> here, since .get() typically returns Promise<any>"
   return _userClient
     .api("/me")
     .select(["displayName", "mail", "userPrincipalName"])
-    .get();
+    .get() as Promise<User>;
 }
 
 export async function getInboxAsync(): Promise<PageCollection> {
@@ -75,12 +73,13 @@ export async function getInboxAsync(): Promise<PageCollection> {
     throw new Error("Graph has not been initialized for user auth");
   }
 
+  // adding "as Promise<PageCollection> here, since .get() typically returns Promise<any>"
   return _userClient
     .api("/me/mailFolders/inbox/messages")
     .select(["from", "isRead", "receivedDateTime", "subject", "body"])
     .top(1)
     .orderby("receivedDateTime DESC")
-    .get();
+    .get() as Promise<PageCollection>;
 }
 
 export async function sendMailAsync(emailProps: SendEmailProps) {
@@ -92,6 +91,7 @@ export async function sendMailAsync(emailProps: SendEmailProps) {
       // where to go to sign in and provides the
       // code to use.
       console.log(info.message);
+      console.log();
     });
     throw new Error("Graph has not been initialized for user auth");
   }
