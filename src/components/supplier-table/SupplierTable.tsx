@@ -1,26 +1,18 @@
-import React, { useState, useEffect } from "react";
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable
+  useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
-<<<<<<< HEAD
 import Link from "next/link";
 import { useEffect, useState } from "react";
-=======
-import { api } from "~/utils/api";
-import { SupplierAction } from "./SupplierAction";
-import { SupplierLink } from "./SupplierLink";
-import { type Supplier } from "~/server/api/routers/supplier";
->>>>>>> 546ed01 (playing with flexboxes)
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -39,6 +31,9 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
+import { type Supplier } from "~/server/api/routers/supplier";
+import { api } from "~/utils/api";
+import { SupplierAction } from "./SupplierAction";
 
 export const columns: ColumnDef<Supplier>[] = [
   {
@@ -64,39 +59,9 @@ export const columns: ColumnDef<Supplier>[] = [
     enableHiding: false
   },
   {
-<<<<<<< HEAD
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => <div>{row.getValue("name")}</div>
-=======
-    accessorKey: "title",
-    header: "Title",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    cell: ({ row }) => (
-      <Link href={`/suppliers/${row.original.id}`} className="text-blue-600 hover:text-blue-800">
-        {row.getValue("title")}
-      </Link>
-    )
->>>>>>> ce3f01d (changed [supplierID] to [supplierId])
-=======
-    cell: ({ row }) => <div>{row.getValue("title")}</div>
->>>>>>> 546ed01 (playing with flexboxes)
-=======
-    cell: ({ row }) => (
-      <Link
-        href={`/suppliers/${row.original.id}`}
-        passHref
-        className="text-blue-600 hover:text-blue-800"
-      >
-        {row.getValue("title")}
-      </Link>
-    )
->>>>>>> 7425426 (make suppliers in table clickable)
-=======
-    cell: ({ row }) => <SupplierLink row={row} />
->>>>>>> 43e99d4 (added SupplierLink to remove Link usage and use handleNavigation)
   },
   {
     accessorKey: "status",
