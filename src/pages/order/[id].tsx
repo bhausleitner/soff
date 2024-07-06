@@ -26,7 +26,7 @@ export default function Order() {
         <h2 className="text-3xl font-bold tracking-tight">Order</h2>
       </div>
       <div>
-        <p>This is the Supplier Name: {data?.title}</p>
+        <p>This is the Supplier Name: {data?.name}</p>
       </div>
       {selectedUser && (
         <Chat messages={selectedUser.messages} selectedUser={selectedUser} />

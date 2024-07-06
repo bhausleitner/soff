@@ -5,7 +5,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 // define schema
 export const supplierSchema = z.object({
   id: z.number(),
-  title: z.string(),
+  name: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email(),
   responseTime: z.number().nullable()
@@ -24,7 +24,7 @@ export const supplierRouter = createTRPCRouter({
     const supplierData = await ctx.db.supplier.findMany({
       select: {
         id: true,
-        title: true,
+        name: true,
         email: true,
         status: true,
         responseTime: true

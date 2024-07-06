@@ -58,9 +58,9 @@ export const columns: ColumnDef<Supplier>[] = [
     enableHiding: false
   },
   {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => <div>{row.getValue("title")}</div>
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => <div>{row.getValue("name")}</div>
   },
   {
     accessorKey: "status",
@@ -128,9 +128,9 @@ export function SupplierTable() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter supplier..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
