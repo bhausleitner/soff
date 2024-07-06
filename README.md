@@ -1,3 +1,5 @@
+<img src="https://github.com/bhausleitner/soff/raw/master/assets/58265021/5af74c6c-bbbb-4a70-9762-bb9b46076f8a.png" alt="Alt Text" width="300" height="200" />
+
 # Soff
 
 ## Running migrations
