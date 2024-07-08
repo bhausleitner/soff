@@ -36,21 +36,8 @@ const columns: ColumnDef<Part>[] = [
   }
 ];
 
-const useFetchParts = () => {
-  const { data, isLoading } = api.part.partsBySupplier.useQuery();
-  const [tableData, setTableData] = useState<Part[]>([]);
-
-  useEffect(() => {
-    if (data) {
-      setTableData(data);
-    }
-  }, [data]);
-
-  return { tableData, isLoading };
-};
-
 export function SupplierPartTable() {
-  const { tableData, isLoading } = useFetchParts();
+  const { data, isLoading } = api.part.partsBySupplier.useQuery();
 
   return (
     <>
@@ -59,7 +46,7 @@ export function SupplierPartTable() {
       ) : (
         <TableComponent
           columns={columns}
-          dataFetcher={() => Promise.resolve(tableData)}
+          data={data ?? []}
           filterPlaceholder="Filter part..."
         />
       )}
