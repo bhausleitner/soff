@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TableComponent } from "~/components/common/TableComponent";
 import { api } from "~/utils/api";
 import { type Part } from "~/server/api/routers/part";

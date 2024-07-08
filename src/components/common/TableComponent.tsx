@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import Spinner from "~/components/spinner";
 
 interface TableProps<T> {
   columns: ColumnDef<T>[];
