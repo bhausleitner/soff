@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TableComponent } from "~/components/common/TableComponent";
 import { api } from "~/utils/api";
 import { type Supplier } from "~/server/api/routers/supplier";
@@ -63,21 +63,8 @@ const columns: ColumnDef<Supplier>[] = [
   }
 ];
 
-const useFetchSuppliers = () => {
-  const { data, isLoading } = api.supplier.getAllSuppliers.useQuery();
-  const [tableData, setTableData] = useState<Supplier[]>([]);
-
-  useEffect(() => {
-    if (data) {
-      setTableData(data);
-    }
-  }, [data]);
-
-  return { tableData, isLoading };
-};
-
 export function SupplierTable() {
-  const { tableData, isLoading } = useFetchSuppliers();
+  const { data, isLoading } = api.supplier.getAllSuppliers.useQuery();
 
   return (
     <>
@@ -86,7 +73,7 @@ export function SupplierTable() {
       ) : (
         <TableComponent
           columns={columns}
-          dataFetcher={() => Promise.resolve(tableData)}
+          data={data ?? []}
           filterPlaceholder="Filter supplier..."
         />
       )}
