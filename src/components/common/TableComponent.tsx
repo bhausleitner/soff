@@ -28,18 +28,78 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
+// import { SupplierAction } from "~/components/supplier-table/SupplierAction";
+// import { SupplierLink } from "~/components/supplier-table/SupplierLink";
+import { Checkbox } from "~/components/ui/checkbox";
+import { ArrowUpDown } from "lucide-react";
 
 interface TableProps<T> {
-  columns: ColumnDef<T>[];
+  tableConfig: {
+    placeholder: string;
+    checkbox: boolean;
+    columns: Array<{
+      header: string;
+      accessorKey: string;
+      sortable: boolean;
+    }>;
+  };
   data: T[];
-  filterPlaceholder?: string;
 }
 
-export function TableComponent<T>({
-  columns,
-  data,
-  filterPlaceholder = "Filter..."
-}: TableProps<T>) {
+function generateColumns<T>(config: TableProps<T>["tableConfig"]) {
+  const columns: ColumnDef<T>[] = [];
+
+  if (config.checkbox) {
+    columns.push({
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false
+    });
+  }
+
+  config.columns.forEach((col) => {
+    columns.push({
+      accessorKey: col.accessorKey,
+      header: ({ column }) =>
+        col.sortable ? (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {col.header}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          col.header
+        ),
+      cell: ({ row }) => {
+        return <div>{row.getValue(col.accessorKey)}</div>;
+      }
+    });
+  });
+
+  return columns;
+}
+
+export function TableComponent<T>({ tableConfig, data }: TableProps<T>) {
+  const columns = generateColumns(tableConfig);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -68,7 +128,7 @@ export function TableComponent<T>({
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder={filterPlaceholder}
+          placeholder={tableConfig.placeholder}
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
