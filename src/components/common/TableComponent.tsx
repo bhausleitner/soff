@@ -49,10 +49,18 @@ export function TableComponent<T>({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    dataFetcher().then((data) => {
-      setTableData(data);
-      setIsLoading(false);
-    });
+    const fetchData = async () => {
+      try {
+        const data = await dataFetcher();
+        setTableData(data);
+      } catch (error) {
+        console.error("Error fetching table data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchData();
   }, [dataFetcher]);
 
   const table = useReactTable({
