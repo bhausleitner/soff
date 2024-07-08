@@ -12,11 +12,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { ChevronDown } from "lucide-react";
-import { api } from "~/utils/api";
-import { type Part } from "~/server/api/routers/part";
-import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,58 +21,39 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import {
-  Table,
+  Table as UITable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow
 } from "~/components/ui/table";
+import Spinner from "~/components/spinner";
 
-export const columns: ColumnDef<Part>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    accessorKey: "partName",
-    header: "Part Name",
-    cell: ({ row }) => <div>{row.getValue("partName")}</div>
-  }
-];
+interface TableProps<T> {
+  columns: ColumnDef<T>[];
+  dataFetcher: () => Promise<T[]>;
+  filterPlaceholder?: string;
+}
 
-export function SupplierParts() {
+export function TableComponent<T>({
+  columns,
+  dataFetcher,
+  filterPlaceholder = "Filter..."
+}: TableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [tableData, setTableData] = useState<Part[]>([]);
-
-  const { data, isLoading } = api.part.partsBySupplier.useQuery();
+  const [tableData, setTableData] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (data) {
+    dataFetcher().then((data) => {
       setTableData(data);
-    }
-  }, [data]);
+      setIsLoading(false);
+    });
+  }, [dataFetcher]);
 
   const table = useReactTable({
     data: tableData,
@@ -101,10 +78,10 @@ export function SupplierParts() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter part..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder={filterPlaceholder}
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -139,7 +116,7 @@ export function SupplierParts() {
       {!isLoading && (
         <>
           <div className="rounded-md border">
-            <Table>
+            <UITable>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
@@ -186,7 +163,7 @@ export function SupplierParts() {
                   </TableRow>
                 )}
               </TableBody>
-            </Table>
+            </UITable>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
