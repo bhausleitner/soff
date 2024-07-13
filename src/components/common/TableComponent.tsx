@@ -29,7 +29,6 @@ import {
   TableRow
 } from "~/components/ui/table";
 import TableLink from "~/components/common/TableLink";
-// import { SupplierAction } from "~/components/supplier-table/SupplierAction";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
@@ -42,6 +41,7 @@ interface TableProps<T extends { id: number }> {
       accessorKey: string;
       sortable: boolean;
       link?: string;
+      cell?: (row: any) => JSX.Element; // i.e. SupplierAction
     }>;
   };
   data: T[];
@@ -93,6 +93,9 @@ function generateColumns<T extends { id: number }>(
           col.header
         ),
       cell: ({ row }) => {
+        if (col.cell) {
+          return col.cell(row);
+        }
         const cellValue: string = row.getValue(col.accessorKey);
         if (col.link) {
           const linkUrl = col.link + row.original.id;
