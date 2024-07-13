@@ -7,7 +7,12 @@ const tableConfig = {
   placeholder: "Filter supplier...",
   checkbox: true,
   columns: [
-    { header: "Name", accessorKey: "name", sortable: true },
+    {
+      header: "Name",
+      accessorKey: "name",
+      sortable: true,
+      link: "/suppliers/"
+    },
     { header: "Status", accessorKey: "status", sortable: false },
     { header: "Email", accessorKey: "email", sortable: true },
     { header: "Actions", accessorKey: "actions", sortable: false }

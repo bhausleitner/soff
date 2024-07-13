@@ -28,12 +28,12 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
+import TableLink from "~/components/common/TableLink";
 // import { SupplierAction } from "~/components/supplier-table/SupplierAction";
-// import { SupplierLink } from "~/components/supplier-table/SupplierLink";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
-interface TableProps<T> {
+interface TableProps<T extends { id: string }> {
   tableConfig: {
     placeholder: string;
     checkbox: boolean;
@@ -41,12 +41,16 @@ interface TableProps<T> {
       header: string;
       accessorKey: string;
       sortable: boolean;
+      linkBase?: string;
+      link?: string;
     }>;
   };
   data: T[];
 }
 
-function generateColumns<T>(config: TableProps<T>["tableConfig"]) {
+function generateColumns<T extends { id: string }>(
+  config: TableProps<T>["tableConfig"]
+) {
   const columns: ColumnDef<T>[] = [];
 
   if (config.checkbox) {
@@ -90,7 +94,12 @@ function generateColumns<T>(config: TableProps<T>["tableConfig"]) {
           col.header
         ),
       cell: ({ row }) => {
-        return <div>{row.getValue(col.accessorKey)}</div>;
+        const cellValue: string = row.getValue(col.accessorKey);
+        if (col.link) {
+          const linkUrl = col.link + row.original.id;
+          return <TableLink href={linkUrl} text={cellValue}></TableLink>;
+        }
+        return <div>{cellValue}</div>;
       }
     });
   });
@@ -98,7 +107,10 @@ function generateColumns<T>(config: TableProps<T>["tableConfig"]) {
   return columns;
 }
 
-export function TableComponent<T>({ tableConfig, data }: TableProps<T>) {
+export function TableComponent<T extends { id: string }>({
+  tableConfig,
+  data
+}: TableProps<T>) {
   const columns = generateColumns(tableConfig);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
