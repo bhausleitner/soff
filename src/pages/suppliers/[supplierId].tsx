@@ -8,16 +8,16 @@ import Spinner from "~/components/spinner";
 
 const SupplierPage = () => {
   const router = useRouter();
-  const { supplierId } = router.query;
+  const { supplierId: supplierIdQuery } = router.query;
 
-  if (!supplierId) {
+  if (!supplierIdQuery) {
     return <Spinner></Spinner>;
   }
 
-  const supplierID = parseInt(supplierId as string, 10);
+  const supplierId = parseInt(supplierIdQuery as string, 10);
 
   const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({
-    supplierId: supplierID
+    supplierId: supplierId
   });
 
   if (isLoading) {
