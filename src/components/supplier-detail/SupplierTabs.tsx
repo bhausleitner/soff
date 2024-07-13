@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
-import { SupplierParts } from "./SupplierParts";
+import { SupplierPartTable } from "./SupplierPartTable";
 
 export function SupplierTabs() {
   return (
@@ -12,7 +12,7 @@ export function SupplierTabs() {
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="parts" className="space-y-4">
-          <SupplierParts></SupplierParts>
+          <SupplierPartTable />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
           Orders
