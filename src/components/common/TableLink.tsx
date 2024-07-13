@@ -6,7 +6,7 @@ interface LinkProps {
   text: string;
 }
 
-const TableLink: React.FC<LinkProps> = ({ href, text }) => {
+const TableLink = ({ href, text }: LinkProps) => {
   const router = useRouter();
 
   const handleNavigation = async (e: React.MouseEvent) => {
