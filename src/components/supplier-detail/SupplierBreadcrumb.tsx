@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/breadcrumb";
 
 interface SupplierBreadcrumbProps {
-  name: string;
+  name?: string;
 }
 
 export function SupplierBreadcrumb({ name }: SupplierBreadcrumbProps) {
@@ -22,12 +22,20 @@ export function SupplierBreadcrumb({ name }: SupplierBreadcrumbProps) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/suppliers">Suppliers</BreadcrumbLink>
+            {name ? (
+              <BreadcrumbLink href="/suppliers">Suppliers</BreadcrumbLink>
+            ) : (
+              <BreadcrumbPage>Suppliers</BreadcrumbPage>
+            )}
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{name}</BreadcrumbPage>
-          </BreadcrumbItem>
+          {name && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          )}
         </BreadcrumbList>
       </Breadcrumb>
     </>
