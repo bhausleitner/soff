@@ -33,7 +33,7 @@ import TableLink from "~/components/common/TableLink";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
-interface TableProps<T extends { id: string }> {
+interface TableProps<T extends { id: number }> {
   tableConfig: {
     placeholder: string;
     checkbox: boolean;
@@ -41,14 +41,13 @@ interface TableProps<T extends { id: string }> {
       header: string;
       accessorKey: string;
       sortable: boolean;
-      linkBase?: string;
       link?: string;
     }>;
   };
   data: T[];
 }
 
-function generateColumns<T extends { id: string }>(
+function generateColumns<T extends { id: number }>(
   config: TableProps<T>["tableConfig"]
 ) {
   const columns: ColumnDef<T>[] = [];
@@ -107,7 +106,7 @@ function generateColumns<T extends { id: string }>(
   return columns;
 }
 
-export function TableComponent<T extends { id: string }>({
+export function TableComponent<T extends { id: number }>({
   tableConfig,
   data
 }: TableProps<T>) {
