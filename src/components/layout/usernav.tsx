@@ -4,6 +4,7 @@ import { useClerk } from "@clerk/nextjs";
 import { startCase, toLower } from "lodash";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +15,23 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu";
+import { api } from "~/utils/api";
+import { useRouter } from "next/router";
 
 export function UserNav() {
   const user = useUser();
   const { signOut } = useClerk();
+  const router = useRouter();
+
+  const FingerprintIcon = Icons.fingerprint;
+
+  const microsoftAuthUrlMutation =
+    api.chat.requestMicrosoftAuthUrl.useMutation();
+
+  const handleMicrosoftAuthUrl = async (): Promise<void> => {
+    const redirectUrl = await microsoftAuthUrlMutation.mutateAsync();
+    await router.push(redirectUrl);
+  };
 
   if (user) {
     return (
@@ -61,6 +75,12 @@ export function UserNav() {
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>New Team</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleMicrosoftAuthUrl()}>
+              Authenticate Outlook
+              <DropdownMenuShortcut>
+                <FingerprintIcon className={`ml-3 size-5`} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>
