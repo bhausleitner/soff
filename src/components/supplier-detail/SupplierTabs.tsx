@@ -12,7 +12,7 @@ export function SupplierTabs() {
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="parts" className="space-y-4">
-          <SupplierPartTable></SupplierPartTable>
+          <SupplierPartTable />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
           Orders

@@ -21,7 +21,7 @@ const SupplierPage = () => {
   });
 
   if (isLoading) {
-    return <Spinner></Spinner>;
+    return <Spinner />;
   }
 
   if (error) {
