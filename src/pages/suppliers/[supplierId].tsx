@@ -4,13 +4,14 @@ import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
+import Spinner from "~/components/spinner";
 
 const SupplierPage = () => {
   const router = useRouter();
   const { supplierId } = router.query;
 
   if (!supplierId) {
-    return <p>Loading...</p>;
+    return <Spinner></Spinner>;
   }
 
   const supplierID = parseInt(supplierId as string, 10);
@@ -20,7 +21,7 @@ const SupplierPage = () => {
   });
 
   if (isLoading) {
-    return <p></p>;
+    return <Spinner></Spinner>;
   }
 
   if (error) {
