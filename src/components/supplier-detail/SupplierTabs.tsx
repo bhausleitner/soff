@@ -2,7 +2,11 @@ import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { SupplierPartTable } from "./SupplierPartTable";
 
-export function SupplierTabs() {
+interface SupplierTabsProps {
+  supplierId: number;
+}
+
+export function SupplierTabs({ supplierId }: SupplierTabsProps) {
   return (
     <>
       <Tabs defaultValue="parts" className="space-y-4">
@@ -12,7 +16,7 @@ export function SupplierTabs() {
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="parts" className="space-y-4">
-          <SupplierPartTable />
+          <SupplierPartTable supplierId={supplierId} />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
           Orders

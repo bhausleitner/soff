@@ -3,6 +3,10 @@ import { TableComponent } from "~/components/common/TableComponent";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 
+interface SupplierProps {
+  supplierId: number;
+}
+
 const tableConfig = {
   placeholder: "Filter part...",
   checkbox: true,
@@ -13,8 +17,8 @@ const tableConfig = {
   ]
 };
 
-export function SupplierPartTable() {
-  const { data, isLoading } = api.part.partsBySupplier.useQuery();
+export function SupplierPartTable({ supplierId }: SupplierProps) {
+  const { data, isLoading } = api.part.partsBySupplier.useQuery({ supplierId });
 
   return (
     <>

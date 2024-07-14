@@ -34,7 +34,7 @@ const SupplierPage = () => {
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <SupplierBreadcrumb name={data.name} />
       <SupplierInfo data={data} />
-      <SupplierTabs />
+      <SupplierTabs supplierId={data.id} />
     </div>
   );
 };
