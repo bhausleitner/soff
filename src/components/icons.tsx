@@ -11,6 +11,7 @@ import {
   CreditCard,
   File,
   FileText,
+  Fingerprint,
   HelpCircle,
   Image,
   Laptop,
@@ -82,5 +83,6 @@ export const Icons = {
     </svg>
   ),
   twitter: Twitter,
-  check: Check
+  check: Check,
+  fingerprint: Fingerprint
 };

@@ -10,7 +10,9 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
-      .default("development")
+      .default("development"),
+    MICROSOFT_APP_CLIENT_ID: z.string(),
+    MICROSOFT_APP_CLIENT_SECRET: z.string()
   },
 
   /**
@@ -28,7 +30,10 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
-    NODE_ENV: process.env.NODE_ENV
+    NODE_ENV: process.env.NODE_ENV,
+    MICROSOFT_APP_CLIENT_ID: process.env.MICROSOFT_APP_CLIENT_ID,
+    MICROSOFT_APP_CLIENT_SECRET: process.env.MICROSOFT_APP_CLIENT_SECRET
+
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
