@@ -1,22 +1,11 @@
 import { Client } from "@microsoft/microsoft-graph-client";
 import { type Message } from "@microsoft/microsoft-graph-types";
 import {
-  ConfidentialClientApplication,
   type AuthorizationUrlRequest,
-  type Configuration,
   type AuthorizationCodeRequest
 } from "@azure/msal-node";
-
-let _graphClient: Client | undefined = undefined;
-let _urlParameters: AuthorizationUrlRequest;
-let _tokenRequest: AuthorizationCodeRequest;
-const _msalConfig: Configuration = {
-  auth: {
-    clientId: process.env.MICROSOFT_APP_CLIENT_ID!,
-    authority: "https://login.microsoftonline.com/common/",
-    clientSecret: process.env.MICROSOFT_APP_CLIENT_SECRET
-  }
-};
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import { msalClient } from "./initMsalClient";
 
 const MICROSOFT_APP_REDIRECT_URI =
   "http://localhost:3000/api/graphMicrosoftCallback";
@@ -27,47 +16,87 @@ const MICROSOFT_APP_SCOPES = [
   "mail.read",
   "mail.send"
 ];
-const _msalClient = new ConfidentialClientApplication(_msalConfig);
 
 export async function initMicrosoftAuthUrl(): Promise<string> {
-  _urlParameters = {
+  const urlParameters: AuthorizationUrlRequest = {
     scopes: MICROSOFT_APP_SCOPES,
     redirectUri: MICROSOFT_APP_REDIRECT_URI
   };
 
-  return await _msalClient.getAuthCodeUrl(_urlParameters);
+  return await msalClient.getAuthCodeUrl(urlParameters);
 }
 
-export async function initGraphClient(queryCode: string) {
-  // get accessToken from _msalClient
-  _tokenRequest = {
+export async function initMsGraphClient(queryCode: string, userId: string) {
+  // get accessToken from msalClient
+  const tokenRequest: AuthorizationCodeRequest = {
     code: queryCode,
     scopes: MICROSOFT_APP_SCOPES,
     redirectUri: MICROSOFT_APP_REDIRECT_URI
   };
 
   // request token from MSAL Client
-  const response = await _msalClient.acquireTokenByCode(_tokenRequest);
+  const response = await msalClient.acquireTokenByCode(tokenRequest);
 
-  // initialize Microsoft Graph API Client
-  _graphClient = Client.init({
-    authProvider: (done) => {
-      done(null, response.accessToken);
+  // store microsoftAccessToken in Clerk session claims
+  await clerkClient.users.updateUserMetadata(userId, {
+    publicMetadata: {
+      microsoftHomeAccountId: response?.account?.homeAccountId
     }
   });
 }
 
+export async function getMsGraphClient(
+  msHomeAccountId: string
+): Promise<Client> {
+  // get account from Microsoft Authentication Library Cache
+  /* eslint-disable-next-line @typescript-eslint/await-thenable */
+  const tokenCache = await msalClient.getTokenCache();
+
+  // Check if tokenCache is defined
+  if (!tokenCache) {
+    throw new Error(
+      `Token Cache from Account with home ID ${msHomeAccountId} not found`
+    );
+  }
+
+  const account = await tokenCache.getAccountByHomeId(msHomeAccountId);
+
+  // Check if account is defined
+  if (!account) {
+    throw new Error(`Account with home ID ${msHomeAccountId} not found`);
+  }
+
+  // acquire token silent - refresh if necessary (handled by msal library)
+  const tokenResponse = await msalClient.acquireTokenSilent({
+    account: account,
+    scopes: MICROSOFT_APP_SCOPES
+  });
+
+  // Check if tokenResponse is defined and has an accessToken
+  if (!tokenResponse?.accessToken) {
+    throw new Error("Failed to acquire an access token");
+  }
+
+  // return fresh token
+  const msGraphClient = Client.init({
+    authProvider: (done) => {
+      done(null, tokenResponse?.accessToken);
+    }
+  });
+
+  return msGraphClient;
+}
+
 export async function sendMailAsync(
+  msHomeAccountId: string,
   subject: string,
   body: string,
   recipientEmail: string
 ) {
-  // Ensure client isn't undefined
-  if (!_graphClient) {
-    throw new Error("Graph has not been initialized for user auth");
-  }
+  // get Microsoft Graph Client
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
 
-  // Create a new message
+  // construct a new message
   const message: Message = {
     subject: subject,
     body: {
@@ -83,8 +112,8 @@ export async function sendMailAsync(
     ]
   };
 
-  // Send the message
-  return _graphClient.api("me/sendMail").post({
+  // send the message
+  return msGraphClient.api("me/sendMail").post({
     message: message
   });
 }
