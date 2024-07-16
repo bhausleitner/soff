@@ -1,10 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 enum Status {
     ACTIVE
     INACTIVE
     ONBOARDING
+    PENDING
+    APPROVED
 }
 
 generator client {
@@ -35,7 +34,8 @@ model Supplier {
     email         String
     status        Status   @default(ACTIVE)
     responseTime  Int?     @default(48)
-    parts         SupplierPart[]  
+    parts         SupplierPart[]
+    quotes        Quote[]
 
     @@index([name])
 }
@@ -46,7 +46,8 @@ model Part {
   partName   String
   price      Float?
   cadFile    String?
-  suppliers  SupplierPart[]     
+  suppliers  SupplierPart[]
+  quotes     Quote[]
 
   @@index([partName])
 }
@@ -58,4 +59,34 @@ model SupplierPart {
   partId     Int
 
   @@id([supplierId, partId])
+}
+
+model Quote {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  price      Float
+  status     Status
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  supplierId Int
+  partId     Int
+  orders     Order[]
+
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  part       Part     @relation(fields: [partId], references: [id])
+
+  @@index([status])
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  quoteId         Int
+  orderDate       DateTime
+  deliveryDate    DateTime
+  deliveryAddress String
+  status          Status
+
+  quote           Quote    @relation(fields: [quoteId], references: [id])
+
+  @@index([status])
 }
