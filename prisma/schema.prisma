@@ -7,18 +7,18 @@ enum SupplierStatus {
     ONBOARDING
 }
 
-enum OrderStatus {
-    PENDING
-    CONFIRMED
-    DELIVERED
-    CANCELLED
-}
-
 enum QuoteStatus {
     WAITING
     RECEIVED
     CONFIRMED
     REJECTED
+}
+
+enum OrderStatus {
+    PENDING
+    CONFIRMED
+    DELIVERED
+    CANCELLED
 }
 
 generator client {
