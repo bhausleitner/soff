@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 enum Status {
     ACTIVE
     INACTIVE
@@ -45,7 +48,7 @@ model Part {
   price      Float?
   cadFile    String?
   suppliers  SupplierPart[]
-  quotes     Quote[]
+  quotes     QuotePart[]
 
   @@index([partName])
 }
@@ -61,19 +64,27 @@ model SupplierPart {
 
 model Quote {
   id         Int      @id @default(autoincrement())
+  supplierId Int
   quantity   Int
   price      Float
   status     Status
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  supplierId Int
-  partId     Int
   orders     Order[]
+  parts      QuotePart[]
 
   supplier   Supplier @relation(fields: [supplierId], references: [id])
-  part       Part     @relation(fields: [partId], references: [id])
 
   @@index([status])
+}
+
+model QuotePart {
+  quote     Quote @relation(fields: [quoteId], references: [id])
+  quoteId   Int
+  part      Part @relation(fields: [partId], references: [id])
+  partId    Int
+
+  @@id([quoteId, partId])
 }
 
 model Order {
