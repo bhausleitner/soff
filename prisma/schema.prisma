@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-enum SupplierStatus {
+enum Status {
     ACTIVE
     INACTIVE
     ONBOARDING
@@ -47,7 +47,7 @@ model Supplier {
     updatedAt     DateTime @updatedAt
     contactPerson String
     email         String
-    status        SupplierStatus   @default(ACTIVE)
+    status        Status   @default(ACTIVE)
     responseTime  Int?     @default(48)
     parts         SupplierPart[]
     quotes        Quote[]
