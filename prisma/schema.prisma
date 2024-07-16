@@ -62,7 +62,7 @@ model Part {
   price      Float?
   cadFile    String?
   suppliers  SupplierPart[]
-  quotes     QuotePart[]
+  quotes     Quote[]
 
   @@index([partName])
 }
@@ -79,26 +79,18 @@ model SupplierPart {
 model Quote {
   id         Int      @id @default(autoincrement())
   supplierId Int
+  partId     Int
   quantity   Int
   price      Float
   status     QuoteStatus
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   orders     Order[]
-  parts      QuotePart[]
 
   supplier   Supplier @relation(fields: [supplierId], references: [id])
+  part       Part     @relation(fields: [partId], references: [id])
 
   @@index([status])
-}
-
-model QuotePart {
-  quote     Quote @relation(fields: [quoteId], references: [id])
-  quoteId   Int
-  part      Part @relation(fields: [partId], references: [id])
-  partId    Int
-
-  @@id([quoteId, partId])
 }
 
 model Order {
