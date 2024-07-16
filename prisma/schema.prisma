@@ -2,8 +2,6 @@ enum Status {
     ACTIVE
     INACTIVE
     ONBOARDING
-    PENDING
-    APPROVED
 }
 
 generator client {
