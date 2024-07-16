@@ -11,9 +11,10 @@ const tableConfig = {
   placeholder: "Filter part...",
   checkbox: true,
   columns: [
+    { header: "Part Number", accessorKey: "partNumber", sortable: true },
     { header: "Part Name", accessorKey: "partName", sortable: true },
-    { header: "Description", accessorKey: "description", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true }
+    { header: "Price", accessorKey: "price", sortable: true },
+    { header: "CAD File", accessorKey: "cadFile", sortable: false }
   ]
 };
 
