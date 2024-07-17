@@ -31,7 +31,7 @@ export const partRouter = createTRPCRouter({
     return partsData;
   }),
 
-  partsBySupplier: publicProcedure
+  getPartsBySupplierId: publicProcedure
     .input(z.object({ supplierId: z.number() }))
     .query(async ({ ctx, input }) => {
       const partsData = await ctx.db.part.findMany({

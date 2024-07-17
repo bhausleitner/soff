@@ -19,7 +19,9 @@ const tableConfig = {
 };
 
 export function SupplierPartTable({ supplierId }: SupplierProps) {
-  const { data, isLoading } = api.part.partsBySupplier.useQuery({ supplierId });
+  const { data, isLoading } = api.part.getPartsBySupplierId.useQuery({
+    supplierId
+  });
 
   return (
     <>
