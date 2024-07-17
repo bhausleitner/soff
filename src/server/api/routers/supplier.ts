@@ -98,14 +98,6 @@ export const supplierRouter = createTRPCRouter({
       return supplierData;
     }),
 
-  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
-    const quoteData = await ctx.db.quote.findMany({});
-    return formatAndValidate(quoteData, quoteArraySchema, [
-      "createdAt",
-      "updatedAt"
-    ]);
-  }),
-
   getQuotesBySupplierId: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
@@ -120,14 +112,6 @@ export const supplierRouter = createTRPCRouter({
         "updatedAt"
       ]);
     }),
-
-  getAllOrders: publicProcedure.query(async ({ ctx }) => {
-    const orderData = await ctx.db.order.findMany({});
-    return formatAndValidate(orderData, orderArraySchema, [
-      "orderDate",
-      "deliveryDate"
-    ]);
-  }),
 
   getOrdersBySupplierId: publicProcedure
     .input(supplierIdSchema)
