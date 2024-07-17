@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Status, QuoteStatus } from "@prisma/client";
+import { Status, QuoteStatus, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { get } from "lodash";
 
+// Define schemas
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -29,8 +29,43 @@ const quoteSchema = z.object({
 
 const quoteArraySchema = z.array(quoteSchema);
 
+const orderSchema = z.object({
+  id: z.number(),
+  quoteId: z.number(),
+  orderDate: z.string(),
+  deliveryDate: z.string(),
+  deliveryAddress: z.string(),
+  status: z.nativeEnum(OrderStatus)
+});
+
+const orderArraySchema = z.array(orderSchema);
+
 export type Supplier = z.infer<typeof supplierSchema>;
 export type Quote = z.infer<typeof quoteSchema>;
+export type Order = z.infer<typeof orderSchema>;
+
+// Utility function to format date fields and validate data
+const formatAndValidate = <T>(
+  data: T[],
+  schema: z.ZodSchema,
+  dateFields: (keyof T)[]
+) => {
+  const formattedData = data.map((item) => {
+    const formattedItem = { ...item };
+    dateFields.forEach((field) => {
+      if (formattedItem[field] instanceof Date) {
+        formattedItem[field] = (
+          formattedItem[field] as Date
+        ).toISOString() as T[keyof T];
+      }
+    });
+    return formattedItem;
+  });
+
+  schema.parse(formattedData);
+
+  return formattedData;
+};
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
@@ -54,7 +89,6 @@ export const supplierRouter = createTRPCRouter({
   getSupplierById: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
-      // fetch supplier by id from db
       const supplierData = await ctx.db.supplier.findUnique({
         where: {
           id: input.supplierId
@@ -66,16 +100,10 @@ export const supplierRouter = createTRPCRouter({
 
   getAllQuotes: publicProcedure.query(async ({ ctx }) => {
     const quoteData = await ctx.db.quote.findMany({});
-
-    const formattedQuoteData = quoteData.map((quote) => ({
-      ...quote,
-      createdAt: quote.createdAt.toISOString(),
-      updatedAt: quote.updatedAt.toISOString()
-    }));
-
-    quoteArraySchema.parse(formattedQuoteData);
-
-    return quoteData;
+    return formatAndValidate(quoteData, quoteArraySchema, [
+      "createdAt",
+      "updatedAt"
+    ]);
   }),
 
   getQuotesBySupplierId: publicProcedure
@@ -87,45 +115,34 @@ export const supplierRouter = createTRPCRouter({
         }
       });
 
-      const formattedQuoteData = quoteData.map((quote) => ({
-        ...quote,
-        createdAt: quote.createdAt.toISOString(),
-        updatedAt: quote.updatedAt.toISOString()
-      }));
-
-      quoteArraySchema.parse(formattedQuoteData);
-
-      return formattedQuoteData;
+      return formatAndValidate(quoteData, quoteArraySchema, [
+        "createdAt",
+        "updatedAt"
+      ]);
     }),
 
   getAllOrders: publicProcedure.query(async ({ ctx }) => {
     const orderData = await ctx.db.order.findMany({});
-
-    return orderData;
+    return formatAndValidate(orderData, orderArraySchema, [
+      "orderDate",
+      "deliveryDate"
+    ]);
   }),
 
   getOrdersBySupplierId: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
-      const quotes = await ctx.db.quote.findMany({
+      const orderData = await ctx.db.order.findMany({
         where: {
-          supplierId: input.supplierId
-        },
-        select: {
-          id: true
-        }
-      });
-
-      const quoteIds = quotes.map((quote) => quote.id);
-
-      const orders = await ctx.db.order.findMany({
-        where: {
-          quoteId: {
-            in: quoteIds
+          quote: {
+            supplierId: input.supplierId
           }
         }
       });
 
-      return orders;
+      return formatAndValidate(orderData, orderArraySchema, [
+        "orderDate",
+        "deliveryDate"
+      ]);
     })
 });
