@@ -2,6 +2,7 @@ import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { SupplierPartTable } from "./SupplierPartTable";
 import { SupplierQuoteTable } from "./SupplierQuoteTable";
+import { SupplierOrderTable } from "./SupplierOrderTable";
 
 interface SupplierTabsProps {
   supplierId: number;
@@ -23,7 +24,7 @@ export function SupplierTabs({ supplierId }: SupplierTabsProps) {
           <SupplierQuoteTable supplierId={supplierId} />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
-          Orders
+          <SupplierOrderTable supplierId={supplierId} />
         </TabsContent>
       </Tabs>
     </>

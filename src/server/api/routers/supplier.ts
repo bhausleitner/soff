@@ -96,5 +96,11 @@ export const supplierRouter = createTRPCRouter({
       quoteArraySchema.parse(formattedQuoteData);
 
       return formattedQuoteData;
-    })
+    }),
+
+  getAllOrders: publicProcedure.query(async ({ ctx }) => {
+    const orderData = await ctx.db.order.findMany({});
+
+    return orderData;
+  })
 });
