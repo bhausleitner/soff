@@ -25,7 +25,9 @@ const supplierOrderTableConfig = {
 };
 
 export function SupplierOrderTable({ supplierId }: SupplierProps) {
-  const { data, isLoading } = api.supplier.getAllOrders.useQuery();
+  const { data, isLoading } = api.supplier.getOrdersBySupplierId.useQuery({
+    supplierId
+  });
 
   return (
     <>

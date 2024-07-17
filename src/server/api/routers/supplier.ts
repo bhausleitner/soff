@@ -102,5 +102,30 @@ export const supplierRouter = createTRPCRouter({
     const orderData = await ctx.db.order.findMany({});
 
     return orderData;
-  })
+  }),
+
+  getOrdersBySupplierId: publicProcedure
+    .input(supplierIdSchema)
+    .query(async ({ input, ctx }) => {
+      const quotes = await ctx.db.quote.findMany({
+        where: {
+          supplierId: input.supplierId
+        },
+        select: {
+          id: true
+        }
+      });
+
+      const quoteIds = quotes.map((quote) => quote.id);
+
+      const orders = await ctx.db.order.findMany({
+        where: {
+          quoteId: {
+            in: quoteIds
+          }
+        }
+      });
+
+      return orders;
+    })
 });
