@@ -6,9 +6,9 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "./initMsalClient";
+import { getBaseUrl } from "~/utils/api";
 
-const MICROSOFT_APP_REDIRECT_URI =
-  "http://localhost:3000/api/graphMicrosoftCallback";
+const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
 const MICROSOFT_APP_SCOPES = [
   "user.read",
@@ -20,7 +20,7 @@ const MICROSOFT_APP_SCOPES = [
 export async function initMicrosoftAuthUrl(): Promise<string> {
   const urlParameters: AuthorizationUrlRequest = {
     scopes: MICROSOFT_APP_SCOPES,
-    redirectUri: MICROSOFT_APP_REDIRECT_URI
+    redirectUri: `${getBaseUrl()}${MICROSOFT_APP_REDIRECT_ROUTE}`
   };
 
   return await msalClient.getAuthCodeUrl(urlParameters);
@@ -31,7 +31,7 @@ export async function initMsGraphClient(queryCode: string, userId: string) {
   const tokenRequest: AuthorizationCodeRequest = {
     code: queryCode,
     scopes: MICROSOFT_APP_SCOPES,
-    redirectUri: MICROSOFT_APP_REDIRECT_URI
+    redirectUri: `${getBaseUrl()}${MICROSOFT_APP_REDIRECT_ROUTE}`
   };
 
   // request token from MSAL Client
