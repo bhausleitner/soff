@@ -7,6 +7,20 @@ enum Status {
     ONBOARDING
 }
 
+enum QuoteStatus {
+    WAITING
+    RECEIVED
+    CONFIRMED
+    REJECTED
+}
+
+enum OrderStatus {
+    PENDING
+    CONFIRMED
+    DELIVERED
+    CANCELLED
+}
+
 generator client {
     provider = "prisma-client-js"
 }
@@ -35,7 +49,8 @@ model Supplier {
     email         String
     status        Status   @default(ACTIVE)
     responseTime  Int?     @default(48)
-    parts         SupplierPart[]  
+    parts         SupplierPart[]
+    quotes        Quote[]
 
     @@index([name])
 }
@@ -46,7 +61,8 @@ model Part {
   partName   String
   price      Float?
   cadFile    String?
-  suppliers  SupplierPart[]     
+  suppliers  SupplierPart[]
+  quotes     Quote[]
 
   @@index([partName])
 }
@@ -58,4 +74,34 @@ model SupplierPart {
   partId     Int
 
   @@id([supplierId, partId])
+}
+
+model Quote {
+  id         Int      @id @default(autoincrement())
+  supplierId Int
+  partId     Int
+  quantity   Int
+  price      Float
+  status     QuoteStatus
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]
+
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  part       Part     @relation(fields: [partId], references: [id])
+
+  @@index([status])
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  quoteId         Int
+  orderDate       DateTime
+  deliveryDate    DateTime
+  deliveryAddress String
+  status          OrderStatus
+
+  quote           Quote    @relation(fields: [quoteId], references: [id])
+
+  @@index([status])
 }
