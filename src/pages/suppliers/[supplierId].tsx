@@ -8,16 +8,14 @@ import Spinner from "~/components/spinner";
 
 const SupplierPage = () => {
   const router = useRouter();
-  const { supplierId } = router.query;
+  const supplierId = parseInt(router.query.supplierId as string, 10);
 
-  if (!supplierId) {
-    return <Spinner></Spinner>;
+  if (isNaN(supplierId)) {
+    return <Spinner />;
   }
 
-  const supplierID = parseInt(supplierId as string, 10);
-
   const { data, isLoading, error } = api.supplier.getSupplierById.useQuery({
-    supplierId: supplierID
+    supplierId
   });
 
   if (isLoading) {
@@ -36,7 +34,7 @@ const SupplierPage = () => {
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <SupplierBreadcrumb name={data.name} />
       <SupplierInfo data={data} />
-      <SupplierTabs />
+      <SupplierTabs supplierId={data.id} />
     </div>
   );
 };

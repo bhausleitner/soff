@@ -38,7 +38,7 @@ export async function initMsGraphClient(queryCode: string, userId: string) {
   const response = await msalClient.acquireTokenByCode(tokenRequest);
 
   // store microsoftAccessToken in Clerk session claims
-  await clerkClient.users.updateUserMetadata(userId, {
+  await clerkClient?.users.updateUserMetadata(userId, {
     publicMetadata: {
       microsoftHomeAccountId: response?.account?.homeAccountId
     }

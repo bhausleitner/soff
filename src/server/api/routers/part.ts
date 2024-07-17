@@ -15,8 +15,7 @@ export const partArraySchema = z.array(partSchema);
 export type Part = z.infer<typeof partSchema>;
 
 export const partRouter = createTRPCRouter({
-  partsBySupplier: publicProcedure.query(async ({ ctx }) => {
-    // fetch data from db
+  getAllParts: publicProcedure.query(async ({ ctx }) => {
     const partsData = await ctx.db.part.findMany({
       select: {
         id: true,
@@ -27,9 +26,26 @@ export const partRouter = createTRPCRouter({
       }
     });
 
-    // validate data using schema
     partArraySchema.parse(partsData);
 
     return partsData;
-  })
+  }),
+
+  partsBySupplier: publicProcedure
+    .input(z.object({ supplierId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const partsData = await ctx.db.part.findMany({
+        where: {
+          suppliers: {
+            some: {
+              supplierId: input.supplierId
+            }
+          }
+        }
+      });
+
+      partArraySchema.parse(partsData);
+
+      return partsData;
+    })
 });
