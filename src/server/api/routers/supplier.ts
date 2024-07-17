@@ -2,7 +2,6 @@ import { z } from "zod";
 import { Status, QuoteStatus, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-// Define schemas
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
