@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Status } from "@prisma/client";
+import { Status, QuoteStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { get } from "lodash";
 
-// define schema
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -16,8 +16,21 @@ const supplierArraySchema = z.array(supplierSchema);
 
 const supplierIdSchema = z.object({ supplierId: z.number() });
 
-// infer type from schema to keep frontend aligned
+const quoteSchema = z.object({
+  id: z.number(),
+  supplierId: z.number(),
+  partId: z.number(),
+  quantity: z.number(),
+  price: z.number(),
+  status: z.nativeEnum(QuoteStatus),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+const quoteArraySchema = z.array(quoteSchema);
+
 export type Supplier = z.infer<typeof supplierSchema>;
+export type Quote = z.infer<typeof quoteSchema>;
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
@@ -37,6 +50,7 @@ export const supplierRouter = createTRPCRouter({
 
     return supplierData;
   }),
+
   getSupplierById: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
@@ -48,5 +62,39 @@ export const supplierRouter = createTRPCRouter({
       });
 
       return supplierData;
+    }),
+
+  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
+    const quoteData = await ctx.db.quote.findMany({});
+
+    const formattedQuoteData = quoteData.map((quote) => ({
+      ...quote,
+      createdAt: quote.createdAt.toISOString(),
+      updatedAt: quote.updatedAt.toISOString()
+    }));
+
+    quoteArraySchema.parse(formattedQuoteData);
+
+    return quoteData;
+  }),
+
+  getQuotesBySupplierId: publicProcedure
+    .input(supplierIdSchema)
+    .query(async ({ input, ctx }) => {
+      const quoteData = await ctx.db.quote.findMany({
+        where: {
+          supplierId: input.supplierId
+        }
+      });
+
+      const formattedQuoteData = quoteData.map((quote) => ({
+        ...quote,
+        createdAt: quote.createdAt.toISOString(),
+        updatedAt: quote.updatedAt.toISOString()
+      }));
+
+      quoteArraySchema.parse(formattedQuoteData);
+
+      return formattedQuoteData;
     })
 });
