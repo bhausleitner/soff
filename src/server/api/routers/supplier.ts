@@ -2,7 +2,6 @@ import { z } from "zod";
 import { Status, QuoteStatus, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-// Define schemas
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -23,8 +22,8 @@ const quoteSchema = z.object({
   quantity: z.number(),
   price: z.number(),
   status: z.nativeEnum(QuoteStatus),
-  createdAt: z.string(),
-  updatedAt: z.string()
+  createdAt: z.date(),
+  updatedAt: z.date()
 });
 
 const quoteArraySchema = z.array(quoteSchema);
@@ -32,8 +31,8 @@ const quoteArraySchema = z.array(quoteSchema);
 const orderSchema = z.object({
   id: z.number(),
   quoteId: z.number(),
-  orderDate: z.string(),
-  deliveryDate: z.string(),
+  orderDate: z.date(),
+  deliveryDate: z.date(),
   deliveryAddress: z.string(),
   status: z.nativeEnum(OrderStatus)
 });
@@ -43,29 +42,6 @@ const orderArraySchema = z.array(orderSchema);
 export type Supplier = z.infer<typeof supplierSchema>;
 export type Quote = z.infer<typeof quoteSchema>;
 export type Order = z.infer<typeof orderSchema>;
-
-// Utility function to format date fields and validate data
-const formatAndValidate = <T>(
-  data: T[],
-  schema: z.ZodSchema,
-  dateFields: (keyof T)[]
-) => {
-  const formattedData = data.map((item) => {
-    const formattedItem = { ...item };
-    dateFields.forEach((field) => {
-      if (formattedItem[field] instanceof Date) {
-        formattedItem[field] = (
-          formattedItem[field] as Date
-        ).toISOString() as T[keyof T];
-      }
-    });
-    return formattedItem;
-  });
-
-  schema.parse(formattedData);
-
-  return formattedData;
-};
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
@@ -107,10 +83,9 @@ export const supplierRouter = createTRPCRouter({
         }
       });
 
-      return formatAndValidate(quoteData, quoteArraySchema, [
-        "createdAt",
-        "updatedAt"
-      ]);
+      quoteArraySchema.parse(quoteData);
+
+      return quoteData;
     }),
 
   getOrdersBySupplierId: publicProcedure
@@ -124,9 +99,8 @@ export const supplierRouter = createTRPCRouter({
         }
       });
 
-      return formatAndValidate(orderData, orderArraySchema, [
-        "orderDate",
-        "deliveryDate"
-      ]);
+      orderArraySchema.parse(orderData);
+
+      return orderData;
     })
 });
