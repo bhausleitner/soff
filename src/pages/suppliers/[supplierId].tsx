@@ -5,6 +5,7 @@ import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import Spinner from "~/components/spinner";
+import { Button } from "~/components/ui/button";
 
 const SupplierPage = () => {
   const router = useRouter();
@@ -32,7 +33,18 @@ const SupplierPage = () => {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <SupplierBreadcrumb name={data.name} />
+      <div className="flex items-center justify-between">
+        <SupplierBreadcrumb name={data.name} />
+        <div className="flex items-center">
+          <Button
+            onClick={async () => {
+              await router.push(`/order/${data.id}`);
+            }}
+          >
+            Create RFQ
+          </Button>
+        </div>
+      </div>
       <SupplierInfo data={data} />
       <SupplierTabs supplierId={data.id} />
     </div>
