@@ -105,3 +105,9 @@ model Order {
 
   @@index([status])
 }
+
+model User {
+  id            Int      @id @default(autoincrement())
+  clerk_user_id String
+  email         String
+}
