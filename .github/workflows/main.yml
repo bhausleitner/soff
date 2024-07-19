@@ -13,19 +13,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
-      - name: Print secrets (for demonstration only - remove in production)
-        run: echo "DATABASE_URL=${{ secrets.PRODUCTION_DATABASE_URL }}"
-      - name: Print secrets (for demonstration only - remove in production)
-        run: echo "DIRECT_URL=${{ secrets.PRODUCTION_DIRECT_URL }}"
-      - name: Decode and display secret
-        run: |
-          echo "ENCODED_SECRET: ${{ secrets.PRODUCTION_DIRECT_URL }}"
-          DECODED_SECRET=$(echo "${{ secrets.PRODUCTION_DIRECT_URL }}" | base64 --decode)
-          echo "DECODED_SECRET: $PRODUCTION_DIRECT_URL"
       - name: Install dependencies
         run: npm install
       - name: Apply all pending migrations to the database
         run: npx prisma migrate deploy
         env:
-          DATABASE_URL: "postgresql://postgres.ylbzetvxebiycivnerev:6pVsL4tIf845dkF2YeRw@aws-0-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-          DIRECT_URL: "postgresql://postgres.ylbzetvxebiycivnerev:6pVsL4tIf845dkF2YeRw@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PRODUCTION_DIRECT_URL }}
