@@ -6,6 +6,8 @@
 
 Add table in `prisma/schema.prisma` and run `npx prisma migrate -m [migration identifier message]`.
 
+Migrations to prod are automatically applied.
+
 ## Setup linting and formatting
 
 This project is uses `prettier` and `eslint`
