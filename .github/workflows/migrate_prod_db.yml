@@ -1,6 +1,8 @@
 name: Migrate Prod DB
 on:
   push:
+    paths:
+      - prisma/migrations/** # Only run if migration folder is touched
     branches:
       - main
   workflow_dispatch:
