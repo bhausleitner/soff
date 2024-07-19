@@ -17,6 +17,11 @@ jobs:
         run: echo "DATABASE_URL=${{ secrets.PRODUCTION_DATABASE_URL }}"
       - name: Print secrets (for demonstration only - remove in production)
         run: echo "DIRECT_URL=${{ secrets.PRODUCTION_DIRECT_URL }}"
+      - name: Decode and display secret
+        run: |
+          echo "ENCODED_SECRET: ${{ secrets.PRODUCTION_DIRECT_URL }}"
+          DECODED_SECRET=$(echo "${{ secrets.PRODUCTION_DIRECT_URL }}" | base64 --decode)
+          echo "DECODED_SECRET: $PRODUCTION_DIRECT_URL"
       - name: Install dependencies
         run: npm install
       - name: Apply all pending migrations to the database
