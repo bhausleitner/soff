@@ -6,7 +6,7 @@
 
 Add table in `prisma/schema.prisma` and run `npx prisma migrate -m [migration identifier message]`.
 
-Migrations to prod are automatically applied.
+Migrations to `prod` are automatically applied.
 
 ## Setup linting and formatting
 
