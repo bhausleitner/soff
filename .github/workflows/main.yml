@@ -1,4 +1,4 @@
-name: Deploy
+name: Migrate Prod DB
 on:
   push:
     branches:
@@ -19,3 +19,4 @@ jobs:
         run: npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PRODUCTION_DIRECT_URL }}
