@@ -52,6 +52,7 @@ model Supplier {
     parts         SupplierPart[]
     quotes        Quote[]
     messages      Message[]
+    chats         Chat[]
 
     @@index([name])
 }
@@ -114,6 +115,7 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   messages      Message[]
+  chats         Chat[]
 }
 
 model Chat {
@@ -121,6 +123,10 @@ model Chat {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   messages      Message[]
+  user          User @relation(fields: [userId], references: [id])
+  userId        Int
+  supplier      Supplier @relation(fields: [supplierId], references: [id])
+  supplierId    Int
 }
 
 model Message {
