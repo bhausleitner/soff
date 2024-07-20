@@ -1,4 +1,4 @@
-import { useEffect, type PropsWithChildren } from "react";
+import { useEffect, type PropsWithChildren, useMemo } from "react";
 import { cn } from "~/lib/utils";
 import Header from "~/components/layout/header";
 import Sidebar from "~/components/layout/sidebar";
@@ -11,15 +11,18 @@ export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
   const upsertUser = api.user.upsertUser.useMutation();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableUser = useMemo(() => user, [user?.id, user?.emailAddresses]);
+
   useEffect(() => {
-    console.log("running effect");
-    if (user) {
+    if (stableUser) {
       upsertUser.mutate({
-        clerkUserId: user.id,
-        email: user?.emailAddresses[0]?.emailAddress ?? ""
+        clerkUserId: stableUser?.id ?? "",
+        email: stableUser?.emailAddresses[0]?.emailAddress ?? ""
       });
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stableUser]);
 
   return (
     <>

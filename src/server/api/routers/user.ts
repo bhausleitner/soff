@@ -33,7 +33,7 @@ export const userRouter = createTRPCRouter({
           return;
         }
 
-        console.log("Creating new User");
+        console.log("Creating new User!");
         await ctx.db.user.create({
           data: {
             clerkUserId: clerkUserId,
