@@ -2,59 +2,58 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 enum Status {
-    ACTIVE
-    INACTIVE
-    ONBOARDING
+  ACTIVE
+  INACTIVE
+  ONBOARDING
 }
 
 enum QuoteStatus {
-    WAITING
-    RECEIVED
-    CONFIRMED
-    REJECTED
+  WAITING
+  RECEIVED
+  CONFIRMED
+  REJECTED
 }
 
 enum OrderStatus {
-    PENDING
-    CONFIRMED
-    DELIVERED
-    CANCELLED
+  PENDING
+  CONFIRMED
+  DELIVERED
+  CANCELLED
 }
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  @@index([name])
 }
 
 model Supplier {
-    id            Int      @id @default(autoincrement())
-    name          String   
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-    contactPerson String
-    email         String
-    status        Status   @default(ACTIVE)
-    responseTime  Int?     @default(48)
-    parts         SupplierPart[]
-    quotes        Quote[]
-    messages      Message[]
-    chats         Chat[]
+  id              Int              @id @default(autoincrement())
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  contactPerson   String
+  email           String
+  status          Status           @default(ACTIVE)
+  responseTime    Int?             @default(48)
+  parts           SupplierPart[]
+  quotes          Quote[]
+  chatParticipant ChatParticipant?
 
-    @@index([name])
+  @@index([name])
 }
 
 model Part {
@@ -72,73 +71,75 @@ model Part {
 model SupplierPart {
   supplier   Supplier @relation(fields: [supplierId], references: [id])
   supplierId Int
-  part       Part @relation(fields: [partId], references: [id])
+  part       Part     @relation(fields: [partId], references: [id])
   partId     Int
 
   @@id([supplierId, partId])
 }
 
 model Quote {
-  id         Int      @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
   supplierId Int
   partId     Int
   quantity   Int
   price      Float
   status     QuoteStatus
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   orders     Order[]
-
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  part       Part     @relation(fields: [partId], references: [id])
+  supplier   Supplier    @relation(fields: [supplierId], references: [id])
+  part       Part        @relation(fields: [partId], references: [id])
 
   @@index([status])
 }
 
 model Order {
-  id              Int      @id @default(autoincrement())
+  id              Int         @id @default(autoincrement())
   quoteId         Int
   orderDate       DateTime
   deliveryDate    DateTime
   deliveryAddress String
   status          OrderStatus
-
-  quote           Quote    @relation(fields: [quoteId], references: [id])
+  quote           Quote       @relation(fields: [quoteId], references: [id])
 
   @@index([status])
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String
-  clerkUserId   String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  messages      Message[]
-  chats         Chat[]
+  id              Int              @id @default(autoincrement())
+  email           String
+  clerkUserId     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  chatParticipant ChatParticipant?
 }
 
 model Chat {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  messages      Message[]
-  user          User @relation(fields: [userId], references: [id])
-  userId        Int
-  clerkUserId   String
-  supplier      Supplier @relation(fields: [supplierId], references: [id])
-  supplierId    Int
+  id               Int               @id @default(autoincrement())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  messages         Message[]
+  chatParticipants ChatParticipant[]
 }
 
 model Message {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  content       String
-  chat          Chat @relation(fields: [chatId], references: [id])
-  chatId        Int
-  sender        User @relation(fields: [senderId], references: [id])
-  senderId      Int
-  supplier      Supplier @relation(fields: [supplierId], references: [id])
-  supplierId    Int
+  id        Int             @id @default(autoincrement())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  content   String
+  chat      Chat            @relation(fields: [chatId], references: [id])
+  chatId    Int
+  sender    ChatParticipant @relation(fields: [senderId], references: [id])
+  senderId  Int
+}
+
+model ChatParticipant {
+  id         Int       @id @default(autoincrement())
+  chat       Chat      @relation(fields: [chatId], references: [id])
+  chatId     Int
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId Int?      @unique
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     Int?      @unique
+  messages   Message[]
 }
