@@ -41,16 +41,17 @@ model Post {
 }
 
 model Supplier {
-  id              Int               @id @default(autoincrement())
-  name            String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  contactPerson   String
-  email           String
-  status          Status            @default(ACTIVE)
-  responseTime    Int?              @default(48)
-  parts           SupplierPart[]
-  quotes          Quote[]
+  id               Int               @id @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  contactPerson    String
+  email            String
+  status           Status            @default(ACTIVE)
+  responseTime     Int?              @default(48)
+  parts            SupplierPart[]
+  quotes           Quote[]
+  chatParticipants ChatParticipant[]
 
   @@index([name])
 }
@@ -105,11 +106,12 @@ model Order {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
-  email           String
-  clerkUserId     String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id               Int               @id @default(autoincrement())
+  email            String
+  clerkUserId      String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  chatParticipants ChatParticipant[]
 }
 
 model Chat {
@@ -117,13 +119,27 @@ model Chat {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   messages         Message[]
+  chatParticipants ChatParticipant[]
 }
 
 model Message {
-  id        Int             @id @default(autoincrement())
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  content   String
-  chat      Chat            @relation(fields: [chatId], references: [id])
-  chatId    Int
+  id                Int             @id @default(autoincrement())
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  content           String
+  chat              Chat            @relation(fields: [chatId], references: [id])
+  chatId            Int
+  chatParticipant   ChatParticipant @relation(fields: [chatParticipantid], references: [id])
+  chatParticipantid Int
+}
+
+model ChatParticipant {
+  id         Int       @id @default(autoincrement())
+  chat       Chat      @relation(fields: [chatId], references: [id])
+  chatId     Int
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId Int?
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     Int?
+  messages   Message[]
 }
