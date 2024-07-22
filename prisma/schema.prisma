@@ -51,7 +51,6 @@ model Supplier {
   responseTime    Int?              @default(48)
   parts           SupplierPart[]
   quotes          Quote[]
-  chatParticipant ChatParticipant[]
 
   @@index([name])
 }
@@ -111,7 +110,6 @@ model User {
   clerkUserId     String
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  chatParticipant ChatParticipant[]
 }
 
 model Chat {
@@ -119,7 +117,6 @@ model Chat {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   messages         Message[]
-  chatParticipants ChatParticipant[]
 }
 
 model Message {
@@ -129,17 +126,4 @@ model Message {
   content   String
   chat      Chat            @relation(fields: [chatId], references: [id])
   chatId    Int
-  sender    ChatParticipant @relation(fields: [senderId], references: [id])
-  senderId  Int
-}
-
-model ChatParticipant {
-  id         Int       @id @default(autoincrement())
-  chat       Chat      @relation(fields: [chatId], references: [id])
-  chatId     Int
-  supplier   Supplier? @relation(fields: [supplierId], references: [id])
-  supplierId Int?
-  user       User?     @relation(fields: [userId], references: [id])
-  userId     Int?
-  messages   Message[]
 }
