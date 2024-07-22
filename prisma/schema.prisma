@@ -129,8 +129,8 @@ model Message {
   content           String
   chat              Chat            @relation(fields: [chatId], references: [id])
   chatId            Int
-  chatParticipant   ChatParticipant @relation(fields: [chatParticipantid], references: [id])
-  chatParticipantid Int
+  chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
+  chatParticipantId Int
 }
 
 model ChatParticipant {
