@@ -29,7 +29,11 @@ export default function Order() {
         <p>This is the Supplier Name: {data?.name}</p>
       </div>
       {selectedUser && (
-        <Chat messages={selectedUser.messages} selectedUser={selectedUser} />
+        <Chat
+          messages={selectedUser.messages}
+          selectedUser={selectedUser}
+          supplierId={supplierId}
+        />
       )}
     </div>
   );
