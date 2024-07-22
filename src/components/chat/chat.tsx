@@ -11,9 +11,10 @@ import { ensureError } from "~/utils/errorHandling";
 interface ChatProps {
   messages?: Message[];
   selectedUser: UserData;
+  supplierId: number;
 }
 
-export function Chat({ messages, selectedUser }: ChatProps) {
+export function Chat({ messages, selectedUser, supplierId }: ChatProps) {
   const [messagesState, setMessages] = useState<Message[]>(messages ?? []);
 
   // Initialize Mutation
@@ -21,8 +22,12 @@ export function Chat({ messages, selectedUser }: ChatProps) {
 
   const sendMessage = async (newMessage: Message) => {
     setMessages([...messagesState, newMessage]);
+
     try {
-      const sendChatPromise = sendChat.mutateAsync(newMessage);
+      const sendChatPromise = sendChat.mutateAsync({
+        message: newMessage.message,
+        supplierId: supplierId
+      });
 
       toast.promise(sendChatPromise, {
         loading: "Sending E-Mail...",

@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
@@ -10,6 +11,9 @@ import { Button } from "~/components/ui/button";
 const SupplierPage = () => {
   const router = useRouter();
   const supplierId = parseInt(router.query.supplierId as string, 10);
+  const [isCreatingRFQ, setIsCreatingRFQ] = useState(false);
+
+  const createChat = api.chat.createChat.useMutation();
 
   if (isNaN(supplierId)) {
     return <Spinner />;
@@ -37,11 +41,24 @@ const SupplierPage = () => {
         <SupplierBreadcrumb name={data.name} />
         <div className="flex items-center">
           <Button
+            className="w-32"
             onClick={async () => {
-              await router.push(`/order/${data.id}`);
+              setIsCreatingRFQ(true);
+
+              const chatId = await createChat.mutateAsync({
+                supplierId: data.id
+              });
+
+              // await router.push(`/order/${chatId}`);
+              setIsCreatingRFQ(false);
             }}
+            disabled={isCreatingRFQ}
           >
-            Create RFQ
+            {isCreatingRFQ ? (
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              "Start RFQ"
+            )}
           </Button>
         </div>
       </div>
