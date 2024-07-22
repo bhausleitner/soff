@@ -7,16 +7,34 @@ import { api } from "~/utils/api";
 import { toast } from "sonner";
 import { getCurrentDateTime } from "~/utils/time";
 import { ensureError } from "~/utils/errorHandling";
+import { type Supplier } from "~/server/api/routers/supplier";
 
 interface ChatProps {
-  messages?: Message[];
-  selectedUser: UserData;
-  supplierId: number;
+  supplier: Supplier;
 }
 
-export function Chat({ messages, selectedUser, supplierId }: ChatProps) {
-  const [messagesState, setMessages] = useState<Message[]>(messages ?? []);
+export function Chat({ supplier }: ChatProps) {
+  // const messages = [];
+  // const [messagesState, setMessages] = useState<Message[]>(messages ?? []);
 
+  return (
+    <>
+      <ChatTopbar supplier={supplier} />
+      {/* <ChatList messages={messagesState} /> */}
+      {/* <ChatBottombar sendMessage={sendMessage} /> */}
+    </>
+  );
+}
+
+function handleSendChat({
+  setMessages,
+  messagesState,
+  supplier
+}: {
+  setMessages: any;
+  messagesState: any;
+  supplier: any;
+}) {
   // Initialize Mutation
   const sendChat = api.chat.sendChat.useMutation();
 
@@ -26,7 +44,7 @@ export function Chat({ messages, selectedUser, supplierId }: ChatProps) {
     try {
       const sendChatPromise = sendChat.mutateAsync({
         message: newMessage.message,
-        supplierId: supplierId
+        supplierId: supplier.id
       });
 
       toast.promise(sendChatPromise, {
@@ -42,12 +60,4 @@ export function Chat({ messages, selectedUser, supplierId }: ChatProps) {
       console.error("Catched the error", error);
     }
   };
-
-  return (
-    <>
-      <ChatTopbar selectedUser={selectedUser} />
-      <ChatList messages={messagesState} selectedUser={selectedUser} />
-      <ChatBottombar sendMessage={sendMessage} />
-    </>
-  );
 }

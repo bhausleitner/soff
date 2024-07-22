@@ -6,10 +6,9 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 
 interface ChatListProps {
   messages?: Message[];
-  selectedUser: UserData;
 }
 
-export function ChatList({ messages, selectedUser }: ChatListProps) {
+export function ChatList({ messages }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

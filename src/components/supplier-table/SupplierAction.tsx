@@ -47,11 +47,6 @@ export function SupplierAction({ row }: SupplierActionProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem>View supplier</DropdownMenuItem>
         <DropdownMenuItem>View supplier details</DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleNavigation(`/order/${supplier.id}`)}
-        >
-          New Order
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

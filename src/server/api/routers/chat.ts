@@ -64,6 +64,27 @@ export const chatRouter = createTRPCRouter({
 
       return chatObject.id;
     }),
+  getChat: publicProcedure
+    .input(
+      z.object({
+        chatId: z.number()
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const chat = await ctx.db.chat.findFirst({
+        where: {
+          id: input.chatId
+        },
+        select: {
+          chatParticipants: {
+            select: {
+              supplier: true
+            }
+          }
+        }
+      });
+      return chat;
+    }),
   sendChat: publicProcedure
     .input(messageSchema)
     .mutation(async ({ input, ctx }) => {
