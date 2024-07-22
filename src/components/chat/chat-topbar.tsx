@@ -4,30 +4,22 @@ import Link from "next/link";
 import { type UserData } from "~/static/data";
 import { cn } from "~/lib/utils";
 import { buttonVariants } from "../ui/button";
-import { Avatar, AvatarImage } from "../ui/avatar";
+
+import { type Supplier } from "~/server/api/routers/supplier";
 
 interface ChatTopbarProps {
-  selectedUser: UserData;
+  supplier: Supplier;
 }
 
 export const TopbarIcons = [{ icon: Phone }, { icon: Video }, { icon: Info }];
 
-export default function ChatTopbar({ selectedUser }: ChatTopbarProps) {
+export default function ChatTopbar({ supplier }: ChatTopbarProps) {
   return (
     <div className="flex h-20 w-full items-center justify-between border-b p-4">
       <div className="flex items-center gap-2">
-        <Avatar className="flex items-center justify-center">
-          <AvatarImage
-            src={selectedUser.avatar}
-            alt={selectedUser.name}
-            width={6}
-            height={6}
-            className="h-10 w-10"
-          />
-        </Avatar>
         <div className="flex flex-col">
-          <span className="font-medium">{selectedUser.name}</span>
-          <span className="text-xs">Active 2 mins ago</span>
+          <span className="font-medium">{supplier.name}</span>
+          <span className="text-xs">{supplier.contactPerson}</span>
         </div>
       </div>
 

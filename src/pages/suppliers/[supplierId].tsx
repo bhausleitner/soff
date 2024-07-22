@@ -49,7 +49,7 @@ const SupplierPage = () => {
                 supplierId: data.id
               });
 
-              // await router.push(`/order/${chatId}`);
+              await router.push(`/exchange/${chatId}`);
               setIsCreatingRFQ(false);
             }}
             disabled={isCreatingRFQ}

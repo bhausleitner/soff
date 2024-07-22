@@ -10,9 +10,17 @@ import {
 
 interface SupplierBreadcrumbProps {
   name?: string;
+  supplierId?: number;
+  rfq?: boolean;
+  chatId?: number;
 }
 
-export function SupplierBreadcrumb({ name }: SupplierBreadcrumbProps) {
+export function SupplierBreadcrumb({
+  name,
+  supplierId,
+  rfq,
+  chatId
+}: SupplierBreadcrumbProps) {
   return (
     <>
       <Breadcrumb>
@@ -31,8 +39,25 @@ export function SupplierBreadcrumb({ name }: SupplierBreadcrumbProps) {
           {name && (
             <>
               <BreadcrumbSeparator />
+              {!rfq && (
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{name}</BreadcrumbPage>
+                </BreadcrumbItem>
+              )}
+              {rfq && (
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={`/suppliers/${supplierId}`}>
+                    {name}
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              )}
+            </>
+          )}
+          {rfq && (
+            <>
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{name}</BreadcrumbPage>
+                <BreadcrumbPage>RFQ #{chatId}</BreadcrumbPage>
               </BreadcrumbItem>
             </>
           )}
