@@ -41,17 +41,17 @@ model Post {
 }
 
 model Supplier {
-  id              Int              @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   name            String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   contactPerson   String
   email           String
-  status          Status           @default(ACTIVE)
-  responseTime    Int?             @default(48)
+  status          Status            @default(ACTIVE)
+  responseTime    Int?              @default(48)
   parts           SupplierPart[]
   quotes          Quote[]
-  chatParticipant ChatParticipant?
+  chatParticipant ChatParticipant[]
 
   @@index([name])
 }
@@ -106,12 +106,12 @@ model Order {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   email           String
   clerkUserId     String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  chatParticipant ChatParticipant?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  chatParticipant ChatParticipant[]
 }
 
 model Chat {
@@ -138,8 +138,8 @@ model ChatParticipant {
   chat       Chat      @relation(fields: [chatId], references: [id])
   chatId     Int
   supplier   Supplier? @relation(fields: [supplierId], references: [id])
-  supplierId Int?      @unique
+  supplierId Int?
   user       User?     @relation(fields: [userId], references: [id])
-  userId     Int?      @unique
+  userId     Int?
   messages   Message[]
 }
