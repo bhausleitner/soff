@@ -39,6 +39,16 @@ export async function initMsGraphClient(queryCode: string, userId: string) {
   // request token from MSAL Client
   const response = await msalClient.acquireTokenByCode(tokenRequest);
 
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log("response from msalclient");
+  console.log(response);
+
   // store microsoftAccessToken in Clerk session claims
   await clerkClient?.users.updateUserMetadata(userId, {
     publicMetadata: {

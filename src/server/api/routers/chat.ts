@@ -104,6 +104,17 @@ export const chatRouter = createTRPCRouter({
         "sessionClaims.publicMetadata.microsoftHomeAccountId"
       );
 
+      console.log("sessionClaims");
+      console.log("sessionClaims");
+      console.log("sessionClaims");
+      console.log("sessionClaims");
+      console.log("sessionClaims");
+      console.log(ctx.auth.sessionClaims);
+      console.log("msHomeAccountId");
+      console.log(msHomeAccountId);
+      console.log("publicmetadata");
+      console.log(ctx?.auth?.sessionClaims?.publicMetadata);
+
       if (!msHomeAccountId) {
         throw Error("Microsoft Account not authorized");
       }
