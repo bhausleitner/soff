@@ -18,6 +18,7 @@ import {
   Laptop,
   LayoutDashboardIcon,
   Loader2,
+  LoaderCircle,
   LogIn,
   type LucideIcon,
   type LucideProps,
@@ -31,12 +32,24 @@ import {
   User,
   User2Icon,
   UserX2Icon,
-  X
+  X,
+  FileImage,
+  Mic,
+  Paperclip,
+  PlusCircle,
+  SendHorizontal,
+  ThumbsUp
 } from "lucide-react";
 
 export type Icon = LucideIcon;
 
 export const Icons = {
+  mic: Mic,
+  fileImage: FileImage,
+  paperClip: Paperclip,
+  plusCircle: PlusCircle,
+  sendHorizontal: SendHorizontal,
+  thumbsUp: ThumbsUp,
   dashboard: LayoutDashboardIcon,
   suppliers: BookUser,
   logo: Command,
@@ -44,6 +57,7 @@ export const Icons = {
   close: X,
   profile: User2Icon,
   spinner: Loader2,
+  loaderCircle: LoaderCircle,
   kanban: CircuitBoardIcon,
   checkcheck: CheckCheck,
   chevronLeft: ChevronLeft,
