@@ -8,11 +8,7 @@ import {
   BreadcrumbSeparator
 } from "~/components/ui/breadcrumb";
 
-interface QuoteBreadcrumbProps {
-  quoteId: number;
-}
-
-export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
+export function QuoteBreadcrumb() {
   return (
     <>
       <Breadcrumb>

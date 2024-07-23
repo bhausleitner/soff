@@ -5,30 +5,20 @@ import { type TableConfig } from "~/types/tableTypes";
 import { type UseTRPCQueryResult } from "@trpc/react-query/shared";
 import { type TRPCClientErrorLike } from "@trpc/client";
 
-interface GenericTableProps<T> {
+interface GenericTableProps<T, TQueryArgs = void> {
   tableConfig: TableConfig;
-  useQueryHook: (args: { supplierId: number }) => UseTRPCQueryResult<
-    T[],
-    TRPCClientErrorLike<{
-      input: {
-        supplierId: number;
-      };
-      output: T[];
-      transformer: true;
-      errorShape: {
-        // Define the shape of the error here
-      };
-    }>
-  >;
-  supplierId: number;
+  useQueryHook: (
+    args: TQueryArgs
+  ) => UseTRPCQueryResult<T[], TRPCClientErrorLike<any>>;
+  queryArgs: TQueryArgs;
 }
 
-export function GenericTable<T extends { id: number }>({
+export function GenericTable<T extends { id: number }, TQueryArgs>({
   tableConfig,
   useQueryHook,
-  supplierId
-}: GenericTableProps<T>) {
-  const { data, isLoading } = useQueryHook({ supplierId });
+  queryArgs
+}: GenericTableProps<T, TQueryArgs>) {
+  const { data, isLoading } = useQueryHook(queryArgs);
 
   return (
     <>

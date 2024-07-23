@@ -28,24 +28,24 @@ export function SupplierTabs({ supplierId }: SupplierTabsProps) {
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="parts" className="space-y-4">
-          <GenericTable<Part>
+          <GenericTable<Part, { supplierId: number }>
             tableConfig={supplierPartTableConfig}
             useQueryHook={useGetPartsBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
         <TabsContent value="quotes" className="space-y-4">
-          <GenericTable<Quote>
+          <GenericTable<Quote, { supplierId: number }>
             tableConfig={supplierQuoteTableConfig}
             useQueryHook={useGetQuotesBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
-          <GenericTable<Order>
+          <GenericTable<Order, { supplierId: number }>
             tableConfig={supplierOrderTableConfig}
             useQueryHook={useGetOrdersBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
       </Tabs>
