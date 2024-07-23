@@ -39,6 +39,7 @@ export type Icon = LucideIcon;
 export const Icons = {
   dashboard: LayoutDashboardIcon,
   suppliers: BookUser,
+  quotes: CreditCard,
   logo: Command,
   login: LogIn,
   close: X,
