@@ -1,79 +1,61 @@
-import React, { useRef, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { type Message, type UserData } from "~/static/data";
+import React from "react";
 import { cn } from "~/lib/utils";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { type ChatMessage } from "~/server/api/routers/chat";
+import { map } from "lodash";
+import { Icons } from "~/components/icons";
 
 interface ChatListProps {
-  messages?: Message[];
+  chatMessages?: ChatMessage[];
+  chatParticipantUserId: number;
 }
 
-export function ChatList({ messages }: ChatListProps) {
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+export function ChatList({
+  chatMessages,
+  chatParticipantUserId
+}: ChatListProps) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    };
+    return date.toLocaleDateString("en-GB", options);
+  };
 
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
-
+  // render message left side if chatparticipant is not the user
   return (
     <div className="flex-1 overflow-y-auto">
-      <div ref={messagesContainerRef} className="flex-grow overflow-x-hidden">
-        <AnimatePresence>
-          {messages?.map((message, index) => (
-            <motion.div
-              key={index}
-              layout
-              initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
-              animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-              exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
-              transition={{
-                opacity: { duration: 0.1 },
-                layout: {
-                  type: "spring",
-                  bounce: 0.3,
-                  duration: messages.indexOf(message) * 0.05 + 0.2
-                }
-              }}
-              style={{
-                originX: 0.5,
-                originY: 0.5
-              }}
+      <div className="flex-grow overflow-x-hidden">
+        {map(chatMessages, (chatMessage, index) => (
+          <div
+            key={index}
+            className={cn(
+              "flex flex-col gap-2 whitespace-pre-wrap p-4",
+              chatMessage.chatParticipantId === chatParticipantUserId
+                ? "items-end"
+                : "items-start"
+            )}
+          >
+            <div
               className={cn(
-                "flex flex-col gap-2 whitespace-pre-wrap p-4",
-                message.name !== selectedUser.name ? "items-end" : "items-start"
+                "flex flex-col rounded-md p-3",
+                chatMessage.chatParticipantId === chatParticipantUserId
+                  ? "bg-blue-100"
+                  : "bg-accent"
               )}
             >
-              <div className="flex items-center gap-3">
-                {message.name === selectedUser.name && (
-                  <Avatar className="flex items-center justify-center">
-                    <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
-                      width={6}
-                      height={6}
-                    />
-                  </Avatar>
-                )}
-                <span className="max-w-xs rounded-md bg-accent p-3">
-                  {message.message}
-                </span>
-                {message.name !== selectedUser.name && (
-                  <Avatar className="flex items-center justify-center">
-                    <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
-                      width={6}
-                      height={6}
-                    />
-                  </Avatar>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+              <span>{chatMessage.content}</span>
+              <span className="mt-1 flex items-center gap-1 text-xs text-gray-600">
+                <Icons.checkcheck className="h-4 w-4" />
+                {formatDate(chatMessage.createdAt.toString())}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
