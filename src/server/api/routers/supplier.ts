@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { Status } from "@prisma/client";
+import { Status, QuoteStatus, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-// define schema
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -16,8 +15,33 @@ const supplierArraySchema = z.array(supplierSchema);
 
 const supplierIdSchema = z.object({ supplierId: z.number() });
 
-// infer type from schema to keep frontend aligned
+const quoteSchema = z.object({
+  id: z.number(),
+  supplierId: z.number(),
+  partId: z.number(),
+  quantity: z.number(),
+  price: z.number(),
+  status: z.nativeEnum(QuoteStatus),
+  createdAt: z.date(),
+  updatedAt: z.date()
+});
+
+const quoteArraySchema = z.array(quoteSchema);
+
+const orderSchema = z.object({
+  id: z.number(),
+  quoteId: z.number(),
+  orderDate: z.date(),
+  deliveryDate: z.date(),
+  deliveryAddress: z.string(),
+  status: z.nativeEnum(OrderStatus)
+});
+
+const orderArraySchema = z.array(orderSchema);
+
 export type Supplier = z.infer<typeof supplierSchema>;
+export type Quote = z.infer<typeof quoteSchema>;
+export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
@@ -37,10 +61,10 @@ export const supplierRouter = createTRPCRouter({
 
     return supplierData;
   }),
+
   getSupplierById: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
-      // fetch supplier by id from db
       const supplierData = await ctx.db.supplier.findUnique({
         where: {
           id: input.supplierId
@@ -48,5 +72,35 @@ export const supplierRouter = createTRPCRouter({
       });
 
       return supplierData;
+    }),
+
+  getQuotesBySupplierId: publicProcedure
+    .input(supplierIdSchema)
+    .query(async ({ input, ctx }) => {
+      const quoteData = await ctx.db.quote.findMany({
+        where: {
+          supplierId: input.supplierId
+        }
+      });
+
+      quoteArraySchema.parse(quoteData);
+
+      return quoteData;
+    }),
+
+  getOrdersBySupplierId: publicProcedure
+    .input(supplierIdSchema)
+    .query(async ({ input, ctx }) => {
+      const orderData = await ctx.db.order.findMany({
+        where: {
+          quote: {
+            supplierId: input.supplierId
+          }
+        }
+      });
+
+      orderArraySchema.parse(orderData);
+
+      return orderData;
     })
 });
