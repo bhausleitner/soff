@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
+import { PaperPlaneIcon } from "@radix-ui/react-icons";
 
 const SupplierPage = () => {
   const router = useRouter();
@@ -49,15 +50,18 @@ const SupplierPage = () => {
                 supplierId: data.id
               });
 
-              await router.push(`/exchange/${chatId}`);
+              await router.push(`/rfq/${chatId}`);
               setIsCreatingRFQ(false);
             }}
             disabled={isCreatingRFQ}
           >
             {isCreatingRFQ ? (
-              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              <ReloadIcon className="h-4 w-4 animate-spin" />
             ) : (
-              "Start RFQ"
+              <>
+                Start RFQ
+                <PaperPlaneIcon className="ml-2 h-4 w-4" />
+              </>
             )}
           </Button>
         </div>

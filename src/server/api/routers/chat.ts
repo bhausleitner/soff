@@ -13,6 +13,17 @@ const createChatSchema = z.object({
   supplierId: z.number()
 });
 
+const chatMessageSchema = z.object({
+  id: z.number(),
+  chatId: z.number(),
+  content: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  chatParticipantId: z.number()
+});
+
+export type ChatMessage = z.infer<typeof chatMessageSchema>;
+
 export const chatRouter = createTRPCRouter({
   requestMicrosoftAuthUrl: publicProcedure.mutation(async () => {
     const authUrl = await initMicrosoftAuthUrl();
@@ -38,27 +49,24 @@ export const chatRouter = createTRPCRouter({
         throw Error("User not found");
       }
 
-      // create chat object & ChatParticipant objects
+      // create chat object
       const chatObject = await ctx.db.chat.create({
+        data: {}
+      });
+
+      // create supplier chat participant
+      await ctx.db.chatParticipant.create({
         data: {
-          chatParticipants: {
-            create: [
-              {
-                supplier: {
-                  connect: {
-                    id: input.supplierId
-                  }
-                }
-              },
-              {
-                user: {
-                  connect: {
-                    id: user.id
-                  }
-                }
-              }
-            ]
-          }
+          chatId: chatObject.id,
+          supplierId: input.supplierId
+        }
+      });
+
+      // create user chat participant
+      await ctx.db.chatParticipant.create({
+        data: {
+          chatId: chatObject.id,
+          userId: user.id
         }
       });
 
@@ -78,9 +86,12 @@ export const chatRouter = createTRPCRouter({
         select: {
           chatParticipants: {
             select: {
-              supplier: true
+              id: true,
+              supplier: true,
+              user: true
             }
-          }
+          },
+          messages: true
         }
       });
       return chat;
