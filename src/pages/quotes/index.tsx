@@ -7,10 +7,11 @@ export default function Supplier() {
   return (
     <>
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <QuoteBreadcrumb quoteId={1} />
-        <GenericTable<Quote>
+        <QuoteBreadcrumb />
+        <GenericTable<Quote, void>
           tableConfig={quoteTableConfig}
           useQueryHook={useGetAllQuotes}
+          queryArgs={undefined}
         />
       </div>
     </>
