@@ -6,7 +6,7 @@ import {
   supplierOrderTableConfig,
   supplierPartTableConfig,
   supplierQuoteTableConfig
-} from "./constants";
+} from "../../constants/tableConfigs";
 import { type Part } from "~/server/api/routers/part";
 import { type Quote, type Order } from "~/server/api/routers/supplier";
 
