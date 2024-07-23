@@ -1,7 +1,6 @@
 import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
-import { api } from "~/utils/api";
 import {
   supplierOrderTableConfig,
   supplierPartTableConfig,
@@ -9,19 +8,17 @@ import {
 } from "../../constants/tableConfigs";
 import { type Part } from "~/server/api/routers/part";
 import { type Quote, type Order } from "~/server/api/routers/supplier";
+import {
+  useGetPartsBySupplierQuery,
+  useGetQuotesBySupplierQuery,
+  useGetOrdersBySupplierQuery
+} from "../../constants/tableConfigs";
 
 interface SupplierTabsProps {
   supplierId: number;
 }
 
 export function SupplierTabs({ supplierId }: SupplierTabsProps) {
-  const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
-    api.part.getPartsBySupplierId.useQuery(args);
-  const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
-    api.supplier.getQuotesBySupplierId.useQuery(args);
-  const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
-    api.supplier.getOrdersBySupplierId.useQuery(args);
-
   return (
     <>
       <Tabs defaultValue="parts" className="space-y-4">
