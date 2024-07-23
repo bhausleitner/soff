@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "~/lib/utils";
-import { Avatar, AvatarImage } from "../ui/avatar";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import { map } from "lodash";
 import { Icons } from "~/components/icons";

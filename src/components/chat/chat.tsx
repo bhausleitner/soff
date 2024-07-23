@@ -1,26 +1,29 @@
-import React from "react";
-import { type Message, type UserData } from "~/static/data";
+import React, { type Dispatch, type SetStateAction } from "react";
 import ChatTopbar from "./chat-topbar";
 import { ChatList } from "./chat-list";
 import ChatBottombar from "./chat-bottombar";
-import { api } from "~/utils/api";
-import { toast } from "sonner";
-import { getCurrentDateTime } from "~/utils/time";
-import { ensureError } from "~/utils/errorHandling";
 import { type Supplier } from "~/server/api/routers/supplier";
 import { type ChatMessage } from "~/server/api/routers/chat";
 
 interface ChatProps {
   supplier: Supplier;
   chatMessages: ChatMessage[];
+  setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+  chatId: number;
   chatParticipantUserId: number;
 }
 
 export function Chat({
   supplier,
   chatMessages,
+  setChatMessages,
+  chatId,
   chatParticipantUserId
 }: ChatProps) {
+  function updateFrontendMessages(newMessage: ChatMessage) {
+    setChatMessages([...chatMessages, newMessage]);
+  }
+
   return (
     <>
       <ChatTopbar supplier={supplier} />
@@ -28,43 +31,11 @@ export function Chat({
         chatMessages={chatMessages}
         chatParticipantUserId={chatParticipantUserId}
       />
-      {/* <ChatBottombar sendMessage={sendMessage} /> */}
+      <ChatBottombar
+        chatParticipantUserId={chatParticipantUserId}
+        chatId={chatId}
+        updateFrontendMessages={updateFrontendMessages}
+      />
     </>
   );
 }
-
-// function handleSendChat({
-//   setMessages,
-//   messagesState,
-//   supplier
-// }: {
-//   setMessages: any;
-//   messagesState: any;
-//   supplier: any;
-// }) {
-//   // Initialize Mutation
-//   const sendChat = api.chat.sendChat.useMutation();
-
-//   const sendMessage = async (newMessage: Message) => {
-//     setMessages([...messagesState, newMessage]);
-
-//     try {
-//       const sendChatPromise = sendChat.mutateAsync({
-//         message: newMessage.message,
-//         supplierId: supplier.id
-//       });
-
-//       toast.promise(sendChatPromise, {
-//         loading: "Sending E-Mail...",
-//         success: "E-Mail sent!",
-//         error: "Failed sending E-Mail. Please try again.",
-//         description: getCurrentDateTime()
-//       });
-
-//       await sendChatPromise;
-//     } catch (err) {
-//       const error = ensureError(err);
-//       console.error("Catched the error", error);
-//     }
-//   };
-// }

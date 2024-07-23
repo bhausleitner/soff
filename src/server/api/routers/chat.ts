@@ -4,11 +4,6 @@ import { sendMailAsync } from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import _ from "lodash";
 
-const messageSchema = z.object({
-  message: z.string(),
-  supplierId: z.number()
-});
-
 const createChatSchema = z.object({
   supplierId: z.number()
 });
@@ -97,13 +92,13 @@ export const chatRouter = createTRPCRouter({
       return chat;
     }),
   sendChat: publicProcedure
-    .input(messageSchema)
+    .input(chatMessageSchema)
     .mutation(async ({ input, ctx }) => {
-      if (input.message === "fail") {
+      if (input.content === "fail") {
         throw Error;
       }
 
-      // use lodash get to get the msHomeAccountid
+      // use lodash to get the msHomeAccountid
       const msHomeAccountId = _.get(
         ctx.auth,
         "sessionClaims.publicMetadata.microsoftHomeAccountId"
@@ -113,26 +108,38 @@ export const chatRouter = createTRPCRouter({
         throw Error("Microsoft Account not authorized");
       }
 
-      // get supplier email
-      const supplier = await ctx.db.supplier.findFirst({
-        where: {
-          id: input.supplierId
-        },
-        select: {
-          email: true
+      // create new message object
+      await ctx.db.message.create({
+        data: {
+          chatId: input.chatId,
+          content: input.content,
+          chatParticipantId: input.chatParticipantId
         }
       });
 
-      if (!supplier?.email) {
+      // get supplier email from chat object
+      const chatParticipant = await ctx.db.chatParticipant.findFirst({
+        where: {
+          chatId: input.chatId,
+          supplierId: {
+            not: null
+          }
+        },
+        include: {
+          supplier: true
+        }
+      });
+
+      if (!chatParticipant?.supplier?.email) {
         throw Error("Supplier email not found");
       }
 
       // send mail
       await sendMailAsync(
         msHomeAccountId,
-        input.message,
-        input.message,
-        supplier.email
+        "Message from Soff Chat",
+        input.content,
+        chatParticipant.supplier.email
       );
 
       return { success: true };

@@ -23,12 +23,6 @@ interface SupplierActionProps {
 export function SupplierAction({ row }: SupplierActionProps) {
   const supplier = row.original;
 
-  const router = useRouter();
-
-  const handleNavigation = async (path: string) => {
-    await router.push(path);
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

@@ -53,6 +53,8 @@ export default function Exchange() {
       <Chat
         supplier={supplier}
         chatMessages={chatMessages}
+        setChatMessages={setChatMessages}
+        chatId={chatId}
         chatParticipantUserId={chatParticipantUserId}
       />
     </div>

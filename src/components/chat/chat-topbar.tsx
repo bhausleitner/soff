@@ -1,7 +1,6 @@
 import React from "react";
 import { Info, Phone, Video } from "lucide-react";
 import Link from "next/link";
-import { type UserData } from "~/static/data";
 import { cn } from "~/lib/utils";
 import { buttonVariants } from "../ui/button";
 
