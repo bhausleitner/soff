@@ -1,34 +1,18 @@
-import { type UseQueryResult } from "react-query";
-
-export interface ColumnConfig<T> {
+export interface ColumnConfig {
   header: string;
   accessorKey: string;
   sortable: boolean;
   link?: string;
-  cell?: (row: T) => JSX.Element;
+  cell?: (row: any) => JSX.Element;
 }
 
-export interface TableConfig<T> {
+export interface TableConfig {
   placeholder: string;
   checkbox: boolean;
-  columns: ColumnConfig<T>[];
+  columns: ColumnConfig[];
 }
 
 export interface TableProps<T extends { id: number }> {
-  tableConfig: {
-    placeholder: string;
-    checkbox: boolean;
-    columns: Array<{
-      header: string;
-      accessorKey: string;
-      sortable: boolean;
-      link?: string;
-      cell?: (row: any) => JSX.Element;
-    }>;
-  };
+  tableConfig: TableConfig;
   data: T[];
 }
-
-export type QueryHook<TData, TError = unknown> = (input: {
-  supplierId: number;
-}) => UseQueryResult<TData[], TError>;

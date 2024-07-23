@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
 import { api } from "~/utils/api";
@@ -15,19 +15,12 @@ interface SupplierTabsProps {
 }
 
 export function SupplierTabs({ supplierId }: SupplierTabsProps) {
-  const useGetPartsBySupplierQuery = api.part.getPartsBySupplierId.useQuery;
-  const useGetQuotesBySupplierQuery =
-    api.supplier.getQuotesBySupplierId.useQuery;
-  const useGetOrdersBySupplierQuery =
-    api.supplier.getOrdersBySupplierId.useQuery;
-
-  const { data: partsData } = useGetPartsBySupplierQuery({
-    supplierId
-  });
-
-  useEffect(() => {
-    console.log("Parts Data:", partsData);
-  }, [partsData]);
+  const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
+    api.part.getPartsBySupplierId.useQuery(args);
+  const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
+    api.supplier.getQuotesBySupplierId.useQuery(args);
+  const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
+    api.supplier.getOrdersBySupplierId.useQuery(args);
 
   return (
     <>
