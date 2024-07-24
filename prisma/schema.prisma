@@ -31,6 +31,13 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model TokenCache {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  expiresAt DateTime
+}
+
 model Post {
   id        Int      @id @default(autoincrement())
   name      String
