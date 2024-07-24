@@ -3,6 +3,7 @@ import React from "react";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
+import { QuoteInfo } from "~/components/quote-detail/QuoteInfo";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const QuotePage = () => {
         <QuoteBreadcrumb quoteId={quoteId} />
         <div className="flex items-center"></div>
       </div>
-      {/* <SupplierInfo data={data} /> */}
+      <QuoteInfo quote={data} />
     </div>
   );
 };
