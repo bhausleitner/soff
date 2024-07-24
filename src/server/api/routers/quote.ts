@@ -1,0 +1,34 @@
+import { z } from "zod";
+import { QuoteStatus } from "@prisma/client";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+export const quoteSchema = z.object({
+  id: z.number(),
+  supplierId: z.number(),
+  partId: z.number(),
+  quantity: z.number(),
+  price: z.number(),
+  status: z.nativeEnum(QuoteStatus),
+  createdAt: z.date(),
+  updatedAt: z.date()
+});
+export const quoteArraySchema = z.array(quoteSchema);
+const quoteIdSchema = z.object({
+  quoteId: z.number()
+});
+
+export type Quote = z.infer<typeof quoteSchema>;
+
+export const quoteRouter = createTRPCRouter({
+  getQuoteById: publicProcedure
+    .input(quoteIdSchema)
+    .query(async ({ ctx, input }) => {
+      const quote = await ctx.db.quote.findUnique({
+        where: { id: input.quoteId }
+      });
+
+      quoteSchema.parse(quote);
+
+      return quote;
+    })
+});
