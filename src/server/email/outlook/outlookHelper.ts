@@ -5,7 +5,7 @@ import {
   type AuthorizationCodeRequest
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
-import { msalClient } from "./initMsalClient";
+import { msalClient } from "~/server/email/outlook/initMsalClient";
 
 const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
