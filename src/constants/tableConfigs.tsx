@@ -1,6 +1,6 @@
 import { SupplierAction } from "~/components/supplier-detail/SupplierAction";
 import { api } from "~/utils/api";
-import { type SupplierType } from "~/types/types";
+import { type Supplier } from "~/server/api/routers/supplier";
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
@@ -68,7 +68,7 @@ export const supplierTableConfig = {
       header: "Actions",
       accessorKey: "actions",
       sortable: false,
-      cell: ({ row }: { row: { original: SupplierType } }) => (
+      cell: ({ row }: { row: { original: Supplier } }) => (
         <SupplierAction row={row} />
       )
     }

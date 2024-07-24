@@ -8,11 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "../ui/dropdown-menu";
-import { type SupplierType } from "~/types/types"; // Updated import
+import { type Supplier } from "~/server/api/routers/supplier";
 
 interface SupplierActionProps {
   row: {
-    original: SupplierType;
+    original: Supplier;
   };
 }
 
