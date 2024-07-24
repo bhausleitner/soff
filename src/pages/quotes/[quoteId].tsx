@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
-import { QuoteBreadcrumb } from "~/components/quote-table/QuoteBreadcrumb";
+import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 
 const QuotePage = () => {
   const router = useRouter();

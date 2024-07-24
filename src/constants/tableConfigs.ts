@@ -1,4 +1,9 @@
 import { api } from "~/utils/api";
+import { type z } from "zod";
+import { type supplierSchema } from "~/server/api/routers/supplier";
+import { type SupplierAction } from "~/components/supplier-detail/SupplierAction";
+
+type SupplierType = z.infer<typeof supplierSchema>;
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
@@ -50,6 +55,27 @@ export const quoteTableConfig = {
   ]
 };
 
+export const supplierTableConfig = {
+  placeholder: "Filter supplier...",
+  checkbox: true,
+  columns: [
+    {
+      header: "Name",
+      accessorKey: "name",
+      sortable: true,
+      link: "/suppliers/"
+    },
+    { header: "Status", accessorKey: "status", sortable: false },
+    { header: "Email", accessorKey: "email", sortable: true },
+    {
+      header: "Actions",
+      accessorKey: "actions",
+      sortable: false
+      // cell: (row: { original: SupplierType }) => <SupplierAction row={row} />
+    }
+  ]
+};
+
 export const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
   api.part.getPartsBySupplierId.useQuery(args);
 export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
@@ -58,3 +84,4 @@ export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
   api.supplier.getOrdersBySupplierId.useQuery(args);
 
 export const useGetAllQuotes = () => api.quote.getAllQuotes.useQuery();
+export const useGetAllSuppliers = () => api.supplier.getAllSuppliers.useQuery();
