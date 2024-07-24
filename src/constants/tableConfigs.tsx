@@ -1,9 +1,6 @@
 import { SupplierAction } from "~/components/supplier-detail/SupplierAction";
 import { api } from "~/utils/api";
-import { type z } from "zod";
-import { type supplierSchema } from "~/server/api/routers/supplier";
-
-type SupplierType = z.infer<typeof supplierSchema>;
+import { type SupplierType } from "~/types/types";
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
