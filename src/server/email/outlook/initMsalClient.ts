@@ -2,7 +2,6 @@ import {
   ConfidentialClientApplication,
   type Configuration
 } from "@azure/msal-node";
-import { GlobalRef } from "~/utils/GlobalRef";
 import { db } from "~/server/db";
 
 const _msalConfig: Configuration = {
@@ -38,16 +37,4 @@ const _msalConfig: Configuration = {
   }
 };
 
-function initMsalClient() {
-  return new ConfidentialClientApplication(_msalConfig);
-}
-
-const globalMsalClientConnection = new GlobalRef<ConfidentialClientApplication>(
-  "myapp.ConfidentialClientApp"
-);
-if (!globalMsalClientConnection.value) {
-  globalMsalClientConnection.value = initMsalClient();
-}
-
-export const msalClient: ConfidentialClientApplication =
-  globalMsalClientConnection.value;
+export const msalClient = new ConfidentialClientApplication(_msalConfig);
