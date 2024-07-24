@@ -34,7 +34,7 @@ datasource db {
 model MsalTokenCache {
   id        Int      @id @default(autoincrement())
   clientId  String   @unique
-  cache     String   
+  cache     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -139,6 +139,8 @@ model Message {
   chatId            Int
   chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
   chatParticipantId Int
+  outlookMessageId  String? 
+  conversationId    String
 }
 
 model ChatParticipant {
