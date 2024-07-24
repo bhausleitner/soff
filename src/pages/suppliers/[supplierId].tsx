@@ -1,13 +1,12 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { ReloadIcon } from "@radix-ui/react-icons";
 import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
-import { PaperPlaneIcon } from "@radix-ui/react-icons";
+import { Icons } from "~/components/icons";
 
 const SupplierPage = () => {
   const router = useRouter();
@@ -56,11 +55,11 @@ const SupplierPage = () => {
             disabled={isCreatingRFQ}
           >
             {isCreatingRFQ ? (
-              <ReloadIcon className="h-4 w-4 animate-spin" />
+              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
             ) : (
               <>
                 Start RFQ
-                <PaperPlaneIcon className="ml-2 h-4 w-4" />
+                <Icons.sendHorizontal className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>
