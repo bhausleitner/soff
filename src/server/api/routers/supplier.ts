@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Status, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { quoteArraySchema, type quoteSchema } from "~/server/api/routers/quote";
+import { quoteArraySchema } from "~/server/api/routers/quote";
 
 export const supplierSchema = z.object({
   id: z.number(),
@@ -27,7 +27,6 @@ const orderSchema = z.object({
 const orderArraySchema = z.array(orderSchema);
 
 export type Supplier = z.infer<typeof supplierSchema>;
-export type Quote = z.infer<typeof quoteSchema>;
 export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({

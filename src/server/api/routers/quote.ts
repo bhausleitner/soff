@@ -20,6 +20,14 @@ const quoteIdSchema = z.object({
 export type Quote = z.infer<typeof quoteSchema>;
 
 export const quoteRouter = createTRPCRouter({
+  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
+    const quoteData = await ctx.db.quote.findMany({});
+
+    quoteArraySchema.parse(quoteData);
+
+    return quoteData;
+  }),
+
   getQuoteById: publicProcedure
     .input(quoteIdSchema)
     .query(async ({ ctx, input }) => {

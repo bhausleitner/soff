@@ -57,4 +57,4 @@ export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
 export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
   api.supplier.getOrdersBySupplierId.useQuery(args);
 
-export const useGetAllQuotes = () => api.supplier.getAllQuotes.useQuery();
+export const useGetAllQuotes = () => api.quote.getAllQuotes.useQuery();
