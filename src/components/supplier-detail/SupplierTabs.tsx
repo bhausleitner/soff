@@ -1,18 +1,16 @@
 import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
-import {
-  supplierOrderTableConfig,
-  supplierPartTableConfig,
-  supplierQuoteTableConfig
-} from "../../constants/tableConfigs";
 import { type Part } from "~/server/api/routers/part";
 import { type Quote, type Order } from "~/server/api/routers/supplier";
 import {
+  supplierOrderTableConfig,
+  supplierPartTableConfig,
+  supplierQuoteTableConfig,
   useGetPartsBySupplierQuery,
   useGetQuotesBySupplierQuery,
   useGetOrdersBySupplierQuery
-} from "../../constants/tableConfigs";
+} from "~/constants/tableConfigs";
 
 interface SupplierTabsProps {
   supplierId: number;
