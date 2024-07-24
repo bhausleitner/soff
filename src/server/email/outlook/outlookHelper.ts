@@ -1,4 +1,4 @@
-import { Client } from "@microsoft/microsoft-graph-client";
+import { Client, type PageCollection } from "@microsoft/microsoft-graph-client";
 import { type Message } from "@microsoft/microsoft-graph-types";
 import {
   type AuthorizationUrlRequest,
@@ -94,7 +94,7 @@ export async function sendMailAsync(
   subject: string,
   body: string,
   recipientEmail: string
-) {
+): Promise<PageCollection> {
   // get Microsoft Graph Client
   const msGraphClient = await getMsGraphClient(msHomeAccountId);
 
@@ -117,5 +117,16 @@ export async function sendMailAsync(
   // send the message
   return msGraphClient.api("me/sendMail").post({
     message: message
-  });
+  }) as Promise<PageCollection>;
+}
+
+export async function getInboxAsync(
+  msHomeAccountId: string
+): Promise<PageCollection> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  return msGraphClient
+    .api("me/mailFolders/inbox/messages")
+    .top(2)
+    .orderby("receivedDateTime DESC")
+    .get() as Promise<PageCollection>;
 }

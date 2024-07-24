@@ -14,6 +14,11 @@ export default function Exchange() {
     chatId: chatId
   });
 
+  const { data: mailData } = api.chat.pollMails.useQuery();
+
+  console.log("mailData");
+  console.log(mailData);
+
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
     data?.messages ?? []
   );

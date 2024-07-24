@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { sendMailAsync } from "~/server/email/outlook/outlookHelper";
+import {
+  getInboxAsync,
+  sendMailAsync
+} from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import _ from "lodash";
 
@@ -147,5 +150,19 @@ export const chatRouter = createTRPCRouter({
       }
 
       return { success: true };
-    })
+    }),
+  pollMails: publicProcedure.query(async ({ ctx }) => {
+    const msHomeAccountId = _.get(
+      ctx.auth,
+      "sessionClaims.publicMetadata.microsoftHomeAccountId"
+    );
+
+    if (!msHomeAccountId) {
+      throw Error("Microsoft Account not authorized");
+    }
+
+    const inbox = await getInboxAsync(msHomeAccountId);
+
+    return inbox;
+  })
 });
