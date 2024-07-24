@@ -15,9 +15,9 @@ export const navItems: NavItem[] = [
   },
   {
     title: "Quotes",
-    href: "/dashboard/employee",
-    icon: "employee",
-    label: "employee"
+    href: "/quotes",
+    icon: "quotes",
+    label: "quotes"
   },
   {
     title: "Notifications",

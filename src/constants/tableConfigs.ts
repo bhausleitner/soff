@@ -1,3 +1,5 @@
+import { api } from "~/utils/api";
+
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
   checkbox: true,
@@ -35,3 +37,24 @@ export const supplierQuoteTableConfig = {
     { header: "Status", accessorKey: "status", sortable: true }
   ]
 };
+
+export const quoteTableConfig = {
+  placeholder: "Filter quotes...",
+  checkbox: true,
+  columns: [
+    { header: "Quote ID", accessorKey: "id", sortable: true },
+    { header: "Part ID", accessorKey: "partId", sortable: true },
+    { header: "Quantity", accessorKey: "quantity", sortable: true },
+    { header: "Price", accessorKey: "price", sortable: true },
+    { header: "Status", accessorKey: "status", sortable: true }
+  ]
+};
+
+export const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
+  api.part.getPartsBySupplierId.useQuery(args);
+export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
+  api.supplier.getQuotesBySupplierId.useQuery(args);
+export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
+  api.supplier.getOrdersBySupplierId.useQuery(args);
+
+export const useGetAllQuotes = () => api.supplier.getAllQuotes.useQuery();

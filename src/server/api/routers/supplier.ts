@@ -12,10 +12,9 @@ export const supplierSchema = z.object({
 });
 
 const supplierArraySchema = z.array(supplierSchema);
-
 const supplierIdSchema = z.object({ supplierId: z.number() });
 
-const quoteSchema = z.object({
+export const quoteSchema = z.object({
   id: z.number(),
   supplierId: z.number(),
   partId: z.number(),
@@ -73,6 +72,14 @@ export const supplierRouter = createTRPCRouter({
 
       return supplierData;
     }),
+
+  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
+    const quoteData = await ctx.db.quote.findMany({});
+
+    quoteArraySchema.parse(quoteData);
+
+    return quoteData;
+  }),
 
   getQuotesBySupplierId: publicProcedure
     .input(supplierIdSchema)

@@ -1,27 +1,22 @@
 import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
-import { api } from "~/utils/api";
+import { type Part } from "~/server/api/routers/part";
+import { type Quote, type Order } from "~/server/api/routers/supplier";
 import {
   supplierOrderTableConfig,
   supplierPartTableConfig,
-  supplierQuoteTableConfig
-} from "./constants";
-import { type Part } from "~/server/api/routers/part";
-import { type Quote, type Order } from "~/server/api/routers/supplier";
+  supplierQuoteTableConfig,
+  useGetPartsBySupplierQuery,
+  useGetQuotesBySupplierQuery,
+  useGetOrdersBySupplierQuery
+} from "~/constants/tableConfigs";
 
 interface SupplierTabsProps {
   supplierId: number;
 }
 
 export function SupplierTabs({ supplierId }: SupplierTabsProps) {
-  const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
-    api.part.getPartsBySupplierId.useQuery(args);
-  const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
-    api.supplier.getQuotesBySupplierId.useQuery(args);
-  const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
-    api.supplier.getOrdersBySupplierId.useQuery(args);
-
   return (
     <>
       <Tabs defaultValue="parts" className="space-y-4">
@@ -31,24 +26,24 @@ export function SupplierTabs({ supplierId }: SupplierTabsProps) {
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="parts" className="space-y-4">
-          <GenericTable<Part>
+          <GenericTable<Part, { supplierId: number }>
             tableConfig={supplierPartTableConfig}
             useQueryHook={useGetPartsBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
         <TabsContent value="quotes" className="space-y-4">
-          <GenericTable<Quote>
+          <GenericTable<Quote, { supplierId: number }>
             tableConfig={supplierQuoteTableConfig}
             useQueryHook={useGetQuotesBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
         <TabsContent value="orders" className="space-y-4">
-          <GenericTable<Order>
+          <GenericTable<Order, { supplierId: number }>
             tableConfig={supplierOrderTableConfig}
             useQueryHook={useGetOrdersBySupplierQuery}
-            supplierId={supplierId}
+            queryArgs={{ supplierId }}
           />
         </TabsContent>
       </Tabs>

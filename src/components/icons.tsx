@@ -52,6 +52,7 @@ export const Icons = {
   thumbsUp: ThumbsUp,
   dashboard: LayoutDashboardIcon,
   suppliers: BookUser,
+  quotes: CreditCard,
   logo: Command,
   login: LogIn,
   close: X,
