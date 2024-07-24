@@ -60,14 +60,6 @@ export const supplierRouter = createTRPCRouter({
       return supplierData;
     }),
 
-  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
-    const quoteData = await ctx.db.quote.findMany({});
-
-    quoteArraySchema.parse(quoteData);
-
-    return quoteData;
-  }),
-
   getQuotesBySupplierId: publicProcedure
     .input(supplierIdSchema)
     .query(async ({ input, ctx }) => {
