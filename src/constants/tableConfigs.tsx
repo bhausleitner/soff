@@ -1,7 +1,7 @@
+import { SupplierAction } from "~/components/supplier-detail/SupplierAction";
 import { api } from "~/utils/api";
 import { type z } from "zod";
 import { type supplierSchema } from "~/server/api/routers/supplier";
-import { type SupplierAction } from "~/components/supplier-detail/SupplierAction";
 
 type SupplierType = z.infer<typeof supplierSchema>;
 
@@ -70,8 +70,10 @@ export const supplierTableConfig = {
     {
       header: "Actions",
       accessorKey: "actions",
-      sortable: false
-      // cell: (row: { original: SupplierType }) => <SupplierAction row={row} />
+      sortable: false,
+      cell: ({ row }: { row: { original: SupplierType } }) => (
+        <SupplierAction row={row} />
+      )
     }
   ]
 };
