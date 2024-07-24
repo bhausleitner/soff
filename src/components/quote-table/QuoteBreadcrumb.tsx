@@ -8,7 +8,11 @@ import {
   BreadcrumbSeparator
 } from "~/components/ui/breadcrumb";
 
-export function QuoteBreadcrumb() {
+interface QuoteBreadcrumbProps {
+  quoteId?: number;
+}
+
+export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
   return (
     <>
       <Breadcrumb>
@@ -18,8 +22,20 @@ export function QuoteBreadcrumb() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Quotes</BreadcrumbPage>
+            {quoteId ? (
+              <BreadcrumbLink href="/quotes">Quotes</BreadcrumbLink>
+            ) : (
+              <BreadcrumbPage>Quotes</BreadcrumbPage>
+            )}
           </BreadcrumbItem>
+          {quoteId && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Quote #{quoteId}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          )}
         </BreadcrumbList>
       </Breadcrumb>
     </>

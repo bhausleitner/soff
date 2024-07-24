@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import React from "react";
-// import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-table/QuoteBreadcrumb";
@@ -32,7 +31,7 @@ const QuotePage = () => {
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between">
-        <QuoteBreadcrumb />
+        <QuoteBreadcrumb quoteId={quoteId} />
         <div className="flex items-center"></div>
       </div>
       {/* <SupplierInfo data={data} /> */}
