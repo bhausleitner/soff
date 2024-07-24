@@ -1,5 +1,5 @@
 import React from "react";
-import { SupplierInfoCard } from "./SupplierInfoCard";
+import { InfoCard } from "~/components/common/InfoCard";
 
 interface SupplierInfoProps {
   data: {
@@ -13,7 +13,7 @@ interface SupplierInfoProps {
 export function SupplierInfo({ data }: SupplierInfoProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <SupplierInfoCard
+      <InfoCard
         title={data.name}
         lines={[
           `Status: ${data.status}`,
@@ -21,7 +21,7 @@ export function SupplierInfo({ data }: SupplierInfoProps) {
           `Response Time: ${data.responseTime ?? "N/A"}h`
         ]}
       />
-      <SupplierInfoCard
+      <InfoCard
         title="Communication"
         lines={[
           `Email: ${data.email}`,
@@ -30,7 +30,7 @@ export function SupplierInfo({ data }: SupplierInfoProps) {
           "Communication history"
         ]}
       />
-      <SupplierInfoCard
+      <InfoCard
         title="Documents"
         lines={["NDA", "Terms & Conditions", "Billing history", "Certificates"]}
       />
