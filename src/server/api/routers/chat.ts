@@ -6,7 +6,8 @@ import {
   sendInitialEmail
 } from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
-import { get } from "lodash";
+import { get, map } from "lodash";
+import { type Message } from "@microsoft/microsoft-graph-types";
 
 const createChatSchema = z.object({
   supplierId: z.number()
@@ -116,28 +117,36 @@ export const chatRouter = createTRPCRouter({
         const inbox = await getInboxAsync(msHomeAccountId, conversationId);
 
         // iterate through inbox and check if chatmessage object has been already created
-        inbox?.value?.forEach(async (message) => {
-          const existingMessage = await ctx.db.message.findFirst({
-            where: {
-              outlookMessageId: message.id
+        if (inbox?.value) {
+          // Use map to create an array of promises
+          const messagePromises = map(inbox.value, async (message: Message) => {
+            const existingMessage = await ctx.db.message.findFirst({
+              where: {
+                outlookMessageId: message.id
+              }
+            });
+
+            // Create message object if no existing message AND new message has a bodyPreview
+            if (
+              !existingMessage &&
+              message.bodyPreview &&
+              supplierChatParticipant
+            ) {
+              await ctx.db.message.create({
+                data: {
+                  chatId: input.chatId,
+                  content: message.bodyPreview,
+                  outlookMessageId: message.id,
+                  conversationId: conversationId,
+                  chatParticipantId: supplierChatParticipant.id
+                }
+              });
             }
           });
 
-          // if message object does not exist
-          if (!existingMessage) {
-            console.log("message does not exist");
-            // create chat message object
-            await ctx.db.message.create({
-              data: {
-                chatId: input.chatId,
-                content: message.bodyPreview,
-                outlookMessageId: message.id,
-                conversationId: conversationId,
-                chatParticipantId: supplierChatParticipant?.id!
-              }
-            });
-          }
-        });
+          // Wait for all promises to resolve
+          await Promise.all(messagePromises);
+        }
       }
 
       const newChat = await ctx.db.chat.findFirst({

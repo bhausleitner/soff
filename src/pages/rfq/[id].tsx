@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
-import { find, get, isEmpty, isString } from "lodash";
+import { find, get } from "lodash";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import Spinner from "~/components/spinner";
