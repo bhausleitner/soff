@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { QuoteStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { orderArraySchema } from "~/server/api/routers/supplier";
 
 export const quoteSchema = z.object({
   id: z.number(),
@@ -38,5 +39,17 @@ export const quoteRouter = createTRPCRouter({
       quoteSchema.parse(quote);
 
       return quote;
+    }),
+
+  getOrdersByQuoteId: publicProcedure
+    .input(quoteIdSchema)
+    .query(async ({ ctx, input }) => {
+      const orders = await ctx.db.order.findMany({
+        where: { quoteId: input.quoteId }
+      });
+
+      orderArraySchema.parse(orders);
+
+      return orders;
     })
 });

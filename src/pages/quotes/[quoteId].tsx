@@ -4,6 +4,12 @@ import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import { QuoteInfo } from "~/components/quote-detail/QuoteInfo";
+import {
+  quoteOrderTableConfig,
+  useGetOrdersByQuoteQuery
+} from "~/constants/tableConfigs";
+import { GenericTable } from "~/components/common/GenericTable";
+import { type Order } from "~/server/api/routers/supplier";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -36,6 +42,11 @@ const QuotePage = () => {
         <div className="flex items-center"></div>
       </div>
       <QuoteInfo quote={data} />
+      <GenericTable<Order, { quoteId: number }>
+        tableConfig={quoteOrderTableConfig}
+        useQueryHook={useGetOrdersByQuoteQuery}
+        queryArgs={{ quoteId }}
+      />
     </div>
   );
 };
