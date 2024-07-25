@@ -6,8 +6,6 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
-import { get } from "lodash";
-import { db } from "~/server/db";
 
 const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
@@ -141,14 +139,14 @@ export async function sendInitialEmail(
 
   const draftResponse = (await msGraphClient
     .api("me/messages/")
-    .post(message)) as Promise<PageCollection>;
+    .post(message)) as Message;
 
-  const newMessageId = get(draftResponse, "id");
-  const conversationId = get(draftResponse, "conversationId");
-
-  if (!newMessageId || !conversationId) {
+  if (!draftResponse?.id || !draftResponse?.conversationId) {
     throw new Error("Failed to retrieve messageId or conversationId");
   }
+
+  const newMessageId = draftResponse.id;
+  const conversationId = draftResponse.conversationId;
 
   await msGraphClient.api(`me/messages/${newMessageId}/send`).post(message);
 
@@ -160,7 +158,7 @@ export async function replyEmailAsync(
   comment: string,
   recipientEmail: string,
   lastMessageId: string
-): Promise<PageCollection> {
+) {
   const msGraphClient = await getMsGraphClient(msHomeAccountId);
 
   const reply = {
@@ -176,7 +174,7 @@ export async function replyEmailAsync(
     comment: comment
   };
 
-  return msGraphClient.api(`me/messages/${lastMessageId}/reply`).post(reply);
+  await msGraphClient.api(`me/messages/${lastMessageId}/reply`).post(reply);
 }
 
 export async function getInboxAsync(
