@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
-import { find, get } from "lodash";
+import { find, get, isEmpty, isString } from "lodash";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import Spinner from "~/components/spinner";
@@ -14,23 +14,18 @@ export default function Exchange() {
     chatId: chatId
   });
 
-  const { data: mailData } = api.chat.pollMails.useQuery();
-
-  console.log("mailData");
-  console.log(mailData);
-
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
-    data?.messages ?? []
+    data?.newChat?.messages ?? []
   );
 
   useEffect(() => {
-    if (data?.messages) {
-      setChatMessages(data.messages);
+    if (data?.newChat?.messages) {
+      setChatMessages(data.newChat.messages);
     }
   }, [data]);
 
   const supplier = get(
-    find(data?.chatParticipants, (item) => item.supplier !== null),
+    find(data?.newChat?.chatParticipants, (item) => item.supplier !== null),
     "supplier"
   );
 
@@ -39,7 +34,7 @@ export default function Exchange() {
   }
 
   const chatParticipantUserId = get(
-    find(data?.chatParticipants, (item) => item.user !== null),
+    find(data?.newChat?.chatParticipants, (item) => item.user !== null),
     "id"
   );
 

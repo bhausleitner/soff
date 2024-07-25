@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
-  createDraftAsync,
-  createMessage,
   getInboxAsync,
-  sendInitialEmailAsync
+  replyEmailAsync,
+  sendInitialEmail
 } from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
-import _ from "lodash";
+import { get } from "lodash";
 
 const createChatSchema = z.object({
   supplierId: z.number()
@@ -94,9 +93,72 @@ export const chatRouter = createTRPCRouter({
           messages: true
         }
       });
-      return chat;
+
+      // get supplier chat participant object
+      const supplierChatParticipant = chat?.chatParticipants.find(
+        (participant) => participant.supplier !== null
+      );
+
+      // get conversationId from first message
+
+      const conversationId = chat?.messages?.[0]?.conversationId;
+
+      if (conversationId) {
+        const msHomeAccountId = get(
+          ctx.auth,
+          "sessionClaims.publicMetadata.microsoftHomeAccountId"
+        );
+
+        if (!msHomeAccountId) {
+          throw Error("Microsoft Account not authorized");
+        }
+
+        const inbox = await getInboxAsync(msHomeAccountId, conversationId);
+
+        // iterate through inbox and check if chatmessage object has been already created
+        inbox?.value?.forEach(async (message) => {
+          const existingMessage = await ctx.db.message.findFirst({
+            where: {
+              outlookMessageId: message.id
+            }
+          });
+
+          // if message object does not exist
+          if (!existingMessage) {
+            console.log("message does not exist");
+            // create chat message object
+            await ctx.db.message.create({
+              data: {
+                chatId: input.chatId,
+                content: message.bodyPreview,
+                outlookMessageId: message.id,
+                conversationId: conversationId,
+                chatParticipantId: supplierChatParticipant?.id!
+              }
+            });
+          }
+        });
+      }
+
+      const newChat = await ctx.db.chat.findFirst({
+        where: {
+          id: input.chatId
+        },
+        select: {
+          chatParticipants: {
+            select: {
+              id: true,
+              supplier: true,
+              user: true
+            }
+          },
+          messages: true
+        }
+      });
+
+      return { newChat };
     }),
-  sendChat: publicProcedure
+  sendEmail: publicProcedure
     .input(chatMessageSchema)
     .mutation(async ({ input, ctx }) => {
       if (input.content === "fail") {
@@ -104,7 +166,7 @@ export const chatRouter = createTRPCRouter({
       }
 
       // use lodash to get the msHomeAccountid
-      const msHomeAccountId = _.get(
+      const msHomeAccountId = get(
         ctx.auth,
         "sessionClaims.publicMetadata.microsoftHomeAccountId"
       );
@@ -130,52 +192,65 @@ export const chatRouter = createTRPCRouter({
         throw Error("Supplier email not found");
       }
 
-      // send message
-      const message = createMessage(
-        "Message from Soff Chat",
-        input.content,
-        chatParticipant.supplier.email
-      );
-
-      // create draft
-      let draft;
-      try {
-        draft = await createDraftAsync(msHomeAccountId, message);
-      } catch (error) {
-        throw new Error(`Failed to create draft: ${String(error)}`);
-      }
-
-      try {
-        await sendInitialEmailAsync(msHomeAccountId, draft.messageId, message);
-      } catch (error) {
-        throw new Error(`Failed to send email: ${String(error)}`);
-      }
-
-      // create new message object in db
-      await ctx.db.message.create({
-        data: {
+      // get messageId from last supplier message
+      const lastMessage = await ctx.db.message.findFirst({
+        where: {
           chatId: input.chatId,
-          content: input.content,
-          chatParticipantId: input.chatParticipantId,
-          outlookMessageId: draft.messageId,
-          conversationId: draft.conversationId
+          chatParticipantId: chatParticipant.id
+        },
+        orderBy: {
+          createdAt: "desc"
+        },
+        select: {
+          outlookMessageId: true,
+          conversationId: true
         }
       });
 
+      const lastMessageId = lastMessage?.outlookMessageId;
+
+      try {
+        if (lastMessageId) {
+          // existing thread
+          await replyEmailAsync(
+            msHomeAccountId,
+            input.content,
+            chatParticipant.supplier.email,
+            lastMessageId
+          );
+
+          // Create a new message object in the database
+          await ctx.db.message.create({
+            data: {
+              chatId: input.chatId,
+              content: input.content,
+              chatParticipantId: input.chatParticipantId,
+              conversationId: lastMessage.conversationId
+            }
+          });
+        } else {
+          // new thread
+          const { newMessageId, conversationId } = await sendInitialEmail(
+            msHomeAccountId,
+            "Message from Soff Chat",
+            input.content,
+            chatParticipant.supplier.email
+          );
+          // Create a new message object in the database
+          await ctx.db.message.create({
+            data: {
+              chatId: input.chatId,
+              content: input.content,
+              chatParticipantId: input.chatParticipantId,
+              outlookMessageId: newMessageId,
+              conversationId: conversationId
+            }
+          });
+        }
+      } catch (error) {
+        throw new Error(`Failed to process request: ${String(error)}`);
+      }
+
       return { success: true };
-    }),
-  pollMails: publicProcedure.query(async ({ ctx }) => {
-    const msHomeAccountId = _.get(
-      ctx.auth,
-      "sessionClaims.publicMetadata.microsoftHomeAccountId"
-    );
-
-    if (!msHomeAccountId) {
-      throw Error("Microsoft Account not authorized");
-    }
-
-    const inbox = await getInboxAsync(msHomeAccountId);
-
-    return inbox;
-  })
+    })
 });

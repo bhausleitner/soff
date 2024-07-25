@@ -92,16 +92,7 @@ export async function getMsGraphClient(
   return msGraphClient;
 }
 
-export async function sendInitialEmailAsync(
-  msHomeAccountId: string,
-  messageId: string,
-  message: Message
-): Promise<void> {
-  const msGraphClient = await getMsGraphClient(msHomeAccountId);
-  await msGraphClient.api(`me/messages/${messageId}/send`).post(message);
-}
-
-export function createMessage(
+export function createInitialMessageBody(
   subject: string,
   body: string,
   recipientEmail: string
@@ -125,34 +116,78 @@ export function createMessage(
   return message;
 }
 
-export async function createDraftAsync(
+export async function sendInitialEmail(
   msHomeAccountId: string,
-  message: Message
-): Promise<{ messageId: string; conversationId: string }> {
+  subject: string,
+  body: string,
+  recipientEmail: string
+): Promise<{ newMessageId: string; conversationId: string }> {
   const msGraphClient = await getMsGraphClient(msHomeAccountId);
 
-  // create a message draft object in outlook
+  const message: Message = {
+    subject: subject,
+    body: {
+      content: body,
+      contentType: "text"
+    },
+    toRecipients: [
+      {
+        emailAddress: {
+          address: recipientEmail
+        }
+      }
+    ]
+  };
+
   const draftResponse = (await msGraphClient
     .api("me/messages/")
     .post(message)) as Promise<PageCollection>;
 
-  const messageId = get(draftResponse, "id");
+  const newMessageId = get(draftResponse, "id");
   const conversationId = get(draftResponse, "conversationId");
 
-  if (!messageId || !conversationId) {
+  if (!newMessageId || !conversationId) {
     throw new Error("Failed to retrieve messageId or conversationId");
   }
 
-  return { messageId, conversationId };
+  await msGraphClient.api(`me/messages/${newMessageId}/send`).post(message);
+
+  return { newMessageId, conversationId };
+}
+
+export async function replyEmailAsync(
+  msHomeAccountId: string,
+  comment: string,
+  recipientEmail: string,
+  lastMessageId: string
+): Promise<PageCollection> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+
+  const reply = {
+    message: {
+      toRecipients: [
+        {
+          emailAddress: {
+            address: recipientEmail
+          }
+        }
+      ]
+    },
+    comment: comment
+  };
+
+  return msGraphClient.api(`me/messages/${lastMessageId}/reply`).post(reply);
 }
 
 export async function getInboxAsync(
-  msHomeAccountId: string
+  msHomeAccountId: string,
+  conversationId: string
 ): Promise<PageCollection> {
   const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  // TODO: this is not filtered, might cause some issues
   return msGraphClient
-    .api("me/mailFolders/inbox/messages")
-    .top(2)
-    .orderby("receivedDateTime DESC")
+    .api(
+      `me/mailFolders/inbox/messages?filter=conversationId eq '${conversationId}'`
+    )
     .get() as Promise<PageCollection>;
 }
