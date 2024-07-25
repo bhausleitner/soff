@@ -44,12 +44,12 @@ export const quoteRouter = createTRPCRouter({
   getOrdersByQuoteId: publicProcedure
     .input(quoteIdSchema)
     .query(async ({ ctx, input }) => {
-      const orders = await ctx.db.order.findMany({
+      const orderData = await ctx.db.order.findMany({
         where: { quoteId: input.quoteId }
       });
 
-      orderArraySchema.parse(orders);
+      orderArraySchema.parse(orderData);
 
-      return orders;
+      return orderData;
     })
 });

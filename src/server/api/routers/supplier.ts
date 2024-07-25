@@ -24,7 +24,7 @@ const orderSchema = z.object({
   status: z.nativeEnum(OrderStatus)
 });
 
-const orderArraySchema = z.array(orderSchema);
+export const orderArraySchema = z.array(orderSchema);
 
 export type Supplier = z.infer<typeof supplierSchema>;
 export type Order = z.infer<typeof orderSchema>;
