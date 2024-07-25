@@ -6,6 +6,8 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
+import { get } from "lodash";
+import { db } from "~/server/db";
 
 const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
@@ -13,7 +15,8 @@ const MICROSOFT_APP_SCOPES = [
   "user.read",
   "mailboxsettings.read",
   "mail.read",
-  "mail.send"
+  "mail.send",
+  "mail.readWrite"
 ];
 
 const getNonHashBaseUrl = () =>
@@ -89,15 +92,20 @@ export async function getMsGraphClient(
   return msGraphClient;
 }
 
-export async function sendMailAsync(
+export async function sendInitialEmailAsync(
   msHomeAccountId: string,
+  messageId: string,
+  message: Message
+): Promise<void> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  await msGraphClient.api(`me/messages/${messageId}/send`).post(message);
+}
+
+export function createMessage(
   subject: string,
   body: string,
   recipientEmail: string
-): Promise<PageCollection> {
-  // get Microsoft Graph Client
-  const msGraphClient = await getMsGraphClient(msHomeAccountId);
-
+): Message {
   // construct a new message
   const message: Message = {
     subject: subject,
@@ -114,10 +122,28 @@ export async function sendMailAsync(
     ]
   };
 
-  // send the message
-  return msGraphClient.api("me/sendMail").post({
-    message: message
-  }) as Promise<PageCollection>;
+  return message;
+}
+
+export async function createDraftAsync(
+  msHomeAccountId: string,
+  message: Message
+): Promise<{ messageId: string; conversationId: string }> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+
+  // create a message draft object in outlook
+  const draftResponse = (await msGraphClient
+    .api("me/messages/")
+    .post(message)) as Promise<PageCollection>;
+
+  const messageId = get(draftResponse, "id");
+  const conversationId = get(draftResponse, "conversationId");
+
+  if (!messageId || !conversationId) {
+    throw new Error("Failed to retrieve messageId or conversationId");
+  }
+
+  return { messageId, conversationId };
 }
 
 export async function getInboxAsync(

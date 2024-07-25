@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
+  createDraftAsync,
+  createMessage,
   getInboxAsync,
-  sendMailAsync
+  sendInitialEmailAsync
 } from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import _ from "lodash";
@@ -111,15 +113,6 @@ export const chatRouter = createTRPCRouter({
         throw Error("Microsoft Account not authorized");
       }
 
-      // create new message object
-      await ctx.db.message.create({
-        data: {
-          chatId: input.chatId,
-          content: input.content,
-          chatParticipantId: input.chatParticipantId
-        }
-      });
-
       // get supplier email from chat object
       const chatParticipant = await ctx.db.chatParticipant.findFirst({
         where: {
@@ -137,17 +130,37 @@ export const chatRouter = createTRPCRouter({
         throw Error("Supplier email not found");
       }
 
-      // send mail
+      // send message
+      const message = createMessage(
+        "Message from Soff Chat",
+        input.content,
+        chatParticipant.supplier.email
+      );
+
+      // create draft
+      let draft;
       try {
-        await sendMailAsync(
-          msHomeAccountId,
-          "Message from Soff Chat",
-          input.content,
-          chatParticipant.supplier.email
-        );
+        draft = await createDraftAsync(msHomeAccountId, message);
       } catch (error) {
-        throw new Error(`Failed to send email with: ${String(error)}`);
+        throw new Error(`Failed to create draft: ${String(error)}`);
       }
+
+      try {
+        await sendInitialEmailAsync(msHomeAccountId, draft.messageId, message);
+      } catch (error) {
+        throw new Error(`Failed to send email: ${String(error)}`);
+      }
+
+      // create new message object in db
+      await ctx.db.message.create({
+        data: {
+          chatId: input.chatId,
+          content: input.content,
+          chatParticipantId: input.chatParticipantId,
+          outlookMessageId: draft.messageId,
+          conversationId: draft.conversationId
+        }
+      });
 
       return { success: true };
     }),
