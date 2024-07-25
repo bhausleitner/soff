@@ -1,12 +1,12 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
-interface SupplierInfoCardProps {
+interface InfoCardProps {
   title: string;
   lines: string[];
 }
 
-export function SupplierInfoCard({ title, lines }: SupplierInfoCardProps) {
+export function InfoCard({ title, lines }: InfoCardProps) {
   return (
     <div className="flex flex-col">
       <Card className="flex h-full flex-col">

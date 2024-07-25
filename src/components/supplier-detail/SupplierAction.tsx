@@ -1,5 +1,4 @@
 import { MoreHorizontal } from "lucide-react";
-import { type z } from "zod";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -9,13 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "../ui/dropdown-menu";
-import { type supplierSchema } from "~/server/api/routers/supplier";
-
-type SupplierType = z.infer<typeof supplierSchema>;
+import { type Supplier } from "~/server/api/routers/supplier";
 
 interface SupplierActionProps {
   row: {
-    original: SupplierType;
+    original: Supplier;
   };
 }
 
