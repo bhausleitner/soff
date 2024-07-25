@@ -74,15 +74,15 @@ export const supplierTableConfig = {
       link: "/suppliers/"
     },
     { header: "Status", accessorKey: "status", sortable: false },
-    { header: "Email", accessorKey: "email", sortable: true },
-    {
-      header: "Actions",
-      accessorKey: "actions",
-      sortable: false,
-      cell: ({ row }: { row: { original: Supplier } }) => (
-        <SupplierAction row={row} />
-      )
-    }
+    { header: "Email", accessorKey: "email", sortable: true }
+    // {
+    //   header: "Actions",
+    //   accessorKey: "actions",
+    //   sortable: false,
+    //   cell: ({ row }: { row: { original: Supplier } }) => (
+    //     <SupplierAction row={row} />
+    //   )
+    // }
   ]
 };
 
