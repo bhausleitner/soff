@@ -22,7 +22,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             name="description"
             content="Built somewhere inbetween Hayes & Glen Park"
           />
-          <link rel="icon" href="/beaver.ico" />
+          <link rel="icon" href="/logo_white_blue_bg.ico" />
         </Head>
         <SignedOut>
           <AuthenticationPage />
