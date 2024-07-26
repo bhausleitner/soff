@@ -141,6 +141,7 @@ model Message {
   chatParticipantId Int
   outlookMessageId  String? 
   conversationId    String
+  hasAttachments    Boolean         @default(false)
 }
 
 model ChatParticipant {
