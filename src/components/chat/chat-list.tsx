@@ -2,9 +2,8 @@ import React, { useRef, useEffect } from "react";
 import { cn } from "~/lib/utils";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import { map } from "lodash";
-import { Icons } from "~/components/icons";
-import { formatDate } from "~/utils/time";
 import { AnimatePresence, motion } from "framer-motion";
+import { MessageBubble } from "~/components/chat/message-bubble";
 
 interface ChatListProps {
   chatMessages?: ChatMessage[];
@@ -57,20 +56,12 @@ export function ChatList({
                     : "items-start"
                 )}
               >
-                <div
-                  className={cn(
-                    "flex flex-col rounded-md p-3",
+                <MessageBubble
+                  chatMessage={chatMessage}
+                  isUserMessage={
                     chatMessage.chatParticipantId === chatParticipantUserId
-                      ? "bg-blue-100"
-                      : "bg-accent"
-                  )}
-                >
-                  <span>{chatMessage.content}</span>
-                  <span className="mt-1 flex items-center gap-1 text-xs text-gray-600">
-                    <Icons.checkcheck className="h-4 w-4" />
-                    {formatDate(chatMessage.createdAt.toString())}
-                  </span>
-                </div>
+                  }
+                />
               </motion.div>
             );
           })}

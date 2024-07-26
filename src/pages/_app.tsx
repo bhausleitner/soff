@@ -5,6 +5,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { PageLayout } from "~/components/layout/layout";
 import AuthenticationPage from "~/components/layout/auth-landing";
+import { fontInter } from "~/constants/font";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
@@ -29,6 +30,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         </SignedOut>
         <SignedIn>
           <PageLayout>
+            <style jsx global>{`
+              html {
+                font-family: ${fontInter.style.fontFamily};
+              }
+            `}</style>
             <Component {...pageProps} />
           </PageLayout>
         </SignedIn>

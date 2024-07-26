@@ -1,6 +1,4 @@
-import { SupplierAction } from "~/components/supplier-detail/SupplierAction";
 import { api } from "~/utils/api";
-import { type Supplier } from "~/server/api/routers/supplier";
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
