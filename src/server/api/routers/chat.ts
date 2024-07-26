@@ -2,8 +2,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   getInboxAsync,
+  getMessageAttachments,
   replyEmailAsync,
-  sendInitialEmail
+  sendInitialEmail,
+  uploadToS3
 } from "~/server/email/outlook/outlookHelper";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import { get, map } from "lodash";
@@ -141,6 +143,18 @@ export const chatRouter = createTRPCRouter({
                   chatParticipantId: supplierChatParticipant.id
                 }
               });
+
+              if (message.hasAttachments) {
+                const attachments = await getMessageAttachments(
+                  msHomeAccountId,
+                  message.id!
+                );
+
+                await uploadToS3(
+                  attachments,
+                  `emailAttachments/${message.id}/`
+                );
+              }
             }
           });
 

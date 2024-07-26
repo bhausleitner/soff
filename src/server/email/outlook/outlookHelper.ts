@@ -6,6 +6,18 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
+import s3 from "~/utils/awsConfig";
+
+export interface Attachment {
+  id: string;
+  name: string;
+  contentBytes: string;
+  contentType: string;
+}
+
+interface AttachmentsResponse {
+  value: Attachment[];
+}
 
 const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
@@ -188,4 +200,38 @@ export async function getInboxAsync(
       `me/mailFolders/inbox/messages?filter=conversationId eq '${conversationId}'`
     )
     .get() as Promise<PageCollection>;
+}
+
+export async function getMessageAttachments(
+  msHomeAccountId: string,
+  messageId: string
+): Promise<Attachment[]> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  const result = (await msGraphClient
+    .api(`/me/messages/${messageId}/attachments`)
+    .get()) as AttachmentsResponse;
+
+  return result.value;
+}
+
+export async function uploadToS3(
+  attachments: Attachment[],
+  s3FolderPrefix: string
+) {
+  const uploadPromises = attachments.map(async (attachment) => {
+    const { name, contentBytes, contentType } = attachment;
+    const buffer = Buffer.from(contentBytes, "base64");
+    const s3Key = `${s3FolderPrefix}${name}`;
+
+    await s3
+      .upload({
+        Bucket: "soff-foundation",
+        Key: s3Key,
+        Body: buffer,
+        ContentType: contentType
+      })
+      .promise();
+  });
+
+  await Promise.all(uploadPromises);
 }
