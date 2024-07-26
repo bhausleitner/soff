@@ -6,7 +6,6 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
-import s3 from "~/utils/awsConfig";
 
 export interface Attachment {
   id: string;
@@ -212,26 +211,4 @@ export async function getMessageAttachments(
     .get()) as AttachmentsResponse;
 
   return result.value;
-}
-
-export async function uploadToS3(
-  attachments: Attachment[],
-  s3FolderPrefix: string
-) {
-  const uploadPromises = attachments.map(async (attachment) => {
-    const { name, contentBytes, contentType } = attachment;
-    const buffer = Buffer.from(contentBytes, "base64");
-    const s3Key = `${s3FolderPrefix}${name}`;
-
-    await s3
-      .upload({
-        Bucket: "soff-foundation",
-        Key: s3Key,
-        Body: buffer,
-        ContentType: contentType
-      })
-      .promise();
-  });
-
-  await Promise.all(uploadPromises);
 }

@@ -4,9 +4,9 @@ import {
   getInboxAsync,
   getMessageAttachments,
   replyEmailAsync,
-  sendInitialEmail,
-  uploadToS3
+  sendInitialEmail
 } from "~/server/email/outlook/outlookHelper";
+import { uploadToS3 } from "~/server/s3/utils";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import { get, map } from "lodash";
 import { type Message } from "@microsoft/microsoft-graph-types";
@@ -21,6 +21,9 @@ const chatMessageSchema = z.object({
   content: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  hasAttachments: z.boolean(),
+  outlookMessageId: z.string().nullable().optional(),
+  conversationId: z.string().nullable().optional(),
   chatParticipantId: z.number()
 });
 

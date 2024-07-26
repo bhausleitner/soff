@@ -39,7 +39,9 @@ import {
   Paperclip,
   PlusCircle,
   SendHorizontal,
-  ThumbsUp
+  ThumbsUp,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -73,7 +75,7 @@ export const Icons = {
   paperClip: Paperclip,
   pizza: Pizza,
   plusCircle: PlusCircle,
-  post: FileText,
+  fileText: FileText,
   profile: User2Icon,
   quotes: CreditCard,
   sendHorizontal: SendHorizontal,
@@ -85,6 +87,8 @@ export const Icons = {
   trash: Trash,
   user: User,
   warning: AlertTriangle,
+  zoomIn: ZoomIn,
+  zoomOut: ZoomOut,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
