@@ -12,7 +12,10 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     MICROSOFT_APP_CLIENT_ID: z.string(),
-    MICROSOFT_APP_CLIENT_SECRET: z.string()
+    MICROSOFT_APP_CLIENT_SECRET: z.string(),
+    AWS_ACCESS_KEY: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
+    AWS_REGION: z.string()
   },
 
   /**
@@ -32,7 +35,10 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     MICROSOFT_APP_CLIENT_ID: process.env.MICROSOFT_APP_CLIENT_ID,
-    MICROSOFT_APP_CLIENT_SECRET: process.env.MICROSOFT_APP_CLIENT_SECRET
+    MICROSOFT_APP_CLIENT_SECRET: process.env.MICROSOFT_APP_CLIENT_SECRET,
+    AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_REGION: process.env.AWS_REGION
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
