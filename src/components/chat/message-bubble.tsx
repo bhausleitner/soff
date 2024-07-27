@@ -22,12 +22,11 @@ export function MessageBubble({
       )}
     >
       <span>{chatMessage.content}</span>
-      {chatMessage.hasAttachments && (
+      {chatMessage.fileNames.map((fileName) => (
         <Attachment
-          fileKey={`emailAttachments/${chatMessage.outlookMessageId}/DARPA-SN-24-68.pdf`}
-          fileName={"file_attach.pdf"}
+          fileKey={`emailAttachments/${chatMessage.outlookMessageId}/${fileName}`}
         />
-      )}
+      ))}
       <span className="mt-1 flex items-center gap-1 text-xs text-gray-600">
         <Icons.checkcheck className="h-4 w-4" />
         {formatDate(chatMessage.createdAt.toString())}

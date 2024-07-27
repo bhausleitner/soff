@@ -47,7 +47,7 @@ export default function ChatBottombar({
         chatId: chatId,
         content: messageContent,
         chatParticipantId: chatParticipantUserId,
-        hasAttachments: false,
+        fileNames: [],
         createdAt: new Date(),
         updatedAt: new Date()
       };
