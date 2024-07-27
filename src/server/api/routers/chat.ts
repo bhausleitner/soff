@@ -6,7 +6,7 @@ import {
   replyEmailAsync,
   sendInitialEmail
 } from "~/server/email/outlook/outlookHelper";
-import { uploadToS3 } from "~/server/s3/utils";
+import { uploadFileToS3 } from "~/server/s3/utils";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
 import { get, map } from "lodash";
 import { type Message } from "@microsoft/microsoft-graph-types";
@@ -21,7 +21,7 @@ const chatMessageSchema = z.object({
   content: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  hasAttachments: z.boolean(),
+  fileNames: z.array(z.string()),
   outlookMessageId: z.string().nullable().optional(),
   conversationId: z.string().nullable().optional(),
   chatParticipantId: z.number()
@@ -124,42 +124,46 @@ export const chatRouter = createTRPCRouter({
         // iterate through inbox and check if chatmessage object has been already created
         if (inbox?.value) {
           // Use map to create an array of promises
-          const messagePromises = map(inbox.value, async (message: Message) => {
-            const existingMessage = await ctx.db.message.findFirst({
-              where: {
-                outlookMessageId: message.id
-              }
-            });
-
-            // Create message object if no existing message AND new message has a bodyPreview
-            if (
-              !existingMessage &&
-              message.bodyPreview &&
-              supplierChatParticipant
-            ) {
-              await ctx.db.message.create({
-                data: {
-                  chatId: input.chatId,
-                  content: message.bodyPreview,
-                  outlookMessageId: message.id,
-                  conversationId: conversationId,
-                  chatParticipantId: supplierChatParticipant.id
+          const messagePromises = map(
+            inbox.value,
+            async (outlookMessage: Message) => {
+              const existingMessage = await ctx.db.message.findFirst({
+                where: {
+                  outlookMessageId: outlookMessage.id
                 }
               });
 
-              if (message.hasAttachments) {
-                const attachments = await getMessageAttachments(
-                  msHomeAccountId,
-                  message.id!
-                );
+              // Create message object if no existing message AND new message has a bodyPreview
+              if (
+                !existingMessage &&
+                outlookMessage.bodyPreview &&
+                supplierChatParticipant
+              ) {
+                const newMessageObject = await ctx.db.message.create({
+                  data: {
+                    chatId: input.chatId,
+                    content: outlookMessage.bodyPreview,
+                    outlookMessageId: outlookMessage.id,
+                    conversationId: conversationId,
+                    chatParticipantId: supplierChatParticipant.id
+                  }
+                });
 
-                await uploadToS3(
-                  attachments,
-                  `emailAttachments/${message.id}/`
-                );
+                if (outlookMessage.hasAttachments) {
+                  const attachments = await getMessageAttachments(
+                    msHomeAccountId,
+                    outlookMessage.id!
+                  );
+
+                  await uploadFileToS3(
+                    attachments,
+                    `emailAttachments/${outlookMessage.id}/`,
+                    newMessageObject
+                  );
+                }
               }
             }
-          });
+          );
 
           // Wait for all promises to resolve
           await Promise.all(messagePromises);
