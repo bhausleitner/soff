@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { Status, QuoteStatus, OrderStatus } from "@prisma/client";
+import { Status, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { quoteArraySchema } from "~/server/api/routers/quote";
 
 export const supplierSchema = z.object({
   id: z.number(),
@@ -14,19 +15,6 @@ export const supplierSchema = z.object({
 const supplierArraySchema = z.array(supplierSchema);
 const supplierIdSchema = z.object({ supplierId: z.number() });
 
-export const quoteSchema = z.object({
-  id: z.number(),
-  supplierId: z.number(),
-  partId: z.number(),
-  quantity: z.number(),
-  price: z.number(),
-  status: z.nativeEnum(QuoteStatus),
-  createdAt: z.date(),
-  updatedAt: z.date()
-});
-
-const quoteArraySchema = z.array(quoteSchema);
-
 const orderSchema = z.object({
   id: z.number(),
   quoteId: z.number(),
@@ -36,10 +24,9 @@ const orderSchema = z.object({
   status: z.nativeEnum(OrderStatus)
 });
 
-const orderArraySchema = z.array(orderSchema);
+export const orderArraySchema = z.array(orderSchema);
 
 export type Supplier = z.infer<typeof supplierSchema>;
-export type Quote = z.infer<typeof quoteSchema>;
 export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
@@ -72,14 +59,6 @@ export const supplierRouter = createTRPCRouter({
 
       return supplierData;
     }),
-
-  getAllQuotes: publicProcedure.query(async ({ ctx }) => {
-    const quoteData = await ctx.db.quote.findMany({});
-
-    quoteArraySchema.parse(quoteData);
-
-    return quoteData;
-  }),
 
   getQuotesBySupplierId: publicProcedure
     .input(supplierIdSchema)

@@ -1,6 +1,6 @@
-import { QuoteBreadcrumb } from "~/components/quote-table/QuoteBreadcrumb";
+import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import { GenericTable } from "~/components/common/GenericTable";
-import { type Quote } from "~/server/api/routers/supplier";
+import { type Quote } from "~/server/api/routers/quote";
 import { quoteTableConfig, useGetAllQuotes } from "~/constants/tableConfigs";
 
 export default function Supplier() {

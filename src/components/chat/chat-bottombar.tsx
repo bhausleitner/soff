@@ -36,7 +36,7 @@ export default function ChatBottombar({
     setTextContent(event.target.value);
   };
 
-  const sendChat = api.chat.sendChat.useMutation();
+  const sendMessage = api.chat.sendEmail.useMutation();
 
   const handleSend = async (emoji?: string) => {
     setIsSending(true);
@@ -47,21 +47,22 @@ export default function ChatBottombar({
         chatId: chatId,
         content: messageContent,
         chatParticipantId: chatParticipantUserId,
+        fileNames: [],
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
       try {
-        const sendChatPromise = sendChat.mutateAsync(newChatMessage);
+        const sendMessagePromise = sendMessage.mutateAsync(newChatMessage);
 
-        toast.promise(sendChatPromise, {
+        toast.promise(sendMessagePromise, {
           loading: "Sending E-Mail...",
           success: "E-Mail sent!",
           error: "Failed sending E-Mail. Please try again.",
           description: getCurrentDateTime()
         });
 
-        await sendChatPromise;
+        await sendMessagePromise;
 
         setIsSending(false);
 

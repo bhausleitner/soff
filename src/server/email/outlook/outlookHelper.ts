@@ -1,4 +1,4 @@
-import { Client } from "@microsoft/microsoft-graph-client";
+import { Client, type PageCollection } from "@microsoft/microsoft-graph-client";
 import { type Message } from "@microsoft/microsoft-graph-types";
 import {
   type AuthorizationUrlRequest,
@@ -7,13 +7,25 @@ import {
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
 
+export interface Attachment {
+  id: string;
+  name: string;
+  contentBytes: string;
+  contentType: string;
+}
+
+interface AttachmentsResponse {
+  value: Attachment[];
+}
+
 const MICROSOFT_APP_REDIRECT_ROUTE = "/api/graphMicrosoftCallback";
 
 const MICROSOFT_APP_SCOPES = [
   "user.read",
   "mailboxsettings.read",
   "mail.read",
-  "mail.send"
+  "mail.send",
+  "mail.readWrite"
 ];
 
 const getNonHashBaseUrl = () =>
@@ -89,15 +101,11 @@ export async function getMsGraphClient(
   return msGraphClient;
 }
 
-export async function sendMailAsync(
-  msHomeAccountId: string,
+export function createInitialMessageBody(
   subject: string,
   body: string,
   recipientEmail: string
-) {
-  // get Microsoft Graph Client
-  const msGraphClient = await getMsGraphClient(msHomeAccountId);
-
+): Message {
   // construct a new message
   const message: Message = {
     subject: subject,
@@ -114,8 +122,93 @@ export async function sendMailAsync(
     ]
   };
 
-  // send the message
-  return msGraphClient.api("me/sendMail").post({
-    message: message
-  });
+  return message;
+}
+
+export async function sendInitialEmail(
+  msHomeAccountId: string,
+  subject: string,
+  body: string,
+  recipientEmail: string
+): Promise<{ newMessageId: string; conversationId: string }> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+
+  const message: Message = {
+    subject: subject,
+    body: {
+      content: body,
+      contentType: "text"
+    },
+    toRecipients: [
+      {
+        emailAddress: {
+          address: recipientEmail
+        }
+      }
+    ]
+  };
+
+  const draftResponse = (await msGraphClient
+    .api("me/messages/")
+    .post(message)) as Message;
+
+  if (!draftResponse?.id || !draftResponse?.conversationId) {
+    throw new Error("Failed to retrieve messageId or conversationId");
+  }
+
+  const newMessageId = draftResponse.id;
+  const conversationId = draftResponse.conversationId;
+
+  await msGraphClient.api(`me/messages/${newMessageId}/send`).post(message);
+
+  return { newMessageId, conversationId };
+}
+
+export async function replyEmailAsync(
+  msHomeAccountId: string,
+  comment: string,
+  recipientEmail: string,
+  lastMessageId: string
+) {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+
+  const reply = {
+    message: {
+      toRecipients: [
+        {
+          emailAddress: {
+            address: recipientEmail
+          }
+        }
+      ]
+    },
+    comment: comment
+  };
+
+  await msGraphClient.api(`me/messages/${lastMessageId}/reply`).post(reply);
+}
+
+export async function getInboxAsync(
+  msHomeAccountId: string,
+  conversationId: string
+): Promise<PageCollection> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  // TODO: this is not filtered, might cause some issues
+  return msGraphClient
+    .api(
+      `me/mailFolders/inbox/messages?filter=conversationId eq '${conversationId}'`
+    )
+    .get() as Promise<PageCollection>;
+}
+
+export async function getMessageAttachments(
+  msHomeAccountId: string,
+  messageId: string
+): Promise<Attachment[]> {
+  const msGraphClient = await getMsGraphClient(msHomeAccountId);
+  const result = (await msGraphClient
+    .api(`/me/messages/${messageId}/attachments`)
+    .get()) as AttachmentsResponse;
+
+  return result.value;
 }

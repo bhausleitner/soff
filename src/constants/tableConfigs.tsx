@@ -42,11 +42,45 @@ export const quoteTableConfig = {
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
-    { header: "Quote ID", accessorKey: "id", sortable: true },
+    {
+      header: "Quote ID",
+      accessorKey: "id",
+      sortable: true,
+      link: "/quotes/"
+    },
     { header: "Part ID", accessorKey: "partId", sortable: true },
     { header: "Quantity", accessorKey: "quantity", sortable: true },
     { header: "Price", accessorKey: "price", sortable: true },
     { header: "Status", accessorKey: "status", sortable: true }
+  ]
+};
+
+export const quoteOrderTableConfig = {
+  placeholder: "Filter orders...",
+  checkbox: true,
+  columns: [{ header: "Order ID", accessorKey: "id", sortable: true }]
+};
+
+export const supplierTableConfig = {
+  placeholder: "Filter supplier...",
+  checkbox: true,
+  columns: [
+    {
+      header: "Name",
+      accessorKey: "name",
+      sortable: true,
+      link: "/suppliers/"
+    },
+    { header: "Status", accessorKey: "status", sortable: false },
+    { header: "Email", accessorKey: "email", sortable: true }
+    // {
+    //   header: "Actions",
+    //   accessorKey: "actions",
+    //   sortable: false,
+    //   cell: ({ row }: { row: { original: Supplier } }) => (
+    //     <SupplierAction row={row} />
+    //   )
+    // }
   ]
 };
 
@@ -57,4 +91,8 @@ export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
 export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
   api.supplier.getOrdersBySupplierId.useQuery(args);
 
-export const useGetAllQuotes = () => api.supplier.getAllQuotes.useQuery();
+export const useGetOrdersByQuoteQuery = (args: { quoteId: number }) =>
+  api.quote.getOrdersByQuoteId.useQuery(args);
+
+export const useGetAllQuotes = () => api.quote.getAllQuotes.useQuery();
+export const useGetAllSuppliers = () => api.supplier.getAllSuppliers.useQuery();

@@ -15,17 +15,17 @@ export default function Exchange() {
   });
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
-    data?.messages ?? []
+    data?.newChat?.messages ?? []
   );
 
   useEffect(() => {
-    if (data?.messages) {
-      setChatMessages(data.messages);
+    if (data?.newChat?.messages) {
+      setChatMessages(data.newChat.messages);
     }
   }, [data]);
 
   const supplier = get(
-    find(data?.chatParticipants, (item) => item.supplier !== null),
+    find(data?.newChat?.chatParticipants, (item) => item.supplier !== null),
     "supplier"
   );
 
@@ -34,7 +34,7 @@ export default function Exchange() {
   }
 
   const chatParticipantUserId = get(
-    find(data?.chatParticipants, (item) => item.user !== null),
+    find(data?.newChat?.chatParticipants, (item) => item.user !== null),
     "id"
   );
 
