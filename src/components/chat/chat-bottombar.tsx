@@ -140,7 +140,7 @@ export default function ChatBottombar({
         chatParticipantId: chatParticipantUserId,
         fileNames: files
           .filter((file) => file.uploaded)
-          .map((file) => file.name), // Attach uploaded file names
+          .map((file) => `outgoingEmailAttachments/${file.hash}/${file.name}`),
         createdAt: new Date(),
         updatedAt: new Date()
       };

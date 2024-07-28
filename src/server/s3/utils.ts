@@ -36,3 +36,26 @@ export async function uploadFileToS3(
 
   await Promise.all(promises);
 }
+
+export async function getFileFromS3(fileKey: string) {
+  const bucket = process.env.AWS_S3_BUCKET;
+  if (!bucket) {
+    throw new Error("AWS_S3_BUCKET environment variable is not defined");
+  }
+
+  const params = {
+    Bucket: bucket,
+    Key: fileKey
+  };
+
+  const data = await s3.getObject(params).promise();
+  if (!data.Body) {
+    throw new Error("Failed to retrieve file from S3");
+  }
+
+  if (!(data.Body instanceof Buffer)) {
+    throw new Error("Data body is not a Buffer");
+  }
+
+  return data.Body.toString("base64"); // Convert to Base64
+}
