@@ -4,8 +4,8 @@ import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
-import { Button } from "../ui/button";
-import { Icons } from "../icons";
+import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/icons";
 import { Separator } from "~/components/ui/separator";
 
 // We are using this to offload heavy PDF parsing tasks to a public web worker
@@ -81,7 +81,7 @@ const PDFViewer = ({ fileKey }: PDFViewerProps) => {
           <Icons.zoomOut className="h-4 w-4" />
         </Button>
       </div>
-      <div className="w-[50vw] bg-gray-500">
+      <div className="w-[50vw] rounded-lg bg-gray-400">
         <div
           className="flex flex-col items-center overflow-auto"
           style={{ height: "60vh", maxWidth: "100%" }}

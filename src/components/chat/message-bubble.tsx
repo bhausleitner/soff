@@ -22,8 +22,9 @@ export function MessageBubble({
       )}
     >
       <span>{chatMessage.content}</span>
-      {chatMessage.fileNames.map((fileName) => (
+      {chatMessage.fileNames.map((fileName, index) => (
         <Attachment
+          key={index}
           fileKey={`emailAttachments/${chatMessage.outlookMessageId}/${fileName}`}
         />
       ))}
