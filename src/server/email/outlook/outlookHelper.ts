@@ -6,12 +6,14 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
+import { getFileFromS3 } from "~/server/s3/utils";
 
 export interface Attachment {
-  id: string;
+  id?: string;
   name: string;
   contentBytes: string;
-  contentType: string;
+  contentType?: string;
+  "@odata.type"?: string;
 }
 
 interface AttachmentsResponse {
@@ -101,36 +103,16 @@ export async function getMsGraphClient(
   return msGraphClient;
 }
 
-export function createInitialMessageBody(
-  subject: string,
-  body: string,
-  recipientEmail: string
-): Message {
-  // construct a new message
-  const message: Message = {
-    subject: subject,
-    body: {
-      content: body,
-      contentType: "text"
-    },
-    toRecipients: [
-      {
-        emailAddress: {
-          address: recipientEmail
-        }
-      }
-    ]
-  };
-
-  return message;
-}
-
 export async function sendInitialEmail(
   msHomeAccountId: string,
   subject: string,
   body: string,
+  fileNames: string[],
   recipientEmail: string
-): Promise<{ newMessageId: string; conversationId: string }> {
+): Promise<{
+  newMessageId: string;
+  conversationId: string;
+}> {
   const msGraphClient = await getMsGraphClient(msHomeAccountId);
 
   const message: Message = {
@@ -145,7 +127,8 @@ export async function sendInitialEmail(
           address: recipientEmail
         }
       }
-    ]
+    ],
+    attachments: await constructAttachments(fileNames)
   };
 
   const draftResponse = (await msGraphClient
@@ -159,14 +142,32 @@ export async function sendInitialEmail(
   const newMessageId = draftResponse.id;
   const conversationId = draftResponse.conversationId;
 
-  await msGraphClient.api(`me/messages/${newMessageId}/send`).post(message);
+  await msGraphClient.api(`me/messages/${newMessageId}/send`).post({});
 
   return { newMessageId, conversationId };
+}
+
+async function constructAttachments(
+  fileNames: string[]
+): Promise<Attachment[]> {
+  const attachments: Attachment[] = [];
+  for (const fileName of fileNames) {
+    const fileBase64 = await getFileFromS3(fileName);
+
+    attachments.push({
+      "@odata.type": "#microsoft.graph.fileAttachment",
+      name: fileName.split("/").pop() ?? "Unnamed File",
+      contentBytes: fileBase64
+    });
+  }
+
+  return attachments;
 }
 
 export async function replyEmailAsync(
   msHomeAccountId: string,
   comment: string,
+  fileNames: string[],
   recipientEmail: string,
   lastMessageId: string
 ) {
@@ -180,7 +181,8 @@ export async function replyEmailAsync(
             address: recipientEmail
           }
         }
-      ]
+      ],
+      attachments: await constructAttachments(fileNames)
     },
     comment: comment
   };
