@@ -17,5 +17,54 @@ export const s3Router = createTRPCRouter({
       };
 
       return { signedUrl: s3.getSignedUrl("getObject", params) };
+    }),
+  generateUploadUrls: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          fileKey: z.string(),
+          fileType: z.string()
+        })
+      )
+    )
+    .mutation(async ({ input }) => {
+      const uploadUrls = await Promise.all(
+        input.map(async ({ fileKey, fileType }) => {
+          const params = {
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: fileKey,
+            ContentType: fileType
+          };
+
+          return s3.getSignedUrlPromise("putObject", params);
+        })
+      );
+
+      return { uploadUrls };
+    }),
+  deleteFile: publicProcedure
+    .input(
+      z.object({
+        fileKey: z.string()
+      })
+    )
+    .mutation(async ({ input }) => {
+      const bucket = process.env.AWS_S3_BUCKET;
+      if (!bucket) {
+        throw new Error("AWS_S3_BUCKET environment variable is not set.");
+      }
+
+      const params = {
+        Bucket: bucket,
+        Key: input.fileKey
+      };
+
+      try {
+        await s3.deleteObject(params).promise();
+        return { success: true };
+      } catch (error) {
+        console.error("Error deleting file:", error);
+        throw new Error("Failed to delete file.");
+      }
     })
 });
