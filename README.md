@@ -35,6 +35,14 @@ Using https://clerk.com/ for user authentication. Reach out for clerk user creds
 
 ## Deployment
 
+
+## Other steps
+
+`npm i canvas` failed on Mac M2, had to install a few packages first to install it:
+
+`brew install pkg-config cairo pango libpng jpeg giflib librsvg` 
+
+
 Using https://vercel.com/soffs-projects/soff
 
 ## Database
