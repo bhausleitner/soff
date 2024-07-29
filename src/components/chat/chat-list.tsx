@@ -8,11 +8,13 @@ import { MessageBubble } from "~/components/chat/message-bubble";
 interface ChatListProps {
   chatMessages?: ChatMessage[];
   chatParticipantUserId: number;
+  supplierId: number;
 }
 
 export function ChatList({
   chatMessages = [],
-  chatParticipantUserId
+  chatParticipantUserId,
+  supplierId
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastMessageRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,7 @@ export function ChatList({
                   isUserMessage={
                     chatMessage.chatParticipantId === chatParticipantUserId
                   }
+                  supplierId={supplierId}
                 />
               </motion.div>
             );
