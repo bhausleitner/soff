@@ -31,8 +31,6 @@ export const supplierQuoteTableConfig = {
   checkbox: true,
   columns: [
     { header: "Quote ID", accessorKey: "id", sortable: true },
-    { header: "Part ID", accessorKey: "partId", sortable: true },
-    { header: "Quantity", accessorKey: "quantity", sortable: true },
     { header: "Price", accessorKey: "price", sortable: true },
     { header: "Status", accessorKey: "status", sortable: true }
   ]
@@ -59,6 +57,18 @@ export const quoteOrderTableConfig = {
   placeholder: "Filter orders...",
   checkbox: true,
   columns: [{ header: "Order ID", accessorKey: "id", sortable: true }]
+};
+
+export const quoteLineItemTableConfig = {
+  placeholder: "Filter line items...",
+  checkbox: true,
+  columns: [
+    { header: "Part ID", accessorKey: "partId", sortable: true },
+    { header: "Description", accessorKey: "description", sortable: true },
+    { header: "Quantity", accessorKey: "quantity", sortable: true },
+    { header: "Price", accessorKey: "price", sortable: true },
+    { header: "Lead Time", accessorKey: "leadTime", sortable: true }
+  ]
 };
 
 export const supplierTableConfig = {
@@ -96,3 +106,6 @@ export const useGetOrdersByQuoteQuery = (args: { quoteId: number }) =>
 
 export const useGetAllQuotes = () => api.quote.getAllQuotes.useQuery();
 export const useGetAllSuppliers = () => api.supplier.getAllSuppliers.useQuery();
+
+export const useGetLineItemsByQuoteQuery = (args: { quoteId: number }) =>
+  api.quote.getLineItemsByQuoteId.useQuery(args);
