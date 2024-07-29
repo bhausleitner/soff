@@ -30,6 +30,7 @@ const quoteIdSchema = z.object({
 });
 
 export type Quote = z.infer<typeof quoteSchema>;
+export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const quoteRouter = createTRPCRouter({
   getAllQuotes: publicProcedure.query(async ({ ctx }) => {
@@ -62,5 +63,17 @@ export const quoteRouter = createTRPCRouter({
       orderArraySchema.parse(orderData);
 
       return orderData;
+    }),
+
+  getLineItemsByQuoteId: publicProcedure
+    .input(quoteIdSchema)
+    .query(async ({ ctx, input }) => {
+      const lineItemData = await ctx.db.lineItem.findMany({
+        where: { quoteId: input.quoteId }
+      });
+
+      lineItemArraySchema.parse(lineItemData);
+
+      return lineItemData;
     })
 });

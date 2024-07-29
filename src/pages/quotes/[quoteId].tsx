@@ -5,11 +5,11 @@ import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import { QuoteInfo } from "~/components/quote-detail/QuoteInfo";
 import {
-  quoteOrderTableConfig,
-  useGetOrdersByQuoteQuery
+  quoteLineItemTableConfig,
+  useGetLineItemsByQuoteQuery
 } from "~/constants/tableConfigs";
 import { GenericTable } from "~/components/common/GenericTable";
-import { type Order } from "~/server/api/routers/supplier";
+import { type LineItem } from "~/server/api/routers/quote";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 
@@ -82,9 +82,9 @@ const QuotePage = () => {
         </div>
       </div>
       <QuoteInfo quote={quoteData} supplier={supplierData} />
-      <GenericTable<Order, { quoteId: number }>
-        tableConfig={quoteOrderTableConfig}
-        useQueryHook={useGetOrdersByQuoteQuery}
+      <GenericTable<LineItem, { quoteId: number }>
+        tableConfig={quoteLineItemTableConfig}
+        useQueryHook={useGetLineItemsByQuoteQuery}
         queryArgs={{ quoteId }}
       />
     </div>
