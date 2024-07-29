@@ -76,7 +76,7 @@ const QuotePage = () => {
           <Button>
             <>
               Add to Odoo
-              <Icons.sendHorizontal className="ml-2 h-4 w-4" />
+              <Icons.odoo className="ml-2 h-4 w-4" />
             </>
           </Button>
         </div>

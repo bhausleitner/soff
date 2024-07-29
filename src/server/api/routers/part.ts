@@ -5,7 +5,6 @@ export const partSchema = z.object({
   id: z.number(),
   partNumber: z.string().nullable(),
   partName: z.string(),
-  price: z.number().nullable(),
   cadFile: z.string().nullable()
 });
 
@@ -16,15 +15,7 @@ export type Part = z.infer<typeof partSchema>;
 
 export const partRouter = createTRPCRouter({
   getAllParts: publicProcedure.query(async ({ ctx }) => {
-    const partsData = await ctx.db.part.findMany({
-      select: {
-        id: true,
-        partNumber: true,
-        partName: true,
-        price: true,
-        cadFile: true
-      }
-    });
+    const partsData = await ctx.db.part.findMany({});
 
     partArraySchema.parse(partsData);
 
