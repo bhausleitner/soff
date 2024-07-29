@@ -222,8 +222,8 @@ export const chatRouter = createTRPCRouter({
         throw Error("Supplier email not found");
       }
 
-      // get messageId from last supplier message
-      const lastMessage = await ctx.db.message.findFirst({
+      // get last messageId that is not from current user
+      const lastForeignMessage = await ctx.db.message.findFirst({
         where: {
           chatId: input.chatId,
           chatParticipantId: chatParticipant.id
@@ -236,17 +236,17 @@ export const chatRouter = createTRPCRouter({
           conversationId: true
         }
       });
-
-      const lastMessageId = lastMessage?.outlookMessageId;
+      const lastForeignMessageId = lastForeignMessage?.outlookMessageId;
 
       try {
-        if (lastMessageId) {
+        if (lastForeignMessageId) {
           // existing thread
           await replyEmailAsync(
             msHomeAccountId,
             input.content,
+            input.fileNames,
             chatParticipant.supplier.email,
-            lastMessageId
+            lastForeignMessageId
           );
 
           // Create a new message object in the database
@@ -255,7 +255,8 @@ export const chatRouter = createTRPCRouter({
               chatId: input.chatId,
               content: input.content,
               chatParticipantId: input.chatParticipantId,
-              conversationId: lastMessage.conversationId
+              conversationId: lastForeignMessage.conversationId,
+              fileNames: input.fileNames
             }
           });
         } else {
@@ -264,6 +265,7 @@ export const chatRouter = createTRPCRouter({
             msHomeAccountId,
             "Message from Soff Chat",
             input.content,
+            input.fileNames,
             chatParticipant.supplier.email
           );
           // Create a new message object in the database
@@ -273,7 +275,8 @@ export const chatRouter = createTRPCRouter({
               content: input.content,
               chatParticipantId: input.chatParticipantId,
               outlookMessageId: newMessageId,
-              conversationId: conversationId
+              conversationId: conversationId,
+              fileNames: input.fileNames
             }
           });
         }

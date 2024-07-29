@@ -6,6 +6,12 @@ import { find, get } from "lodash";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import Spinner from "~/components/spinner";
+import { ChatMetadata } from "~/components/chat/chat-metadata";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
+} from "~/components/ui/resizable";
 
 export default function Exchange() {
   const router = useRouter();
@@ -43,20 +49,34 @@ export default function Exchange() {
   }
 
   return (
-    <div className="flex h-full flex-col space-y-4 p-4 pt-6 md:p-8">
+    <div className="flex h-full flex-col space-y-4 p-8 pt-6">
       <SupplierBreadcrumb
         name={supplier.name}
         supplierId={supplier.id}
         rfq={true}
         chatId={chatId}
       />
-      <Chat
-        supplier={supplier}
-        chatMessages={chatMessages}
-        setChatMessages={setChatMessages}
-        chatId={chatId}
-        chatParticipantUserId={chatParticipantUserId}
-      />
+      {/* <div className="flex h-full flex-row"> */}
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={70} minSize={50}>
+          <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
+            <Chat
+              supplier={supplier}
+              chatMessages={chatMessages}
+              setChatMessages={setChatMessages}
+              chatId={chatId}
+              chatParticipantUserId={chatParticipantUserId}
+            />
+          </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={30} minSize={20}>
+          <div className="w-80">
+            <ChatMetadata supplier={supplier} />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+      {/* </div> */}
     </div>
   );
 }
