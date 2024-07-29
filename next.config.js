@@ -3,8 +3,6 @@
  * for Docker builds.
  */
 await import("./src/env.js");
-import CopyWebpackPlugin from "copy-webpack-plugin";
-import path from "path";
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -19,33 +17,7 @@ const config = {
     locales: ["en"],
     defaultLocale: "en"
   },
-  transpilePackages: ["geist"],
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // This copies the worker file to the build directory
-      config.plugins.push(
-        new CopyWebpackPlugin({
-          patterns: [
-            {
-              from: path.resolve(
-                process.cwd(),
-                "node_modules/pdfjs-dist/build/pdf.worker.js"
-              ),
-              to: path.resolve(
-                process.cwd(),
-                ".next/static/chunks/pdf.worker.js"
-              )
-            }
-          ]
-        })
-      );
-
-      // Alias the worker path to the copied location
-      config.resolve.alias["pdfjs-dist/build/pdf.worker"] =
-        "/_next/static/chunks/pdf.worker.js";
-    }
-    return config;
-  }
+  transpilePackages: ["geist"]
 };
 
 export default config;
