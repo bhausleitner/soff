@@ -1,10 +1,14 @@
 import { createCanvas } from "canvas";
 // import * as pdfjsLib from "pdfjs-dist";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.js";
+import { pdfjs } from "react-pdf";
+import {
+  getDocument,
+  GlobalWorkerOptions
+} from "pdfjs-dist/legacy/build/pdf.js";
 
 import { type RenderParameters } from "pdfjs-dist/types/src/display/api";
 
-// pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`;
+GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 // Function to convert ArrayBuffer to Uint8Array
 const arrayBufferToUint8Array = (buffer: ArrayBuffer): Uint8Array => {
