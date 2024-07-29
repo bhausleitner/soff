@@ -68,7 +68,6 @@ model Part {
   id         Int            @id @default(autoincrement())
   partNumber String?
   partName   String
-  price      Float?
   cadFile    String?
   suppliers  SupplierPart[]
   lineItems LineItem[]
@@ -103,11 +102,10 @@ model Quote {
 model LineItem {
   id Int @id @default(autoincrement())
   partId Int
-  partName String?
+  description String?
   quantity Int
   price Float
   leadTime String?
-  totalPrice Float
   quoteId Int
 
   part Part @relation(fields: [partId], references: [id])

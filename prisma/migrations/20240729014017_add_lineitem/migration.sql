@@ -1,6 +1,7 @@
 /*
   Warnings:
 
+  - You are about to drop the column `price` on the `Part` table. All the data in the column will be lost.
   - You are about to drop the column `partId` on the `Quote` table. All the data in the column will be lost.
   - You are about to drop the column `price` on the `Quote` table. All the data in the column will be lost.
   - You are about to drop the column `quantity` on the `Quote` table. All the data in the column will be lost.
@@ -9,6 +10,9 @@
 */
 -- DropForeignKey
 ALTER TABLE "Quote" DROP CONSTRAINT "Quote_partId_fkey";
+
+-- AlterTable
+ALTER TABLE "Part" DROP COLUMN "price";
 
 -- AlterTable
 ALTER TABLE "Quote" DROP COLUMN "partId",
@@ -21,11 +25,10 @@ ADD COLUMN     "totalPrice" DOUBLE PRECISION NOT NULL;
 CREATE TABLE "LineItem" (
     "id" SERIAL NOT NULL,
     "partId" INTEGER NOT NULL,
-    "partName" TEXT,
+    "description" TEXT,
     "quantity" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "leadTime" TEXT,
-    "totalPrice" DOUBLE PRECISION NOT NULL,
     "quoteId" INTEGER NOT NULL,
 
     CONSTRAINT "LineItem_pkey" PRIMARY KEY ("id")
