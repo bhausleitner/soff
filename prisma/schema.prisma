@@ -68,10 +68,9 @@ model Part {
   id         Int            @id @default(autoincrement())
   partNumber String?
   partName   String
-  price      Float?
   cadFile    String?
   suppliers  SupplierPart[]
-  quotes     Quote[]
+  lineItems  LineItem[]
 
   @@index([partName])
 }
@@ -86,19 +85,31 @@ model SupplierPart {
 }
 
 model Quote {
-  id         Int         @id @default(autoincrement())
-  supplierId Int
-  partId     Int
-  quantity   Int
-  price      Float
-  status     QuoteStatus
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  orders     Order[]
-  supplier   Supplier    @relation(fields: [supplierId], references: [id])
-  part       Part        @relation(fields: [partId], references: [id])
+  id           Int         @id @default(autoincrement())
+  supplierId   Int
+  paymentTerms String?
+  price        Float
+  status       QuoteStatus
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orders       Order[]
+  supplier     Supplier    @relation(fields: [supplierId], references: [id])
+  lineItems    LineItem[]
 
   @@index([status])
+}
+
+model LineItem {
+  id          Int     @id @default(autoincrement())
+  partId      Int
+  description String?
+  quantity    Int
+  price       Float
+  leadTime    String?
+  quoteId     Int
+
+  part  Part  @relation(fields: [partId], references: [id])
+  quote Quote @relation(fields: [quoteId], references: [id])
 }
 
 model Order {
@@ -139,7 +150,7 @@ model Message {
   chatId            Int
   chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
   chatParticipantId Int
-  outlookMessageId  String? 
+  outlookMessageId  String?
   conversationId    String
   fileNames         String[]
 }
