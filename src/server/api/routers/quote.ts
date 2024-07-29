@@ -3,17 +3,28 @@ import { QuoteStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { orderArraySchema } from "~/server/api/routers/supplier";
 
+export const lineItemSchema = z.object({
+  id: z.number(),
+  partId: z.number(),
+  description: z.string().nullable(),
+  quantity: z.number(),
+  price: z.number(),
+  leadTime: z.string().nullable(),
+  quoteId: z.number()
+});
+export const lineItemArraySchema = z.array(lineItemSchema);
+
 export const quoteSchema = z.object({
   id: z.number(),
   supplierId: z.number(),
-  partId: z.number(),
-  quantity: z.number(),
+  paymentTerms: z.string().nullable(),
   price: z.number(),
   status: z.nativeEnum(QuoteStatus),
   createdAt: z.date(),
   updatedAt: z.date()
 });
 export const quoteArraySchema = z.array(quoteSchema);
+
 const quoteIdSchema = z.object({
   quoteId: z.number()
 });

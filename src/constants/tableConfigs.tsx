@@ -31,8 +31,6 @@ export const supplierQuoteTableConfig = {
   checkbox: true,
   columns: [
     { header: "Quote ID", accessorKey: "id", sortable: true },
-    { header: "Part ID", accessorKey: "partId", sortable: true },
-    { header: "Quantity", accessorKey: "quantity", sortable: true },
     { header: "Price", accessorKey: "price", sortable: true },
     { header: "Status", accessorKey: "status", sortable: true }
   ]
