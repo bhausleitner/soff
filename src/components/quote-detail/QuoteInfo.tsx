@@ -13,7 +13,6 @@ export function QuoteInfo({ quote }: QuoteInfoProps) {
         title="Quote Details"
         lines={[
           `Price: ${quote.price ? quote.price : "$-"}`,
-          `Quantity: ${quote.quantity}`,
           `Status: ${quote.status}`
         ]}
       />
@@ -21,7 +20,6 @@ export function QuoteInfo({ quote }: QuoteInfoProps) {
         title="Supplier Information"
         lines={[
           `Price: ${quote.price ? quote.price : "$-"}`,
-          `Quantity: ${quote.quantity}`,
           `Status: ${quote.status}`
         ]}
       />
@@ -29,7 +27,6 @@ export function QuoteInfo({ quote }: QuoteInfoProps) {
         title="Additional Information"
         lines={[
           `Price: ${quote.price ? quote.price : "$-"}`,
-          `Quantity: ${quote.quantity}`,
           `Status: ${quote.status}`
         ]}
       />

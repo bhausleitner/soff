@@ -28,6 +28,7 @@ export function Chat({
     <>
       <ChatTopbar supplier={supplier} />
       <ChatList
+        supplierId={supplier.id}
         chatMessages={chatMessages}
         chatParticipantUserId={chatParticipantUserId}
       />

@@ -8,11 +8,13 @@ import { Attachment } from "~/components/chat/attachment";
 interface MessageBubbleProps {
   chatMessage: ChatMessage;
   isUserMessage: boolean;
+  supplierId: number;
 }
 
 export function MessageBubble({
   chatMessage,
-  isUserMessage
+  isUserMessage,
+  supplierId
 }: MessageBubbleProps) {
   return (
     <div
@@ -31,6 +33,8 @@ export function MessageBubble({
                 ? `emailAttachments/${chatMessage.outlookMessageId}/${fileName}`
                 : `${fileName}`
             }
+            isUserMessage={isUserMessage}
+            supplierId={supplierId}
           />
         );
       })}

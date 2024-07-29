@@ -2,6 +2,7 @@ import s3 from "~/server/s3/config";
 import { type Attachment } from "~/server/email/outlook/outlookHelper";
 import { type Message } from "@prisma/client";
 import { db } from "~/server/db";
+import { type S3 } from "aws-sdk";
 
 export async function uploadFileToS3(
   attachments: Attachment[],
@@ -53,9 +54,5 @@ export async function getFileFromS3(fileKey: string) {
     throw new Error("Failed to retrieve file from S3");
   }
 
-  if (!(data.Body instanceof Buffer)) {
-    throw new Error("Data body is not a Buffer");
-  }
-
-  return data.Body.toString("base64"); // Convert to Base64
+  return data as S3.GetObjectOutput;
 }

@@ -152,7 +152,13 @@ async function constructAttachments(
 ): Promise<Attachment[]> {
   const attachments: Attachment[] = [];
   for (const fileName of fileNames) {
-    const fileBase64 = await getFileFromS3(fileName);
+    const file = await getFileFromS3(fileName);
+
+    if (!(file.Body instanceof Buffer)) {
+      throw new Error("Data body is not a Buffer");
+    }
+
+    const fileBase64 = file.Body?.toString("base64");
 
     attachments.push({
       "@odata.type": "#microsoft.graph.fileAttachment",

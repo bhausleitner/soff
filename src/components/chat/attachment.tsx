@@ -10,13 +10,36 @@ import {
 } from "~/components/ui/dialog";
 import PDFViewer from "~/components/chat/pdf-viewer";
 import { FileBadge } from "~/components/chat/file-badge";
+import { api } from "~/utils/api";
+import { Icons } from "~/components/icons";
+import { useRouter } from "next/router";
 
 interface AttachmentProps {
   fileKey: string;
+  isUserMessage: boolean;
+  supplierId: number;
 }
 
-export function Attachment({ fileKey }: AttachmentProps) {
+export function Attachment({
+  fileKey,
+  isUserMessage,
+  supplierId
+}: AttachmentProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
+  const router = useRouter();
+
+  const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
+
+  const handleCreateQuote = async () => {
+    setIsParsing(true);
+    const quoteId = await createQuoteMutation.mutateAsync({
+      fileKey,
+      supplierId
+    });
+    await router.push(`/quotes/${quoteId}`);
+    setIsParsing(false);
+  };
 
   // Derive the file name from the fileKey
   const fileName = fileKey.split("/").pop() ?? "Unnamed File";
@@ -43,6 +66,23 @@ export function Attachment({ fileKey }: AttachmentProps) {
           <PDFViewer fileKey={fileKey} />
         </div>
         <DialogFooter>
+          {!isUserMessage && (
+            <Button
+              className="w-40"
+              onClick={handleCreateQuote}
+              variant="outline"
+              disabled={isParsing}
+            >
+              {isParsing ? (
+                <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Parse Quote
+                  <Icons.sparkles className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          )}
           <Button onClick={handleClose}>Close</Button>
         </DialogFooter>
       </DialogContent>
