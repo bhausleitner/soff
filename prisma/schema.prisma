@@ -101,14 +101,14 @@ model Quote {
 
 model LineItem {
   id          Int     @id @default(autoincrement())
-  partId      Int
+  partId      Int?
   description String?
-  quantity    Int
-  price       Float
+  quantity    Int?
+  price       Float?
   leadTime    String?
   quoteId     Int
 
-  part  Part  @relation(fields: [partId], references: [id])
+  part  Part? @relation(fields: [partId], references: [id])
   quote Quote @relation(fields: [quoteId], references: [id])
 }
 
