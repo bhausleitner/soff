@@ -6,15 +6,29 @@ import openai from "~/server/openai/config";
 import { getFileFromS3 } from "~/server/s3/utils";
 import { convertPdfToImage } from "~/server/openai/utils";
 
+export const lineItemSchema = z.object({
+  id: z.number(),
+  partId: z.number().nullable(),
+  description: z.string().nullable(),
+  quantity: z.number().nullable(),
+  price: z.number().nullable(),
+  leadTime: z.string().nullable(),
+  quoteId: z.number()
+});
+
 export const quoteSchema = z.object({
   id: z.number(),
   supplierId: z.number(),
+  paymentTerms: z.string().nullable(),
   price: z.number(),
   status: z.nativeEnum(QuoteStatus),
   createdAt: z.date(),
   updatedAt: z.date()
 });
+
 export const quoteArraySchema = z.array(quoteSchema);
+export const lineItemArraySchema = z.array(lineItemSchema);
+
 const quoteIdSchema = z.object({
   quoteId: z.number()
 });
@@ -30,6 +44,7 @@ interface ParsedQuoteData {
 }
 
 export type Quote = z.infer<typeof quoteSchema>;
+export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const quoteRouter = createTRPCRouter({
   getAllQuotes: publicProcedure.query(async ({ ctx }) => {
@@ -51,7 +66,17 @@ export const quoteRouter = createTRPCRouter({
 
       return quote;
     }),
+  getLineItemsByQuoteId: publicProcedure
+    .input(quoteIdSchema)
+    .query(async ({ ctx, input }) => {
+      const lineItemData = await ctx.db.lineItem.findMany({
+        where: { quoteId: input.quoteId }
+      });
 
+      lineItemArraySchema.parse(lineItemData);
+
+      return lineItemData;
+    }),
   getOrdersByQuoteId: publicProcedure
     .input(quoteIdSchema)
     .query(async ({ ctx, input }) => {
