@@ -13,6 +13,7 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 // GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 // pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 // Function to convert ArrayBuffer to Uint8Array
@@ -24,7 +25,7 @@ export const convertPdfToImage = async (pdfData: ArrayBuffer) => {
   const uint8ArrayData = arrayBufferToUint8Array(pdfData);
 
   const loadingTask = pdfjs.getDocument({ data: uint8ArrayData });
-  console.log("zwei");
+
   const pdfDocument = await loadingTask.promise;
   const page = await pdfDocument.getPage(1); // Get the first page
 
