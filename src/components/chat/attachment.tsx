@@ -13,6 +13,7 @@ import { FileBadge } from "~/components/chat/file-badge";
 import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 
 interface AttachmentProps {
   fileKey: string;
@@ -32,13 +33,19 @@ export function Attachment({
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
 
   const handleCreateQuote = async () => {
-    setIsParsing(true);
-    const quoteId = await createQuoteMutation.mutateAsync({
-      fileKey,
-      supplierId
-    });
-    await router.push(`/quotes/${quoteId}`);
-    setIsParsing(false);
+    try {
+      setIsParsing(true);
+      const quoteId = await createQuoteMutation.mutateAsync({
+        fileKey,
+        supplierId
+      });
+      await router.push(`/quotes/${quoteId}`);
+    } catch (error) {
+      console.error("Error in handleCreateQuote:", error);
+      toast.error("Failed to create quote. Please reach out to admin.");
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   // Derive the file name from the fileKey

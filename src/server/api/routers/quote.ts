@@ -96,70 +96,76 @@ export const quoteRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const pdfData = await getFileFromS3(input.fileKey);
+      try {
+        const pdfData = await getFileFromS3(input.fileKey);
 
-      if (!pdfData.Body) {
-        throw new Error("No PDF data found");
-      }
-
-      const pngPages: Buffer = await convertPdfToImage(
-        pdfData.Body as ArrayBuffer
-      );
-
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: 'Given the following quote data, parse it into the specified JSON format: {"totalPrice": 1000, "lineItems": [{"partId": 1, "quantity": 10, "price": 100, "description": "Part 1 Description"}, {"partId": 2, "quantity": 5, "price": 200, "description": "Part 2 Description"}]}'
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${pngPages.toString("base64")}`
-                }
-              }
-            ]
-          }
-        ]
-      });
-
-      const responseString = response.choices[0]?.message.content;
-
-      const jsonRegex = /```json\n([\s\S]*?)\n```/;
-      const match = responseString?.match(jsonRegex);
-
-      if (!match?.[1]) {
-        throw new Error("No JSON data found");
-      }
-
-      const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
-
-      // create quote object
-      const quote = await ctx.db.quote.create({
-        data: {
-          supplierId: input.supplierId,
-          price: parsedData.totalPrice,
-          status: QuoteStatus.RECEIVED
+        if (!pdfData.Body) {
+          throw new Error("No PDF data found");
         }
-      });
 
-      // iterate through line item object
-      for (const lineItem of parsedData.lineItems) {
-        await ctx.db.lineItem.create({
+        const pngPages: Buffer = await convertPdfToImage(
+          pdfData.Body as ArrayBuffer
+        );
+
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: 'Given the following quote data, parse it into the specified JSON format: {"totalPrice": 1000, "lineItems": [{"partId": 1, "quantity": 10, "price": 100, "description": "Part 1 Description"}, {"partId": 2, "quantity": 5, "price": 200, "description": "Part 2 Description"}]}'
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${pngPages.toString("base64")}`
+                  }
+                }
+              ]
+            }
+          ]
+        });
+
+        const responseString = response.choices[0]?.message.content;
+
+        console.log("Here");
+        console.log(responseString);
+
+        const jsonRegex = /```json\n([\s\S]*?)\n```/;
+        const match = responseString?.match(jsonRegex);
+
+        if (!match?.[1]) {
+          throw new Error("No JSON data found");
+        }
+
+        const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
+
+        // create quote object
+        const quote = await ctx.db.quote.create({
           data: {
-            quoteId: quote.id,
-            description: lineItem.description,
-            quantity: lineItem.quantity,
-            price: lineItem.price
+            supplierId: input.supplierId,
+            price: parsedData.totalPrice,
+            status: QuoteStatus.RECEIVED
           }
         });
-      }
 
-      return quote.id.toString();
-      // return "2";
+        // iterate through line item object
+        for (const lineItem of parsedData.lineItems) {
+          await ctx.db.lineItem.create({
+            data: {
+              quoteId: quote.id,
+              description: lineItem.description,
+              quantity: lineItem.quantity,
+              price: lineItem.price
+            }
+          });
+        }
+        return quote.id.toString();
+      } catch (error) {
+        console.error("Error in createQuoteFromPdf:", error);
+        throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
+      }
     })
 });
