@@ -16,7 +16,9 @@ export const env = createEnv({
     AWS_NON_SECRET_ACCESS_KEY: z.string(),
     AWS_SECRET_ACCESS_KEY: z.string(),
     AWS_REGION: z.string(),
-    AWS_S3_BUCKET: z.string()
+    AWS_S3_BUCKET: z.string(),
+    OPENAI_API_KEY: z.string(),
+    SENTRY_AUTH_TOKEN: z.string()
   },
 
   /**
@@ -40,7 +42,9 @@ export const env = createEnv({
     AWS_NON_SECRET_ACCESS_KEY: process.env.AWS_NON_SECRET_ACCESS_KEY,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_REGION: process.env.AWS_REGION,
-    AWS_S3_BUCKET: process.env.AWS_S3_BUCKET
+    AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
