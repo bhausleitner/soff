@@ -102,7 +102,9 @@ export const quoteRouter = createTRPCRouter({
         throw new Error("No PDF data found");
       }
 
-      const pngPages = await convertPdfToImage(pdfData.Body as ArrayBuffer);
+      const pngPages: Buffer = await convertPdfToImage(
+        pdfData.Body as ArrayBuffer
+      );
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",

@@ -1,14 +1,19 @@
 import { createCanvas } from "canvas";
 // import * as pdfjsLib from "pdfjs-dist";
 import { pdfjs } from "react-pdf";
-import {
-  getDocument,
-  GlobalWorkerOptions
-} from "pdfjs-dist/legacy/build/pdf.js";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 
-import { type RenderParameters } from "pdfjs-dist/types/src/display/api";
+// import {
+//   getDocument,
+//   GlobalWorkerOptions
+// } from "pdfjs-dist/legacy/build/pdf.js";
+
+// import { type RenderParameters } from "pdfjs-dist/types/src/display/api";
 
 // GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 // Function to convert ArrayBuffer to Uint8Array
 const arrayBufferToUint8Array = (buffer: ArrayBuffer): Uint8Array => {
@@ -18,7 +23,7 @@ const arrayBufferToUint8Array = (buffer: ArrayBuffer): Uint8Array => {
 export const convertPdfToImage = async (pdfData: ArrayBuffer) => {
   const uint8ArrayData = arrayBufferToUint8Array(pdfData);
 
-  const loadingTask = getDocument({ data: uint8ArrayData });
+  const loadingTask = pdfjs.getDocument({ data: uint8ArrayData });
   console.log("zwei");
   const pdfDocument = await loadingTask.promise;
   const page = await pdfDocument.getPage(1); // Get the first page
@@ -28,7 +33,7 @@ export const convertPdfToImage = async (pdfData: ArrayBuffer) => {
   const canvas = createCanvas(viewport.width, viewport.height);
   const context = canvas.getContext("2d");
 
-  const renderContext: RenderParameters = {
+  const renderContext = {
     canvasContext: context as unknown as CanvasRenderingContext2D,
     viewport: viewport
   };
