@@ -10,8 +10,8 @@ export function SupplierInfo(supplier: Supplier) {
         title={supplier.name}
         lines={[
           `Status: ${supplier.status}`,
-          `Supplier grade: coming soon`,
-          `Response Time: coming soon`
+          `Supplier Grade:`,
+          `Response Time:`
         ]}
       />
       <InfoCard
@@ -28,10 +28,10 @@ export function SupplierInfo(supplier: Supplier) {
         lines={[
           "Non-Disclosure Agreements",
           "Terms & Conditions",
-          "Billing history",
+          "Billing History",
           "Certificates"
         ]}
-        badge={<Badge variant="secondary">Coming soon</Badge>}
+        badge={<Badge variant="secondary">Coming Soon</Badge>}
       />
     </div>
   );
