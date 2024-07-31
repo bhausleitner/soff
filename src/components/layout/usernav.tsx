@@ -25,19 +25,6 @@ export function UserNav() {
   const microsoftAuthUrlMutation =
     api.chat.requestMicrosoftAuthUrl.useMutation();
 
-  const handleMicrosoftAuthUrl = async (): Promise<void> => {
-    const redirectUrl = await microsoftAuthUrlMutation.mutateAsync();
-    await router.push(redirectUrl);
-  };
-
-  const handleSettingsRedirect = async (): Promise<void> => {
-    await router.push(
-      process.env.VERCEL_URL
-        ? "https://accounts.soff.ai/user"
-        : "https://lucky-crow-92.accounts.dev/user"
-    );
-  };
-
   if (user) {
     return (
       <DropdownMenu>
@@ -68,8 +55,12 @@ export function UserNav() {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={() => {
-                handleSettingsRedirect();
+              onClick={async () => {
+                await router.push(
+                  process.env.VERCEL_URL
+                    ? "https://accounts.soff.ai/user"
+                    : "https://lucky-crow-92.accounts.dev/user"
+                );
               }}
             >
               Settings
@@ -77,7 +68,13 @@ export function UserNav() {
                 <Icons.settings className="ml-3 size-5" />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleMicrosoftAuthUrl()}>
+            <DropdownMenuItem
+              onClick={async () => {
+                const redirectUrl =
+                  await microsoftAuthUrlMutation.mutateAsync();
+                await router.push(redirectUrl);
+              }}
+            >
               Authenticate Outlook
               <DropdownMenuShortcut>
                 <Icons.fingerprint className="ml-3 size-5" />
