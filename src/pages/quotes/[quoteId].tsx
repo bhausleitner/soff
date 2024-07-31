@@ -38,24 +38,16 @@ const QuotePage = () => {
     }
   );
 
-  if (isNaN(quoteId)) {
+  if (isNaN(quoteId) || quoteLoading || supplierLoading) {
     return <Spinner />;
   }
 
-  if (quoteError) {
-    return <p>Error: {quoteError.message}</p>;
+  if (quoteError ?? supplierError) {
+    return <p>Error: {quoteError?.message ?? supplierError?.message}</p>;
   }
 
   if (!quoteData) {
     return <p>No quote found.</p>;
-  }
-
-  if (supplierLoading) {
-    return <Spinner />;
-  }
-
-  if (supplierError) {
-    return <p>Error: {supplierError.message}</p>;
   }
 
   if (!supplierData) {
