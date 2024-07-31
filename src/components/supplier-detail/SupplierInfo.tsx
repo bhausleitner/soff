@@ -15,8 +15,9 @@ export function SupplierInfo(supplier: Supplier) {
         ]}
       />
       <InfoCard
-        title="Communication"
+        title="Contact Details"
         lines={[
+          `${supplier.contactPerson}`,
           `Email: ${supplier.email}`,
           `Phone: ${supplier.phone}`,
           `Address: ${supplier.address}`
