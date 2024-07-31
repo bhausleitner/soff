@@ -65,7 +65,7 @@ const SupplierPage = () => {
           </Button>
         </div>
       </div>
-      <SupplierInfo data={data} />
+      <SupplierInfo {...data} />
       <SupplierTabs supplierId={data.id} />
     </div>
   );

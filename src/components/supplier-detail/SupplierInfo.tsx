@@ -1,30 +1,22 @@
 import React from "react";
 import { InfoCard } from "~/components/common/InfoCard";
+import { type Supplier } from "~/server/api/routers/supplier";
 
-interface SupplierInfoProps {
-  data: {
-    name: string;
-    email: string;
-    status: string;
-    responseTime?: number | null;
-  };
-}
-
-export function SupplierInfo({ data }: SupplierInfoProps) {
+export function SupplierInfo(supplier: Supplier) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <InfoCard
-        title={data.name}
+        title={supplier.name}
         lines={[
-          `Status: ${data.status}`,
+          `Status: ${supplier.status}`,
           `Supplier grade: A`,
-          `Response Time: ${data.responseTime ?? "N/A"}h`
+          `Response Time: ${supplier.responseTime ?? "N/A"}h`
         ]}
       />
       <InfoCard
         title="Communication"
         lines={[
-          `Email: ${data.email}`,
+          `Email: ${supplier.email}`,
           "Phone: 123-456-7890",
           "Address: 123 Main St"
         ]}
