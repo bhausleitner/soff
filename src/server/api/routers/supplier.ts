@@ -8,8 +8,8 @@ export const supplierSchema = z.object({
   name: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email(),
-  phone: z.string().optional(),
-  address: z.string().optional(),
+  phone: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
   responseTime: z.number().nullable(),
   contactPerson: z.string().nullable()
 });

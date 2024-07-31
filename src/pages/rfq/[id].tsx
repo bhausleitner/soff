@@ -61,11 +61,7 @@ export default function Exchange() {
         <ResizablePanel defaultSize={70} minSize={50}>
           <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
             <Chat
-              supplier={{
-                ...supplier,
-                phone: supplier.phone as string | undefined,
-                address: supplier.address as string | undefined
-              }}
+              supplier={supplier}
               chatMessages={chatMessages}
               setChatMessages={setChatMessages}
               chatId={chatId}
