@@ -8,8 +8,8 @@ export const supplierSchema = z.object({
   name: z.string(),
   status: z.nativeEnum(Status),
   email: z.string().email(),
-  phone: z.string().nullable(),
-  address: z.string().nullable(),
+  phone: z.string().optional(),
+  address: z.string().optional(),
   responseTime: z.number().nullable(),
   contactPerson: z.string().nullable()
 });
@@ -33,9 +33,8 @@ export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
-    // fetch data from db
     const supplierData = await ctx.db.supplier.findMany({});
-    // validate data using schema
+
     supplierArraySchema.parse(supplierData);
 
     return supplierData;
@@ -49,6 +48,8 @@ export const supplierRouter = createTRPCRouter({
           id: input.supplierId
         }
       });
+
+      supplierSchema.parse(supplierData);
 
       return supplierData;
     }),
