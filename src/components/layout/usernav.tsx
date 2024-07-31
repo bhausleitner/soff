@@ -22,14 +22,20 @@ export function UserNav() {
   const { signOut } = useClerk();
   const router = useRouter();
 
-  const FingerprintIcon = Icons.fingerprint;
-
   const microsoftAuthUrlMutation =
     api.chat.requestMicrosoftAuthUrl.useMutation();
 
   const handleMicrosoftAuthUrl = async (): Promise<void> => {
     const redirectUrl = await microsoftAuthUrlMutation.mutateAsync();
     await router.push(redirectUrl);
+  };
+
+  const handleSettingsRedirect = async (): Promise<void> => {
+    await router.push(
+      process.env.VERCEL_URL
+        ? "https://accounts.soff.ai/user"
+        : "https://lucky-crow-92.accounts.dev/user"
+    );
   };
 
   if (user) {
@@ -39,7 +45,7 @@ export function UserNav() {
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
               <AvatarImage
-                src={user?.user?.username ?? ""}
+                src={user?.user?.imageUrl}
                 alt={user?.user?.username ?? ""}
               />
               <AvatarFallback>
@@ -61,30 +67,29 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              Profile
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                handleSettingsRedirect();
+              }}
+            >
               Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+              <DropdownMenuShortcut>
+                <Icons.settings className="ml-3 size-5" />
+              </DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleMicrosoftAuthUrl()}>
               Authenticate Outlook
               <DropdownMenuShortcut>
-                <FingerprintIcon className={`ml-3 size-5`} />
+                <Icons.fingerprint className="ml-3 size-5" />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>
             Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            <DropdownMenuShortcut>
+              <Icons.logout className="ml-3 size-5" />
+            </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
