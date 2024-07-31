@@ -124,17 +124,23 @@ export function TableComponent<T extends { id: number }>({
     }
   });
 
+  const firstFilterableColumn = table
+    .getAllColumns()
+    .find((column) => column.getCanFilter());
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-          placeholder={tableConfig.placeholder}
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        {firstFilterableColumn && (
+          <Input
+            placeholder={tableConfig.placeholder}
+            value={(firstFilterableColumn.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              firstFilterableColumn.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
