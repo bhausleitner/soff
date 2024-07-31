@@ -67,7 +67,14 @@ const QuotePage = () => {
           </Button>
         </div>
       </div>
-      <QuoteInfo quote={quoteData} supplier={supplierData} />
+      <QuoteInfo
+        quote={quoteData}
+        supplier={{
+          ...supplierData,
+          phone: supplierData.phone as string | undefined,
+          address: supplierData.address as string | undefined
+        }}
+      />
       <GenericTable<LineItem, { quoteId: number }>
         tableConfig={quoteLineItemTableConfig}
         useQueryHook={useGetLineItemsByQuoteQuery}

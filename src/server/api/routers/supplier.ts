@@ -33,7 +33,16 @@ export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
   getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
-    const supplierData = await ctx.db.supplier.findMany({});
+    const supplierData = await ctx.db.supplier.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        status: true,
+        responseTime: true,
+        contactPerson: true
+      }
+    });
 
     supplierArraySchema.parse(supplierData);
 
