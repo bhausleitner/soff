@@ -1,17 +1,20 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
 
 interface InfoCardProps {
   title: string;
   lines: string[];
+  badge?: React.ReactNode;
 }
 
-export function InfoCard({ title, lines }: InfoCardProps) {
+export function InfoCard({ title, lines, badge }: InfoCardProps) {
   return (
     <div className="flex flex-col">
       <Card className="flex h-full flex-col">
-        <CardHeader className="flex flex-row items-center">
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          {badge && badge}
         </CardHeader>
         <CardContent className="flex-grow">
           {lines.map((line, index) => (

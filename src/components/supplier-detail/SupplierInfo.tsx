@@ -1,6 +1,7 @@
 import React from "react";
 import { InfoCard } from "~/components/common/InfoCard";
 import { type Supplier } from "~/server/api/routers/supplier";
+import { Badge } from "~/components/ui/badge";
 
 export function SupplierInfo(supplier: Supplier) {
   return (
@@ -10,7 +11,7 @@ export function SupplierInfo(supplier: Supplier) {
         lines={[
           `Status: ${supplier.status}`,
           `Supplier grade: coming soon`,
-          `Response Time: ${supplier.responseTime ?? "N/A"}h`
+          `Response Time: coming soon`
         ]}
       />
       <InfoCard
@@ -29,6 +30,7 @@ export function SupplierInfo(supplier: Supplier) {
           "Billing history",
           "Certificates"
         ]}
+        badge={<Badge variant="secondary">Coming soon</Badge>}
       />
     </div>
   );
