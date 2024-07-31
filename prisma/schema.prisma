@@ -55,6 +55,8 @@ model Supplier {
   updatedAt        DateTime          @updatedAt
   contactPerson    String
   email            String
+  phone            String?           @default("")
+  address          String?           @default("")
   status           Status            @default(ACTIVE)
   responseTime     Int?              @default(48)
   parts            SupplierPart[]
