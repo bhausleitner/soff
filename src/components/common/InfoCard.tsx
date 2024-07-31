@@ -12,7 +12,7 @@ export function InfoCard({ title, lines, badge }: InfoCardProps) {
   return (
     <div className="flex flex-col">
       <Card className="flex h-full flex-col">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
           {badge && badge}
         </CardHeader>
