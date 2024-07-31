@@ -26,8 +26,7 @@ export function SupplierInfo({ data }: SupplierInfoProps) {
         lines={[
           `Email: ${data.email}`,
           "Phone: 123-456-7890",
-          "Address: 123 Main St",
-          "Communication history"
+          "Address: 123 Main St"
         ]}
       />
       <InfoCard
