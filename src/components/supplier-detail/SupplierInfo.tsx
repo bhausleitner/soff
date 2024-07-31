@@ -9,7 +9,7 @@ export function SupplierInfo(supplier: Supplier) {
         title={supplier.name}
         lines={[
           `Status: ${supplier.status}`,
-          `Supplier grade: A`,
+          `Supplier grade: coming soon`,
           `Response Time: ${supplier.responseTime ?? "N/A"}h`
         ]}
       />
@@ -17,13 +17,18 @@ export function SupplierInfo(supplier: Supplier) {
         title="Communication"
         lines={[
           `Email: ${supplier.email}`,
-          "Phone: 123-456-7890",
-          "Address: 123 Main St"
+          `Phone: ${supplier.phone}`,
+          `Address: ${supplier.address}`
         ]}
       />
       <InfoCard
         title="Documents"
-        lines={["NDA", "Terms & Conditions", "Billing history", "Certificates"]}
+        lines={[
+          "Non-Disclosure Agreements",
+          "Terms & Conditions",
+          "Billing history",
+          "Certificates"
+        ]}
       />
     </div>
   );
