@@ -31,9 +31,11 @@ export function Attachment({
     handleClose
   } = useFileHandling();
   const [isParsing, setIsParsing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const router = useRouter();
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
+  const downloadFileMutation = api.s3.downloadFile.useMutation();
 
   const handleCreateQuote = async () => {
     try {
