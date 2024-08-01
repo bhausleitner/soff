@@ -13,10 +13,10 @@ export const PageLayout = (props: PropsWithChildren) => {
   const stableUser = useMemo(() => user, [user?.id, user?.emailAddresses]);
 
   useEffect(() => {
-    if (stableUser) {
+    if (stableUser && user?.publicMetadata?.syncedToDB !== true) {
       upsertUser.mutate({
-        clerkUserId: stableUser?.id ?? "",
-        email: stableUser?.emailAddresses[0]?.emailAddress ?? ""
+        clerkUserId: user?.id ?? "",
+        email: user?.emailAddresses[0]?.emailAddress ?? ""
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
