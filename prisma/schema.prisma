@@ -7,6 +7,17 @@ enum Status {
   ONBOARDING
 }
 
+enum Erp {
+  ODOO
+  NETSUITE
+  SAP
+}
+
+enum EmailProvider {
+  GMAIL
+  OUTLOOK
+}
+
 enum QuoteStatus {
   WAITING
   RECEIVED
@@ -62,6 +73,8 @@ model Supplier {
   parts            SupplierPart[]
   quotes           Quote[]
   chatParticipants ChatParticipant[]
+  organizationId   Int?
+  organization     Organization?     @relation(fields: [organizationId], references: [id])
 
   @@index([name])
 }
@@ -127,6 +140,18 @@ model Order {
   @@index([status])
 }
 
+model Organization {
+  id            Int            @id @default(autoincrement())
+  name          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  emailProvider EmailProvider?
+  erpUrl        String?
+  erp           Erp?
+  suppliers     Supplier[]
+  users         User[]
+}
+
 model User {
   id               Int               @id @default(autoincrement())
   email            String
@@ -134,6 +159,8 @@ model User {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   chatParticipants ChatParticipant[]
+  organizationId   Int?
+  organization     Organization?     @relation(fields: [organizationId], references: [id])
 }
 
 model Chat {
