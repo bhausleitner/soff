@@ -75,14 +75,8 @@ export function Attachment({
   // Split the file name and extension
   const [name, extension] = fileName.split(/\.(?=[^\.]+$)/); // Splits at the last dot
 
+  const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
-  const handleOpen = () => {
-    if (isPDF) {
-      setIsOpen(true);
-    } else {
-      toast.info("This file type is not supported for preview.");
-    }
-  };
 
   const isPDF = extension?.toLowerCase() === "pdf";
 
