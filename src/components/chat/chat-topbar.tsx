@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { startCase, toLower } from "lodash";
 import {
   Tooltip,
-  TooltipProvider,
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
@@ -44,25 +43,23 @@ export default function ChatTopbar({ supplier }: ChatTopbarProps) {
 
         <div>
           {TopbarIcons.map((icon, index) => (
-            <TooltipProvider key={index}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={icon.link}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "h-9 w-9",
-                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                    )}
-                  >
-                    <icon.icon size={20} className="text-muted-foreground" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{icon.prefix} on Microsoft Teams.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip key={index}>
+              <TooltipTrigger asChild>
+                <Link
+                  href={icon.link}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "h-9 w-9",
+                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                  )}
+                >
+                  <icon.icon size={20} className="text-muted-foreground" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{icon.prefix} on Microsoft Teams.</p>
+              </TooltipContent>
+            </Tooltip>
           ))}
         </div>
       </div>

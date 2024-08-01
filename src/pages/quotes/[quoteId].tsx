@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
@@ -12,62 +12,102 @@ import { GenericTable } from "~/components/common/GenericTable";
 import { type LineItem } from "~/server/api/routers/quote";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
+import { toast } from "sonner";
 
 const QuotePage = () => {
   const router = useRouter();
   const quoteId = parseInt(router.query.quoteId as string, 10);
+  const [isCreatingPO, setIsCreatingPO] = useState(false);
+  const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
+    null
+  );
+
+  const purchaseOrderMutation = api.quote.createPurchaseOrder.useMutation();
+
+  if (isNaN(quoteId)) {
+    return <p>Invalid quote ID.</p>;
+  }
+
+  const handleAddToOdoo = async () => {
+    try {
+      setIsCreatingPO(true);
+      const odooId = await purchaseOrderMutation.mutateAsync({
+        quoteId
+      });
+      setErpPurchaseOrderId(odooId as number);
+      toast.success("Purchase order created in Odoo.");
+    } catch (error) {
+      console.error("Error in handleCreateQuote:", error);
+      toast.error("Failed to create PO. Please try again.");
+    } finally {
+      setIsCreatingPO(false);
+    }
+  };
 
   const {
     data: quoteData,
     isLoading: quoteLoading,
     error: quoteError
   } = api.quote.getQuoteById.useQuery({
-    quoteId: !isNaN(quoteId) ? quoteId : 0
+    quoteId: quoteId
   });
 
-  const {
-    data: supplierData,
-    isLoading: supplierLoading,
-    error: supplierError
-  } = api.supplier.getSupplierById.useQuery(
-    {
-      supplierId: quoteData?.supplierId ?? 0
-    },
-    {
-      enabled: !!quoteData?.supplierId
-    }
-  );
-
-  if (isNaN(quoteId) || quoteLoading || supplierLoading) {
+  if (quoteLoading) {
     return <Spinner />;
   }
 
-  if (quoteError ?? supplierError) {
-    return <p>Error: {quoteError?.message ?? supplierError?.message}</p>;
+  if (quoteError) {
+    return <p>Error: {quoteError.message}</p>;
   }
 
   if (!quoteData) {
     return <p>No quote found.</p>;
   }
 
-  if (!supplierData) {
-    return <p>No supplier found.</p>;
-  }
-
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between">
         <QuoteBreadcrumb quoteId={quoteId} />
-        <div className="flex items-center">
-          <Button>
-            <>
-              Add to Odoo
-              <Icons.odoo className="ml-2 h-4 w-4" />
-            </>
-          </Button>
+        <div className="flex items-center space-x-4">
+          {!erpPurchaseOrderId && (
+            <Button
+              className="w-36"
+              onClick={() => handleAddToOdoo()}
+              disabled={isCreatingPO}
+            >
+              {isCreatingPO ? (
+                <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Add to Odoo
+                  <Icons.odoo className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          )}
+          {!!erpPurchaseOrderId && (
+            <Button
+              className="w-36"
+              disabled={!quoteData?.erpPurchaseOrderId}
+              variant="outline"
+              onClick={async () =>
+                await router.push(
+                  `${quoteData.erpUrl}/odoo/purchase/${quoteData.erpPurchaseOrderId}`
+                )
+              }
+            >
+              View in Odoo
+              <Icons.odooLogo className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
-      <QuoteInfo quote={quoteData} supplier={supplierData} />
+      <QuoteInfo
+        quote={quoteData}
+        supplierName={quoteData.supplierName}
+        supplierContactPerson={quoteData.supplierContactPerson}
+        supplierEmail={quoteData.supplierEmail}
+      />
       <GenericTable<LineItem, { quoteId: number }>
         tableConfig={quoteLineItemTableConfig}
         useQueryHook={useGetLineItemsByQuoteQuery}

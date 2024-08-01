@@ -1,15 +1,21 @@
 import React from "react";
 import { InfoCard } from "~/components/common/InfoCard";
 import { type Quote } from "~/server/api/routers/quote";
-import { type Supplier } from "~/server/api/routers/supplier";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface QuoteInfoProps {
   quote: Quote;
-  supplier: Supplier;
+  supplierName: string;
+  supplierContactPerson: string;
+  supplierEmail: string;
 }
 
-export function QuoteInfo({ quote, supplier }: QuoteInfoProps) {
+export function QuoteInfo({
+  quote,
+  supplierName,
+  supplierContactPerson,
+  supplierEmail
+}: QuoteInfoProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card>
@@ -40,9 +46,9 @@ export function QuoteInfo({ quote, supplier }: QuoteInfoProps) {
       <InfoCard
         title="Supplier Information"
         lines={[
-          `Supplier: ${supplier.name}`,
-          `Contact: ${supplier.contactPerson}`,
-          `Email: ${supplier.email}`
+          `Supplier: ${supplierName}`,
+          `Contact: ${supplierContactPerson}`,
+          `Email: ${supplierEmail}`
         ]}
       />
     </div>
