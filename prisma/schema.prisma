@@ -77,11 +77,13 @@ model Supplier {
   organization     Organization?     @relation(fields: [organizationId], references: [id])
 
   @@index([name])
+  @@index([organizationId])
+  @@index([email])
 }
 
 model Part {
   id         Int            @id @default(autoincrement())
-  partNumber String?
+  partNumber String?        
   partName   String
   cadFile    String?
   suppliers  SupplierPart[]
@@ -113,6 +115,7 @@ model Quote {
   erpPurchaseOrderId Int?
 
   @@index([status])
+  @@index([supplierId])
 }
 
 model LineItem {
@@ -126,6 +129,9 @@ model LineItem {
 
   part  Part? @relation(fields: [partId], references: [id])
   quote Quote @relation(fields: [quoteId], references: [id])
+
+  @@index([partId])
+  @@index([quoteId])
 }
 
 model Order {
@@ -138,6 +144,7 @@ model Order {
   quote           Quote       @relation(fields: [quoteId], references: [id])
 
   @@index([status])
+  @@index([quoteId])
 }
 
 model Organization {
@@ -150,6 +157,8 @@ model Organization {
   erp           Erp?
   suppliers     Supplier[]
   users         User[]
+
+  @@index([name])
 }
 
 model User {
@@ -161,6 +170,9 @@ model User {
   chatParticipants ChatParticipant[]
   organizationId   Int?
   organization     Organization?     @relation(fields: [organizationId], references: [id])
+
+  @@index([email])
+  @@index([organizationId])
 }
 
 model Chat {
@@ -183,6 +195,9 @@ model Message {
   outlookMessageId  String?
   conversationId    String
   fileNames         String[]
+
+  @@index([chatId])
+  @@index([chatParticipantId])
 }
 
 model ChatParticipant {
@@ -194,4 +209,8 @@ model ChatParticipant {
   user       User?     @relation(fields: [userId], references: [id])
   userId     Int?
   messages   Message[]
+
+  @@index([chatId])
+  @@index([supplierId])
+  @@index([userId])
 }
