@@ -90,7 +90,11 @@ export function Attachment({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild className="mt-2">
-        <FileBadge fileName={fileName} handleOpen={handleOpen} />
+        <FileBadge
+          fileName={fileName}
+          handleOpen={handleOpen}
+          handleDownload={handleDownload}
+        />
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[60vw] overflow-auto">
         <DialogHeader>
