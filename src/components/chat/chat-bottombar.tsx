@@ -15,7 +15,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger
 } from "~/components/ui/tooltip";
 
@@ -280,50 +279,45 @@ export default function ChatBottombar({
             />
           </Link>
         ) : (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {textContent.trim() ? (
-                  <Link
-                    href="#"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      uploading && "cursor-not-allowed opacity-50",
-                      "h-9 w-9",
-                      "shrink-0 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                    )}
-                    onClick={async () => await handleSend()}
-                  >
-                    <Icons.sendHorizontal
-                      size={20}
-                      className="text-muted-foreground"
-                    />
-                  </Link>
-                ) : (
-                  <Link
-                    href="#"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      uploading && "cursor-not-allowed opacity-50",
-                      "h-9 w-9",
-                      "shrink-0 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                    )}
-                    onClick={async () => {
-                      await handleSend("👍");
-                    }}
-                  >
-                    <Icons.thumbsUp
-                      size={20}
-                      className="text-muted-foreground"
-                    />
-                  </Link>
-                )}
-              </TooltipTrigger>
-              <TooltipContent>
-                {uploading ? <p>Uploading files...</p> : <p>Click to send.</p>}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {textContent.trim() ? (
+                <Link
+                  href="#"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    uploading && "cursor-not-allowed opacity-50",
+                    "h-9 w-9",
+                    "shrink-0 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                  )}
+                  onClick={async () => await handleSend()}
+                >
+                  <Icons.sendHorizontal
+                    size={20}
+                    className="text-muted-foreground"
+                  />
+                </Link>
+              ) : (
+                <Link
+                  href="#"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    uploading && "cursor-not-allowed opacity-50",
+                    "h-9 w-9",
+                    "shrink-0 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                  )}
+                  onClick={async () => {
+                    await handleSend("👍");
+                  }}
+                >
+                  <Icons.thumbsUp size={20} className="text-muted-foreground" />
+                </Link>
+              )}
+            </TooltipTrigger>
+            <TooltipContent>
+              {uploading ? <p>Uploading files...</p> : <p>Click to send.</p>}
+            </TooltipContent>
+          </Tooltip>
         )}
       </AnimatePresence>
     </div>

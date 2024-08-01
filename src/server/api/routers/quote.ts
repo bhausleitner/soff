@@ -23,7 +23,8 @@ export const quoteSchema = z.object({
   price: z.number(),
   status: z.nativeEnum(QuoteStatus),
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
+  erpPurchaseOrderId: z.number().optional().nullable()
 });
 
 export const quoteArraySchema = z.array(quoteSchema);
@@ -56,15 +57,38 @@ export const quoteRouter = createTRPCRouter({
   }),
 
   getQuoteById: publicProcedure
-    .input(quoteIdSchema)
+    .input(z.object({ quoteId: z.number() }))
     .query(async ({ ctx, input }) => {
       const quote = await ctx.db.quote.findUnique({
-        where: { id: input.quoteId }
+        where: { id: input.quoteId },
+        include: {
+          supplier: {
+            select: {
+              name: true,
+              contactPerson: true,
+              email: true,
+              organization: {
+                select: {
+                  erpUrl: true
+                }
+              }
+            }
+          },
+          lineItems: true // Include line items if needed
+        }
       });
 
-      quoteSchema.parse(quote);
+      if (!quote) {
+        throw new Error("Quote not found");
+      }
 
-      return quote;
+      return {
+        ...quote,
+        supplierName: quote.supplier.name,
+        supplierContactPerson: quote.supplier.contactPerson,
+        supplierEmail: quote.supplier.email,
+        erpUrl: quote.supplier.organization?.erpUrl
+      };
     }),
   getLineItemsByQuoteId: publicProcedure
     .input(quoteIdSchema)
@@ -163,6 +187,29 @@ export const quoteRouter = createTRPCRouter({
           });
         }
         return quote.id.toString();
+      } catch (error) {
+        console.error("Error in createQuoteFromPdf:", error);
+        throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
+      }
+    })
+  createPurchaseOrder: publicProcedure
+    .input(
+      z.object({
+        quoteId: z.number()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // get the quote object from the db
+        // authenticate with odoo
+        // create odoo purchase order object
+        // update the quote object with the odoo purchase order id
+        // return odoo purchase order id
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(123);
+          }, 5000);
+        });
       } catch (error) {
         console.error("Error in createQuoteFromPdf:", error);
         throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
