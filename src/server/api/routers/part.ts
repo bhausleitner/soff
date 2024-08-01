@@ -14,14 +14,6 @@ export const partArraySchema = z.array(partSchema);
 export type Part = z.infer<typeof partSchema>;
 
 export const partRouter = createTRPCRouter({
-  getAllParts: publicProcedure.query(async ({ ctx }) => {
-    const partsData = await ctx.db.part.findMany({});
-
-    partArraySchema.parse(partsData);
-
-    return partsData;
-  }),
-
   getPartsBySupplierId: publicProcedure
     .input(z.object({ supplierId: z.number() }))
     .query(async ({ ctx, input }) => {

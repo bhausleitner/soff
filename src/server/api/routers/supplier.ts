@@ -15,7 +15,6 @@ export const supplierSchema = z.object({
 });
 
 const supplierArraySchema = z.array(supplierSchema);
-const supplierIdSchema = z.object({ supplierId: z.number() });
 
 const orderSchema = z.object({
   id: z.number(),
@@ -32,25 +31,45 @@ export type Supplier = z.infer<typeof supplierSchema>;
 export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
-  getAllSuppliers: publicProcedure.query(async ({ ctx }) => {
-    const supplierData = await ctx.db.supplier.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        status: true,
-        responseTime: true,
-        contactPerson: true
-      }
-    });
+  getAllSuppliers: publicProcedure
+    .input(
+      z.object({
+        clerkUserId: z.string()
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const suppliers = await ctx.db.user.findFirst({
+        where: {
+          clerkUserId: input.clerkUserId
+        },
+        select: {
+          organizationId: true,
+          organization: {
+            select: {
+              suppliers: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  status: true,
+                  responseTime: true,
+                  contactPerson: true
+                }
+              }
+            }
+          }
+        }
+      });
 
-    supplierArraySchema.parse(supplierData);
+      const supplierData = suppliers?.organization?.suppliers ?? [];
 
-    return supplierData;
-  }),
+      supplierArraySchema.parse(supplierData);
+
+      return supplierData;
+    }),
 
   getSupplierById: publicProcedure
-    .input(supplierIdSchema)
+    .input(z.object({ supplierId: z.number() }))
     .query(async ({ input, ctx }) => {
       const supplierData = await ctx.db.supplier.findUnique({
         where: {
@@ -64,7 +83,7 @@ export const supplierRouter = createTRPCRouter({
     }),
 
   getQuotesBySupplierId: publicProcedure
-    .input(supplierIdSchema)
+    .input(z.object({ supplierId: z.number() }))
     .query(async ({ input, ctx }) => {
       const quoteData = await ctx.db.quote.findMany({
         where: {
@@ -78,7 +97,7 @@ export const supplierRouter = createTRPCRouter({
     }),
 
   getOrdersBySupplierId: publicProcedure
-    .input(supplierIdSchema)
+    .input(z.object({ supplierId: z.number() }))
     .query(async ({ input, ctx }) => {
       const orderData = await ctx.db.order.findMany({
         where: {
