@@ -13,6 +13,7 @@ import { FileBadge } from "~/components/chat/file-badge";
 import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 
 interface AttachmentProps {
   fileKey: string;
@@ -29,9 +30,11 @@ export function Attachment({
 }: AttachmentProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const router = useRouter();
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
+  const downloadFileMutation = api.s3.downloadFile.useMutation();
 
   const handleCreateQuote = async () => {
     try {
@@ -47,6 +50,29 @@ export function Attachment({
       toast.error("Failed to create quote. Please reach out to admin.");
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      const result = await downloadFileMutation.mutateAsync({ fileKey });
+      const blob = new Blob([Buffer.from(result.content, "base64")], {
+        type: result.contentType
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = result.fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast.error("Failed to download file. Please try again.");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -83,6 +109,18 @@ export function Attachment({
           )}
         </div>
         <DialogFooter>
+          <Button
+            className="w-30"
+            onClick={handleDownload}
+            variant="outline"
+            disabled={isDownloading}
+          >
+            {isDownloading ? (
+              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+              <>Download</>
+            )}
+          </Button>
           {!isUserMessage && (
             <Button
               className="w-40"
