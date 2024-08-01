@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/clerk-sdk-node";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
@@ -38,6 +39,13 @@ export const userRouter = createTRPCRouter({
           data: {
             clerkUserId: clerkUserId,
             email: email
+          }
+        });
+
+        // todo move after user creation
+        await clerkClient?.users.updateUserMetadata(clerkUserId, {
+          publicMetadata: {
+            syncedToDB: true
           }
         });
 

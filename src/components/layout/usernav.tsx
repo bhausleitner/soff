@@ -19,8 +19,8 @@ import { useRouter } from "next/router";
 
 export function UserNav() {
   const user = useUser();
-  const { signOut } = useClerk();
   const router = useRouter();
+  const { signOut } = useClerk();
 
   const microsoftAuthUrlMutation =
     api.chat.requestMicrosoftAuthUrl.useMutation();
@@ -57,9 +57,9 @@ export function UserNav() {
             <DropdownMenuItem
               onClick={async () => {
                 await router.push(
-                  process.env.VERCEL_URL
-                    ? "https://accounts.soff.ai/user"
-                    : "https://lucky-crow-92.accounts.dev/user"
+                  window.location.host === "localhost:3000"
+                    ? "https://lucky-crow-92.accounts.dev/user"
+                    : "https://accounts.soff.ai/user"
                 );
               }}
             >
