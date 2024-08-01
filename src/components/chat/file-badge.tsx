@@ -1,7 +1,5 @@
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/icons";
-import Link from "next/link";
-import { cn } from "~/lib/utils";
 import { useState } from "react";
 
 interface FileBadgeProps {
