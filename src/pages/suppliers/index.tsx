@@ -5,17 +5,22 @@ import {
   supplierTableConfig,
   useGetAllSuppliers
 } from "~/constants/tableConfigs";
+import { useUser } from "@clerk/nextjs";
 
 export default function Supplier() {
+  const user = useUser();
+  const clerkUserId = user.user?.id;
   return (
     <>
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
         <SupplierBreadcrumb />
-        <GenericTable<Supplier, void>
-          tableConfig={supplierTableConfig}
-          useQueryHook={useGetAllSuppliers}
-          queryArgs={undefined}
-        />
+        {clerkUserId && (
+          <GenericTable<Supplier, { clerkUserId: string }>
+            tableConfig={supplierTableConfig}
+            useQueryHook={useGetAllSuppliers}
+            queryArgs={{ clerkUserId }}
+          />
+        )}
       </div>
     </>
   );

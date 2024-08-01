@@ -104,8 +104,10 @@ export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
 export const useGetOrdersByQuoteQuery = (args: { quoteId: number }) =>
   api.quote.getOrdersByQuoteId.useQuery(args);
 
-export const useGetAllQuotes = () => api.quote.getAllQuotes.useQuery();
-export const useGetAllSuppliers = () => api.supplier.getAllSuppliers.useQuery();
+export const useGetAllQuotes = (args: { clerkUserId: string }) =>
+  api.quote.getAllQuotes.useQuery(args);
+export const useGetAllSuppliers = (args: { clerkUserId: string }) =>
+  api.supplier.getAllSuppliers.useQuery(args);
 
 export const useGetLineItemsByQuoteQuery = (args: { quoteId: number }) =>
   api.quote.getLineItemsByQuoteId.useQuery(args);
