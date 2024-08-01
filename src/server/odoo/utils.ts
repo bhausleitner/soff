@@ -1,4 +1,4 @@
-import { type Quote } from "@prisma/client";
+import { type LineItem, type Quote } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
 const db = process.env.ODOO_DB;
@@ -38,22 +38,22 @@ export function authenticate(odooUrl: string) {
   });
 }
 
-export function quoteToPurchaseOrder(quote: Quote): PurchaseOrder {
+export function quoteToPurchaseOrder(
+  quote: Quote & { lineItems: LineItem[] }
+): PurchaseOrder {
   return {
     partner_id: 1, // Replace with the supplier's ID
     // date_order: new Date().toISOString(),
-    order_line: [
-      [
-        0,
-        0,
-        {
-          product_id: 1, // Replace with the product's ID
-          product_qty: 10, // Quantity of the product
-          price_unit: 100, // Unit price of the product
-          name: "Product Description" // Description of the product
-        }
-      ]
-    ],
+    order_line: quote?.lineItems.map((lineItem: LineItem) => [
+      0,
+      0,
+      {
+        product_id: lineItem.partId ?? 1, // Replace with the product's ID
+        product_qty: lineItem.quantity ?? 10, // Quantity of the product
+        price_unit: lineItem.price ?? 100, // Unit price of the product
+        name: lineItem.description ?? "Product Description" // Description of the product
+      }
+    ]),
     currency_id: 1, // Replace with the currency's ID
     company_id: 1 // Replace with the company's ID
   };

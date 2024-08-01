@@ -155,9 +155,6 @@ export const quoteRouter = createTRPCRouter({
 
         const responseString = response.choices[0]?.message.content;
 
-        console.log("Here");
-        console.log(responseString);
-
         const jsonRegex = /```json\n([\s\S]*?)\n```/;
         const match = responseString?.match(jsonRegex);
 
@@ -205,6 +202,11 @@ export const quoteRouter = createTRPCRouter({
         const quote = await ctx.db.quote.findUnique({
           where: { id: input.quoteId },
           include: {
+            lineItems: {
+              include: {
+                part: true
+              }
+            },
             supplier: {
               select: {
                 organization: {
