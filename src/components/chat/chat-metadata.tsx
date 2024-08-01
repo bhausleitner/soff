@@ -17,18 +17,30 @@ const getSentFiles = (
   messages: ChatMessage[],
   chatParticipantUserId: number
 ) => {
-  return messages
+  const files = messages
     .filter((message) => message.chatParticipantId === chatParticipantUserId)
-    .flatMap((message) => message.fileNames);
+    .flatMap((message) =>
+      message.fileNames.map((fileName) => ({
+        fileName,
+        date: message.createdAt
+      }))
+    );
+  return files;
 };
 
 const getReceivedFiles = (
   messages: ChatMessage[],
   chatParticipantUserId: number
 ) => {
-  return messages
+  const files = messages
     .filter((message) => message.chatParticipantId !== chatParticipantUserId)
-    .flatMap((message) => message.fileNames);
+    .flatMap((message) =>
+      message.fileNames.map((fileName) => ({
+        fileName,
+        date: message.createdAt
+      }))
+    );
+  return files;
 };
 
 export function ChatMetadata({
@@ -48,25 +60,34 @@ export function ChatMetadata({
     handleClose
   } = useFileHandling();
 
-  const renderFileList = (files: string[]) => (
-    <ul className="space-y-2">
-      {files.map((file, index) => {
-        const fileName = file.split("/").pop() ?? "Unnamed File";
-        return (
-          <li key={index}>
-            <FileBadge
-              fileName={fileName}
-              handleOpen={() => {
-                setCurrentFile(file);
-                handleOpen();
-              }}
-              handleDownload={() => handleDownload(file)}
-            />
-          </li>
-        );
-      })}
-    </ul>
-  );
+  const renderFileList = (files: { fileName: string; date: Date }[]) => {
+    console.log("Rendering file list:", files);
+    return (
+      <ul className="space-y-2">
+        {files.map((file, index) => {
+          const fileName = file.fileName.split("/").pop() ?? "Unnamed File";
+          console.log("Rendering file:", file);
+          return (
+            <li key={index} className="flex flex-col space-y-1">
+              <div className="flex items-center justify-between">
+                <FileBadge
+                  fileName={fileName}
+                  handleOpen={() => {
+                    setCurrentFile(file.fileName);
+                    handleOpen();
+                  }}
+                  handleDownload={() => handleDownload(file.fileName)}
+                />
+                <span className="ml-2 text-sm text-gray-500">
+                  {new Date(file.date).toLocaleDateString()}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <div>
