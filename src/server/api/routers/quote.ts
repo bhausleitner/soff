@@ -5,6 +5,7 @@ import { orderArraySchema } from "~/server/api/routers/supplier";
 import openai from "~/server/openai/config";
 import { getFileFromS3 } from "~/server/s3/utils";
 import { convertPdfToImage } from "~/server/openai/utils";
+import * as odooUtils from "~/server/odoo/utils";
 
 export const lineItemSchema = z.object({
   id: z.number(),
@@ -201,15 +202,54 @@ export const quoteRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         // get the quote object from the db
-        // authenticate with odoo
-        // create odoo purchase order object
-        // update the quote object with the odoo purchase order id
-        // return odoo purchase order id
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(123);
-          }, 5000);
+        const quote = await ctx.db.quote.findUnique({
+          where: { id: input.quoteId },
+          include: {
+            supplier: {
+              select: {
+                organization: {
+                  select: {
+                    erpUrl: true
+                  }
+                }
+              }
+            }
+          }
         });
+
+        // authenticate with odoo
+        const odooUrl = quote?.supplier.organization?.erpUrl;
+
+        if (!odooUrl) {
+          throw new Error("No ERP URL found");
+        }
+
+        const odooUid = await odooUtils.authenticate(odooUrl);
+
+        if (typeof odooUid !== "number") {
+          throw new Error("No ERP user id found");
+        }
+
+        // create purchase order object from quote
+        const purchaseOrderObject = odooUtils.quoteToPurchaseOrder(quote);
+
+        // create odoo purchase order object
+        const purchaseOrderId = await odooUtils.createPurchaseOrder(
+          odooUrl,
+          odooUid,
+          purchaseOrderObject
+        );
+
+        // update the quote object with the odoo purchase order id
+        await ctx.db.quote.update({
+          where: { id: input.quoteId },
+          data: {
+            erpPurchaseOrderId: purchaseOrderId
+          }
+        });
+
+        // return odoo purchase order id
+        return purchaseOrderId;
       } catch (error) {
         console.error("Error in createQuoteFromPdf:", error);
         throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
 import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
@@ -24,17 +24,13 @@ const QuotePage = () => {
 
   const purchaseOrderMutation = api.quote.createPurchaseOrder.useMutation();
 
-  if (isNaN(quoteId)) {
-    return <p>Invalid quote ID.</p>;
-  }
-
   const handleAddToOdoo = async () => {
     try {
       setIsCreatingPO(true);
       const odooId = await purchaseOrderMutation.mutateAsync({
         quoteId
       });
-      setErpPurchaseOrderId(odooId as number);
+      setErpPurchaseOrderId(odooId);
       toast.success("Purchase order created in Odoo.");
     } catch (error) {
       console.error("Error in handleCreateQuote:", error);
@@ -51,6 +47,16 @@ const QuotePage = () => {
   } = api.quote.getQuoteById.useQuery({
     quoteId: quoteId
   });
+
+  useEffect(() => {
+    if (quoteData?.erpPurchaseOrderId) {
+      setErpPurchaseOrderId(quoteData.erpPurchaseOrderId);
+    }
+  }, [quoteData]);
+
+  if (isNaN(quoteId)) {
+    return <p>Invalid quote ID.</p>;
+  }
 
   if (quoteLoading) {
     return <Spinner />;
@@ -88,11 +94,11 @@ const QuotePage = () => {
           {!!erpPurchaseOrderId && (
             <Button
               className="w-36"
-              disabled={!quoteData?.erpPurchaseOrderId}
               variant="outline"
               onClick={async () =>
-                await router.push(
-                  `${quoteData.erpUrl}/odoo/purchase/${quoteData.erpPurchaseOrderId}`
+                window.open(
+                  `${quoteData.erpUrl}/odoo/purchase/${quoteData.erpPurchaseOrderId}`,
+                  "_blank"
                 )
               }
             >
