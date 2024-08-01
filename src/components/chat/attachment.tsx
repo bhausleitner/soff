@@ -14,7 +14,7 @@ import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
-import { createAndDownloadFile } from "~/lib/utils";
+import { useFileHandling } from "~/hooks/use-file-handling";
 
 interface AttachmentProps {
   fileKey: string;
@@ -29,13 +29,18 @@ export function Attachment({
   isUserMessage,
   supplierId
 }: AttachmentProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    isOpen,
+    setIsOpen,
+    isDownloading,
+    handleDownload,
+    handleOpen,
+    handleClose
+  } = useFileHandling();
   const [isParsing, setIsParsing] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
   const router = useRouter();
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
-  const downloadFileMutation = api.s3.downloadFile.useMutation();
 
   const handleCreateQuote = async () => {
     try {
@@ -54,32 +59,11 @@ export function Attachment({
     }
   };
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
-
-    try {
-      const result = await downloadFileMutation.mutateAsync({ fileKey });
-      createAndDownloadFile(
-        result.content,
-        result.contentType ?? "application/octet-stream",
-        result.fileName
-      );
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      toast.error("Failed to download file. Please try again.");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   // Derive the file name from the fileKey
   const fileName = fileKey.split("/").pop() ?? "Unnamed File";
 
   // Split the file name and extension
   const [name, extension] = fileName.split(/\.(?=[^\.]+$)/); // Splits at the last dot
-
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
 
   const isPDF = extension?.toLowerCase() === "pdf";
 
@@ -89,7 +73,7 @@ export function Attachment({
         <FileBadge
           fileName={fileName}
           handleOpen={handleOpen}
-          handleDownload={handleDownload}
+          handleDownload={() => handleDownload(fileKey)}
         />
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-[60vw] overflow-auto">
@@ -111,7 +95,7 @@ export function Attachment({
         <DialogFooter>
           <Button
             className="w-30"
-            onClick={handleDownload}
+            onClick={() => handleDownload(fileKey)}
             variant="outline"
             disabled={isDownloading}
           >

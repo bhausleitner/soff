@@ -3,6 +3,17 @@ import { Icons } from "~/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import { FileBadge } from "~/components/chat/file-badge";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "~/components/ui/dialog";
+import PDFViewer from "~/components/chat/pdf-viewer";
+import { useFileHandling } from "~/hooks/use-file-handling";
+import { Button } from "~/components/ui/button";
 
 interface ChatMetadataProps {
   supplier: Supplier;
@@ -35,14 +46,33 @@ export function ChatMetadata({
 }: ChatMetadataProps) {
   const sentFiles = getSentFiles(messages, chatParticipantUserId);
   const receivedFiles = getReceivedFiles(messages, chatParticipantUserId);
+  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const {
+    isOpen,
+    setIsOpen,
+    isDownloading,
+    handleDownload,
+    handleOpen,
+    handleClose
+  } = useFileHandling();
 
   const renderFileList = (files: string[]) => (
     <ul className="space-y-2">
-      {files.map((file, index) => (
-        <li key={index}>
-          <FileBadge fileName={file} />
-        </li>
-      ))}
+      {files.map((file, index) => {
+        const fileName = file.split("/").pop() ?? "Unnamed File";
+        return (
+          <li key={index}>
+            <FileBadge
+              fileName={fileName}
+              handleOpen={() => {
+                setCurrentFile(file);
+                handleOpen();
+              }}
+              handleDownload={() => handleDownload(file)}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 
@@ -75,6 +105,40 @@ export function ChatMetadata({
           </TabsContent>
         </Tabs>
       </div>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-h-[90vh] max-w-[60vw] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {currentFile?.split("/").pop() ?? "File Preview"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center">
+            {currentFile &&
+              (currentFile.toLowerCase().endsWith(".pdf") ? (
+                <PDFViewer fileKey={currentFile} />
+              ) : (
+                <div className="text-sm text-gray-500">
+                  This file type is not supported for preview, yet.
+                </div>
+              ))}
+          </div>
+          <DialogFooter>
+            <Button
+              className="w-30"
+              onClick={() => currentFile && handleDownload(currentFile)}
+              variant="outline"
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>Download</>
+              )}
+            </Button>
+            <Button onClick={handleClose}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
