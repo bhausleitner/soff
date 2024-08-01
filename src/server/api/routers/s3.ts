@@ -72,12 +72,11 @@ export const s3Router = createTRPCRouter({
     .input(z.object({ fileKey: z.string() }))
     .mutation(async ({ input }) => {
       const file = await getFileFromS3(input.fileKey);
-      if (!file.Body) {
-        throw new Error("File not found");
+      if (!(file?.Body instanceof Buffer)) {
+        throw new Error("File not found or invalid file type");
       }
       return {
-        content:
-          file.Body instanceof Buffer ? file.Body.toString("base64") : "",
+        content: file.Body.toString("base64"),
         contentType: file.ContentType,
         fileName: input.fileKey.split("/").pop() ?? "download"
       };
