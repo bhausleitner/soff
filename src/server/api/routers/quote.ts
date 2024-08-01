@@ -191,7 +191,7 @@ export const quoteRouter = createTRPCRouter({
         console.error("Error in createQuoteFromPdf:", error);
         throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
       }
-    })
+    }),
   createPurchaseOrder: publicProcedure
     .input(
       z.object({
