@@ -10,6 +10,7 @@ export interface TableConfig {
   placeholder: string;
   checkbox: boolean;
   columns: ColumnConfig[];
+  link?: string;
 }
 
 export interface TableProps<T extends { id: number }> {

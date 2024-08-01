@@ -27,6 +27,7 @@ export const supplierPartTableConfig = {
 };
 
 export const supplierQuoteTableConfig = {
+  link: "/quotes/",
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
@@ -37,6 +38,7 @@ export const supplierQuoteTableConfig = {
 };
 
 export const quoteTableConfig = {
+  link: "/quotes/",
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
@@ -73,6 +75,7 @@ export const quoteLineItemTableConfig = {
 
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
+  link: "/suppliers/",
   checkbox: true,
   columns: [
     {
