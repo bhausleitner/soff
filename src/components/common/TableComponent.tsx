@@ -32,6 +32,8 @@ import TableLink from "~/components/common/TableLink";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { type TableProps } from "~/types/tableTypes";
+import { useRouter } from "next/router";
+import { cn } from "~/lib/utils";
 
 function generateColumns<T extends { id: number }>(
   config: TableProps<T>["tableConfig"]
@@ -104,6 +106,7 @@ export function TableComponent<T extends { id: number }>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const router = useRouter();
 
   const table = useReactTable({
     data: data,
@@ -196,7 +199,17 @@ export function TableComponent<T extends { id: number }>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(tableConfig.link && "cursor-pointer")}
+                      onClick={async () => {
+                        if (tableConfig.link) {
+                          router.push(
+                            `/${tableConfig.link}/${row.original.id}`
+                          );
+                        }
+                      }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
