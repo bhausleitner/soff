@@ -13,7 +13,6 @@ import { FileBadge } from "~/components/chat/file-badge";
 import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 interface AttachmentProps {
   fileKey: string;
@@ -57,14 +56,8 @@ export function Attachment({
   // Split the file name and extension
   const [name, extension] = fileName.split(/\.(?=[^\.]+$)/); // Splits at the last dot
 
+  const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
-  const handleOpen = () => {
-    if (isPDF) {
-      setIsOpen(true);
-    } else {
-      toast.info("This file type is not supported for preview.");
-    }
-  };
 
   const isPDF = extension?.toLowerCase() === "pdf";
 
@@ -81,7 +74,13 @@ export function Attachment({
           </DialogTitle>
         </DialogHeader>
         <div className="flex justify-center">
-          <PDFViewer fileKey={fileKey} />
+          {isPDF ? (
+            <PDFViewer fileKey={fileKey} />
+          ) : (
+            <div className="text-sm text-gray-500">
+              This file type is not supported for preview, yet.
+            </div>
+          )}
         </div>
         <DialogFooter>
           {!isUserMessage && (
