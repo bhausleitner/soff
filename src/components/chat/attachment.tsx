@@ -14,6 +14,7 @@ import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
+import { createAndDownloadFile } from "~/lib/utils";
 
 interface AttachmentProps {
   fileKey: string;
@@ -54,20 +55,15 @@ export function Attachment({
   };
 
   const handleDownload = async () => {
+    setIsDownloading(true);
+
     try {
-      setIsDownloading(true);
       const result = await downloadFileMutation.mutateAsync({ fileKey });
-      const blob = new Blob([Buffer.from(result.content, "base64")], {
-        type: result.contentType
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
+      createAndDownloadFile(
+        result.content,
+        result.contentType ?? "application/octet-stream",
+        result.fileName
+      );
     } catch (error) {
       console.error("Error downloading file:", error);
       toast.error("Failed to download file. Please try again.");
