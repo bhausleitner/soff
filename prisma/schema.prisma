@@ -113,6 +113,10 @@ model Quote {
   supplier           Supplier    @relation(fields: [supplierId], references: [id])
   lineItems          LineItem[]
   erpPurchaseOrderId Int?
+  chatId             Int?
+  chat               Chat?       @relation(fields: [chatId], references: [id])
+  version            Int         @default(0)
+  isActive           Boolean     @default(true)
 
   @@index([status])
   @@index([supplierId])
@@ -181,6 +185,7 @@ model Chat {
   updatedAt        DateTime          @updatedAt
   messages         Message[]
   chatParticipants ChatParticipant[]
+  quotes           Quote[]
 }
 
 model Message {
