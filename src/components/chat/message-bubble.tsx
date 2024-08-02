@@ -24,21 +24,25 @@ export function MessageBubble({
       )}
     >
       <span>{chatMessage.content}</span>
-      {chatMessage.fileNames.map((fileName, index) => {
-        return (
-          <Attachment
-            key={index}
-            fileKey={
-              !isUserMessage
-                ? `emailAttachments/${chatMessage.outlookMessageId}/${fileName}`
-                : `${fileName}`
-            }
-            isUserMessage={isUserMessage}
-            supplierId={supplierId}
-            chatId={chatMessage.chatId}
-          />
-        );
-      })}
+      <div className="mt-2 flex gap-2">
+        {chatMessage.fileNames.map((fileName, index) => {
+          return (
+            <div key={index} className="mb-2">
+              <Attachment
+                key={index}
+                fileKey={
+                  !isUserMessage
+                    ? `emailAttachments/${chatMessage.outlookMessageId}/${fileName}`
+                    : `${fileName}`
+                }
+                isUserMessage={isUserMessage}
+                supplierId={supplierId}
+                chatId={chatMessage.chatId}
+              />
+            </div>
+          );
+        })}
+      </div>
       <span className="mt-1 flex items-center gap-1 text-xs text-gray-600">
         <Icons.checkcheck className="h-4 w-4" />
         {formatDate(chatMessage.createdAt.toString())}

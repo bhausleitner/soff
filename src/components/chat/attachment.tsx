@@ -34,7 +34,6 @@ export function Attachment({
   const router = useRouter();
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
-  const downloadFileMutation = api.s3.downloadFile.useMutation();
 
   const handleCreateQuote = async () => {
     try {
@@ -72,11 +71,6 @@ export function Attachment({
       )}
     </Button>
   );
-
-  // Split the file name and extension
-  const [name, extension] = fileName.split(/\.(?=[^\.]+$)/); // Splits at the last dot
-
-  const isPDF = extension?.toLowerCase() === "pdf";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

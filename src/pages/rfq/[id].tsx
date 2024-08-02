@@ -78,7 +78,7 @@ export default function Exchange() {
       </div>
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={70} minSize={50}>
-          <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
+          <div className="flex h-[calc(100vh-180px)] w-full flex-col overflow-y-auto">
             <Chat
               supplier={supplier}
               chatMessages={chatMessages}
@@ -90,7 +90,7 @@ export default function Exchange() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={30} minSize={20}>
-          <div className="w-80">
+          <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
             <ChatMetadata
               supplier={supplier}
               chatParticipantUserId={chatParticipantUserId}
