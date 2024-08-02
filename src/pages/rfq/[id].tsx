@@ -91,7 +91,11 @@ export default function Exchange() {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={30} minSize={20}>
           <div className="w-80">
-            <ChatMetadata supplier={supplier} />
+            <ChatMetadata
+              supplier={supplier}
+              chatParticipantUserId={chatParticipantUserId}
+              messages={chatMessages}
+            />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

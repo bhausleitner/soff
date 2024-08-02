@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import s3 from "~/server/s3/config";
+import { getFileFromS3 } from "~/server/s3/utils";
 
 export const s3Router = createTRPCRouter({
   getSignedUrl: publicProcedure
@@ -66,5 +67,18 @@ export const s3Router = createTRPCRouter({
         console.error("Error deleting file:", error);
         throw new Error("Failed to delete file.");
       }
+    }),
+  downloadFile: publicProcedure
+    .input(z.object({ fileKey: z.string() }))
+    .mutation(async ({ input }) => {
+      const file = await getFileFromS3(input.fileKey);
+      if (!(file?.Body instanceof Buffer)) {
+        throw new Error("File not found or invalid file type");
+      }
+      return {
+        content: file.Body.toString("base64"),
+        contentType: file.ContentType,
+        fileName: input.fileKey.split("/").pop() ?? "download"
+      };
     })
 });

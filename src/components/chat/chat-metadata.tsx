@@ -1,12 +1,94 @@
 import { type Supplier } from "@prisma/client";
 import { Icons } from "~/components/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { type ChatMessage } from "~/server/api/routers/chat";
+import { FileBadge } from "~/components/chat/file-badge";
+import { useState } from "react";
+import { useFileHandling } from "~/hooks/use-file-handling";
+import { FilePreviewDialog } from "~/components/common/FilePreviewDialog";
 
 interface ChatMetadataProps {
   supplier: Supplier;
+  messages: ChatMessage[];
+  chatParticipantUserId: number;
 }
 
-export function ChatMetadata({ supplier }: ChatMetadataProps) {
+const getSentFiles = (
+  messages: ChatMessage[],
+  chatParticipantUserId: number
+) => {
+  const files = messages
+    .filter((message) => message.chatParticipantId === chatParticipantUserId)
+    .flatMap((message) =>
+      message.fileNames.map((fileName) => ({
+        fileName,
+        date: message.createdAt
+      }))
+    );
+  return files;
+};
+
+const getReceivedFiles = (
+  messages: ChatMessage[],
+  chatParticipantUserId: number
+) => {
+  const files = messages
+    .filter((message) => message.chatParticipantId !== chatParticipantUserId)
+    .flatMap((message) =>
+      message.fileNames.map((fileName) => ({
+        fileName,
+        date: message.createdAt
+      }))
+    );
+  return files;
+};
+
+export function ChatMetadata({
+  supplier,
+  messages,
+  chatParticipantUserId
+}: ChatMetadataProps) {
+  const sentFiles = getSentFiles(messages, chatParticipantUserId);
+  const receivedFiles = getReceivedFiles(messages, chatParticipantUserId);
+  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const {
+    isOpen,
+    setIsOpen,
+    isDownloading,
+    handleDownload,
+    handleOpen,
+    handleClose
+  } = useFileHandling();
+
+  const renderFileList = (files: { fileName: string; date: Date }[]) => {
+    console.log("Rendering file list:", files);
+    return (
+      <ul className="space-y-2">
+        {files.map((file, index) => {
+          const fileName = file.fileName.split("/").pop() ?? "Unnamed File";
+          console.log("Rendering file:", file);
+          return (
+            <li key={index} className="flex flex-col space-y-1">
+              <div className="flex items-center justify-between">
+                <FileBadge
+                  fileName={fileName}
+                  handleOpen={() => {
+                    setCurrentFile(file.fileName);
+                    handleOpen();
+                  }}
+                  handleDownload={() => handleDownload(file.fileName)}
+                />
+                <span className="ml-2 text-sm text-gray-500">
+                  {new Date(file.date).toLocaleDateString()}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
   return (
     <div>
       <div className="border-b pb-4">
@@ -23,19 +105,27 @@ export function ChatMetadata({ supplier }: ChatMetadataProps) {
         </div>
       </div>
       <div className="p-4">
-        <Tabs defaultValue="account" className="w-[400px]">
+        <Tabs defaultValue="sentFiles" className="w-[400px]">
           <TabsList>
             <TabsTrigger value="sentFiles">Sent Files</TabsTrigger>
             <TabsTrigger value="receivedFiles">Received Files</TabsTrigger>
           </TabsList>
           <TabsContent value="sentFiles">
-            Make changes to your account here.
+            {renderFileList(sentFiles)}
           </TabsContent>
           <TabsContent value="receivedFiles">
-            Change your password here.
+            {renderFileList(receivedFiles)}
           </TabsContent>
         </Tabs>
       </div>
+      <FilePreviewDialog
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        fileKey={currentFile}
+        isDownloading={isDownloading}
+        handleDownload={handleDownload}
+        handleClose={handleClose}
+      />
     </div>
   );
 }
