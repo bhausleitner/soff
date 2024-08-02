@@ -182,7 +182,16 @@ export const chatRouter = createTRPCRouter({
               user: true
             }
           },
-          messages: true
+          messages: true,
+          quotes: {
+            where: {
+              isActive: true
+            },
+            select: {
+              id: true
+              // Add other relevant fields you want to return
+            }
+          }
         }
       });
 

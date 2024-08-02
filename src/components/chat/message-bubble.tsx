@@ -35,6 +35,7 @@ export function MessageBubble({
             }
             isUserMessage={isUserMessage}
             supplierId={supplierId}
+            chatId={chatMessage.chatId}
           />
         );
       })}

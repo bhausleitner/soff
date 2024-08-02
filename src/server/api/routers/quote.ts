@@ -84,7 +84,7 @@ export const quoteRouter = createTRPCRouter({
     .input(z.object({ quoteId: z.number() }))
     .query(async ({ ctx, input }) => {
       const quote = await ctx.db.quote.findUnique({
-        where: { id: input.quoteId },
+        where: { id: input.quoteId, isActive: true },
         include: {
           supplier: {
             select: {
@@ -106,12 +106,33 @@ export const quoteRouter = createTRPCRouter({
         throw new Error("Quote not found");
       }
 
+      // Fetch the history of quotes for the same supplier
+      if (quote.chatId) {
+        const quoteHistory = await ctx.db.quote.findMany({
+          where: {
+            chatId: quote.chatId,
+            isActive: false
+          },
+          select: {
+            id: true,
+            version: true
+          },
+          orderBy: {
+            version: "asc" // Order by version to maintain the history order
+          }
+        });
+      }
+
       return {
         ...quote,
         supplierName: quote.supplier.name,
         supplierContactPerson: quote.supplier.contactPerson,
         supplierEmail: quote.supplier.email,
         erpUrl: quote.supplier.organization?.erpUrl
+        // quoteHistory: quoteHistory.map((q) => ({
+        //   id: q.id,
+        //   version: q.version
+        // }))
       };
     }),
   getLineItemsByQuoteId: publicProcedure
@@ -140,6 +161,7 @@ export const quoteRouter = createTRPCRouter({
     .input(
       z.object({
         fileKey: z.string(),
+        chatId: z.number(),
         supplierId: z.number()
       })
     )
@@ -177,7 +199,6 @@ export const quoteRouter = createTRPCRouter({
         });
 
         const responseString = response.choices[0]?.message.content;
-
         const jsonRegex = /```json\n([\s\S]*?)\n```/;
         const match = responseString?.match(jsonRegex);
 
@@ -187,32 +208,74 @@ export const quoteRouter = createTRPCRouter({
 
         const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
 
-        // create quote object
-        const quote = await ctx.db.quote.create({
-          data: {
-            supplierId: input.supplierId,
-            price: parsedData.totalPrice,
-            status: QuoteStatus.RECEIVED
-          }
+        const existingQuote = await ctx.db.quote.findFirst({
+          where: { chatId: input.chatId, isActive: true },
+          select: { version: true, id: true }
         });
 
-        // iterate through line item object
-        for (const lineItem of parsedData.lineItems) {
-          await ctx.db.lineItem.create({
+        if (existingQuote) {
+          await ctx.db.quote.update({
+            where: {
+              id: existingQuote.id
+            },
+            data: { isActive: false }
+          });
+
+          const newQuote = await ctx.db.quote.create({
             data: {
-              quoteId: quote.id,
-              description: lineItem.description,
-              quantity: lineItem.quantity,
-              price: lineItem.price
+              chatId: input.chatId,
+              supplierId: input.supplierId,
+              version: existingQuote.version + 1,
+              price: parsedData.totalPrice,
+              status: QuoteStatus.RECEIVED
             }
           });
+
+          await Promise.all(
+            parsedData.lineItems.map((lineItem) =>
+              ctx.db.lineItem.create({
+                data: {
+                  quoteId: newQuote.id,
+                  description: lineItem.description,
+                  quantity: lineItem.quantity,
+                  price: lineItem.price
+                }
+              })
+            )
+          );
+
+          return newQuote.id.toString();
+        } else {
+          const newQuote = await ctx.db.quote.create({
+            data: {
+              chatId: input.chatId,
+              supplierId: input.supplierId,
+              price: parsedData.totalPrice,
+              status: QuoteStatus.RECEIVED
+            }
+          });
+
+          await Promise.all(
+            parsedData.lineItems.map((lineItem) =>
+              ctx.db.lineItem.create({
+                data: {
+                  quoteId: newQuote.id,
+                  description: lineItem.description,
+                  quantity: lineItem.quantity,
+                  price: lineItem.price
+                }
+              })
+            )
+          );
+
+          return newQuote.id.toString();
         }
-        return quote.id.toString();
       } catch (error) {
         console.error("Error in createQuoteFromPdf:", error);
         throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
       }
     }),
+
   createPurchaseOrder: publicProcedure
     .input(
       z.object({

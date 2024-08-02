@@ -19,9 +19,11 @@ interface AttachmentProps {
   fileKey: string;
   isUserMessage: boolean;
   supplierId: number;
+  chatId: number;
 }
 
 export function Attachment({
+  chatId,
   fileKey,
   isUserMessage,
   supplierId
@@ -36,6 +38,7 @@ export function Attachment({
     try {
       setIsParsing(true);
       const quoteId = await createQuoteMutation.mutateAsync({
+        chatId,
         fileKey,
         supplierId
       });

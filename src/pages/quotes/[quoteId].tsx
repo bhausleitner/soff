@@ -75,6 +75,15 @@ const QuotePage = () => {
       <div className="flex items-center justify-between">
         <QuoteBreadcrumb quoteId={quoteId} />
         <div className="flex items-center space-x-4">
+          {quoteData.chatId && (
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/rfq/${quoteData.chatId}`)}
+            >
+              Show Chat
+              <Icons.messageCircleMore className="ml-2 h-4 w-4" />
+            </Button>
+          )}
           {!erpPurchaseOrderId && (
             <Button
               className="w-36"

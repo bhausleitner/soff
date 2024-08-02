@@ -204,7 +204,7 @@ export function TableComponent<T extends { id: number }>({
                       className={cn(tableConfig.link && "cursor-pointer")}
                       onClick={async () => {
                         if (tableConfig.link) {
-                          router.push(
+                          await router.push(
                             `/${tableConfig.link}/${row.original.id}`
                           );
                         }
