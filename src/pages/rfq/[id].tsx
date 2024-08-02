@@ -12,6 +12,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from "~/components/ui/resizable";
+import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/icons";
 
 export default function Exchange() {
   const router = useRouter();
@@ -50,13 +52,30 @@ export default function Exchange() {
 
   return (
     <div className="flex h-full flex-col space-y-4 p-8 pt-6">
-      <SupplierBreadcrumb
-        name={supplier.name}
-        supplierId={supplier.id}
-        rfq={true}
-        chatId={chatId}
-      />
-      {/* <div className="flex h-full flex-row"> */}
+      <div className="flex items-center justify-between">
+        <SupplierBreadcrumb
+          name={supplier.name}
+          supplierId={supplier.id}
+          rfq={true}
+          chatId={chatId}
+        />
+        {data?.newChat?.quotes && data?.newChat?.quotes.length > 0 && (
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const quote = data?.newChat?.quotes[0];
+                if (quote) {
+                  await router.push(`/quotes/${quote.id}`);
+                }
+              }}
+            >
+              View Quote
+              <Icons.quotes className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={70} minSize={50}>
           <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
