@@ -31,7 +31,6 @@ export function Attachment({
     handleClose
   } = useFileHandling();
   const [isParsing, setIsParsing] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
   const router = useRouter();
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
@@ -76,9 +75,6 @@ export function Attachment({
 
   // Split the file name and extension
   const [name, extension] = fileName.split(/\.(?=[^\.]+$)/); // Splits at the last dot
-
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
 
   const isPDF = extension?.toLowerCase() === "pdf";
 
