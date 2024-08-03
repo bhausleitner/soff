@@ -8,17 +8,15 @@ export default function Supplier() {
   const user = useUser();
   const clerkUserId = user.user?.id;
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <QuoteBreadcrumb />
-        {clerkUserId && (
-          <GenericTable<Quote, { clerkUserId: string }>
-            tableConfig={quoteTableConfig}
-            useQueryHook={useGetAllQuotes}
-            queryArgs={{ clerkUserId }}
-          />
-        )}
-      </div>
-    </>
+    <div className="space-y-4">
+      <QuoteBreadcrumb />
+      {clerkUserId && (
+        <GenericTable<Quote, { clerkUserId: string }>
+          tableConfig={quoteTableConfig}
+          useQueryHook={useGetAllQuotes}
+          queryArgs={{ clerkUserId }}
+        />
+      )}
+    </div>
   );
 }

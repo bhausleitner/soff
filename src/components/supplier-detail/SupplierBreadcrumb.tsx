@@ -22,7 +22,7 @@ export function SupplierBreadcrumb({
   chatId
 }: SupplierBreadcrumbProps) {
   return (
-    <>
+    <div className="mt-5">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -63,6 +63,6 @@ export function SupplierBreadcrumb({
           )}
         </BreadcrumbList>
       </Breadcrumb>
-    </>
+    </div>
   );
 }

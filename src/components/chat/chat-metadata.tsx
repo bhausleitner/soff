@@ -17,7 +17,7 @@ export function ChatMetadata({
   return (
     <div className="flex h-full flex-col overflow-y-auto overflow-x-hidden">
       <div className="px-4">
-        <Tabs defaultValue="sentFiles" className="w-full">
+        <Tabs defaultValue="receivedFiles" className="w-full">
           <TabsList>
             <TabsTrigger value="receivedFiles">Received Files</TabsTrigger>
             <TabsTrigger value="sentFiles">Sent Files</TabsTrigger>
