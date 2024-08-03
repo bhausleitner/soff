@@ -18,7 +18,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           }
         }}
       >
-        <TooltipProvider>
+        <TooltipProvider delayDuration={0}>
           <Head>
             <title>Soff</title>
             <meta

@@ -2,7 +2,6 @@
 import { useUser, useClerk } from "@clerk/nextjs";
 import { startCase, toLower } from "lodash";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import {
   DropdownMenu,
@@ -16,8 +15,13 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
+import { cn } from "~/lib/utils";
 
-export function UserNav() {
+interface UserNavProps {
+  isCollapsed: boolean;
+}
+
+export function UserNav({ isCollapsed }: UserNavProps) {
   const user = useUser();
   const router = useRouter();
   const { signOut } = useClerk();
@@ -29,8 +33,13 @@ export function UserNav() {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-8 w-8">
+          <div
+            className={cn(
+              "flex w-full flex-row justify-center p-3 hover:cursor-pointer hover:bg-accent",
+              isCollapsed && "justify-center"
+            )}
+          >
+            <Avatar className={cn("h-10 w-10", !isCollapsed && "mr-3")}>
               <AvatarImage
                 src={user?.user?.imageUrl}
                 alt={user?.user?.username ?? ""}
@@ -39,9 +48,18 @@ export function UserNav() {
                 {startCase(toLower(user?.user?.username?.[0]))}
               </AvatarFallback>
             </Avatar>
-          </Button>
+            {!isCollapsed && (
+              <div className="flex cursor-pointer items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">{"Berni"}</p>
+                  <p className="text-xs text-gray-500">{"ShoesOff"}</p>
+                </div>
+                <Icons.chevronDown className="ml-10 h-4 w-4" />
+              </div>
+            )}
+          </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuContent className="m-3 w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">

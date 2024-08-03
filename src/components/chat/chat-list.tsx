@@ -20,14 +20,36 @@ export function ChatList({
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    if (lastMessageRef.current && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const lastMessage = lastMessageRef.current;
+
+      const scrollOptions: ScrollIntoViewOptions = {
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest"
+      };
+
+      // Use a timeout to ensure the scroll happens after the animation
+      setTimeout(() => {
+        lastMessage.scrollIntoView(scrollOptions);
+
+        // Prevent scrolling of parent elements
+        const scrollTop = container.scrollTop;
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+        const maxScrollTop = scrollHeight - clientHeight;
+
+        if (scrollTop > maxScrollTop) {
+          container.scrollTop = maxScrollTop;
+        }
+      }, 100); // Adjust this timeout if needed
     }
   }, [chatMessages]);
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div ref={messagesContainerRef} className="flex-grow overflow-x-hidden">
+    <div className="h-full overflow-y-auto" ref={messagesContainerRef}>
+      <div className="min-h-full">
         <AnimatePresence>
           {map(chatMessages, (chatMessage, index) => {
             const isLastMessage = index === chatMessages.length - 1;

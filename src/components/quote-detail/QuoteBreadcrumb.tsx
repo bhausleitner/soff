@@ -14,7 +14,7 @@ interface QuoteBreadcrumbProps {
 
 export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
   return (
-    <>
+    <div className="mt-5">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -38,6 +38,6 @@ export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
           )}
         </BreadcrumbList>
       </Breadcrumb>
-    </>
+    </div>
   );
 }

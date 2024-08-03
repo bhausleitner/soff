@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Chat } from "~/components/chat/chat";
 import { api } from "~/utils/api";
 import { find, get } from "lodash";
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
@@ -14,6 +13,9 @@ import {
 } from "~/components/ui/resizable";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
+import ChatBottombar from "~/components/chat/chat-bottombar";
+import ChatTopbar from "~/components/chat/chat-topbar";
+import { ChatList } from "~/components/chat/chat-list";
 
 export default function Exchange() {
   const router = useRouter();
@@ -31,6 +33,10 @@ export default function Exchange() {
       setChatMessages(data.newChat.messages);
     }
   }, [data]);
+
+  function updateFrontendMessages(newMessage: ChatMessage) {
+    setChatMessages([...chatMessages, newMessage]);
+  }
 
   const supplier = get(
     find(data?.newChat?.chatParticipants, (item) => item.supplier !== null),
@@ -51,55 +57,68 @@ export default function Exchange() {
   }
 
   return (
-    <div className="flex h-full flex-col space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between">
-        <SupplierBreadcrumb
-          name={supplier.name}
-          supplierId={supplier.id}
-          rfq={true}
-          chatId={chatId}
-        />
-        {data?.newChat?.quotes && data?.newChat?.quotes.length > 0 && (
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={async () => {
-                const quote = data?.newChat?.quotes[0];
-                if (quote) {
-                  await router.push(`/quotes/${quote.id}`);
-                }
-              }}
-            >
-              View Quote
-              <Icons.quotes className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        )}
+    <div className="flex h-full flex-col pb-5">
+      <div className="pb-4">
+        <div className="flex items-center justify-between">
+          <SupplierBreadcrumb
+            name={supplier.name}
+            supplierId={supplier.id}
+            rfq={true}
+            chatId={chatId}
+          />
+          {data?.newChat?.quotes && data?.newChat?.quotes.length > 0 && (
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const quote = data?.newChat?.quotes[0];
+                  if (quote) {
+                    await router.push(`/quotes/${quote.id}`);
+                  }
+                }}
+              >
+                View Quote
+                <Icons.quotes className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={70} minSize={50}>
-          <div className="flex h-[calc(100vh-180px)] w-full flex-col overflow-y-auto">
-            <Chat
-              supplier={supplier}
-              chatMessages={chatMessages}
-              setChatMessages={setChatMessages}
+      <div className="flex-grow overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanel
+            defaultSize={70}
+            minSize={50}
+            className="flex flex-col"
+          >
+            <ChatTopbar supplier={supplier} />
+            <div className="flex-grow overflow-hidden">
+              <ChatList
+                supplierId={supplier.id}
+                chatMessages={chatMessages}
+                chatParticipantUserId={chatParticipantUserId}
+              />
+            </div>
+            <ChatBottombar
               chatId={chatId}
               chatParticipantUserId={chatParticipantUserId}
+              updateFrontendMessages={updateFrontendMessages}
             />
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={30} minSize={20}>
-          <div className="flex h-[calc(100vh-160px)] w-full flex-col overflow-y-auto">
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel
+            defaultSize={30}
+            minSize={20}
+            className="overflow-hidden"
+          >
             <ChatMetadata
               supplier={supplier}
               chatParticipantUserId={chatParticipantUserId}
               messages={chatMessages}
             />
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-      {/* </div> */}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </div>
   );
 }

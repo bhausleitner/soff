@@ -71,10 +71,10 @@ const QuotePage = () => {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <div className="flex items-center justify-between">
+    <div>
+      <div className="flex items-center justify-between pb-4">
         <QuoteBreadcrumb quoteId={quoteId} />
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center">
           {quoteData.chatId && (
             <Button
               variant="outline"
@@ -86,6 +86,7 @@ const QuotePage = () => {
           )}
           {!erpPurchaseOrderId && (
             <Button
+              variant="blue"
               className="w-36"
               onClick={() => handleAddToOdoo()}
               disabled={isCreatingPO}

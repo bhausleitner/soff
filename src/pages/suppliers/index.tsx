@@ -12,7 +12,7 @@ export default function Supplier() {
   const clerkUserId = user.user?.id;
   return (
     <>
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+      <div className="space-y-4">
         <SupplierBreadcrumb />
         {clerkUserId && (
           <GenericTable<Supplier, { clerkUserId: string }>
