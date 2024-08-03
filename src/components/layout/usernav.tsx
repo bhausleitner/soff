@@ -76,7 +76,52 @@ export function UserNav({ isCollapsed }: UserNavProps) {
       </DropdownMenuTrigger>
       {!isLoading && (
         <DropdownMenuContent className="m-3 w-56" align="end" forceMount>
-          {/* ... (rest of the DropdownMenuContent remains unchanged) ... */}
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {user?.username}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user?.primaryEmailAddress?.emailAddress}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={async () => {
+                await router.push(
+                  window.location.host === "localhost:3000"
+                    ? "https://lucky-crow-92.accounts.dev/user"
+                    : "https://accounts.soff.ai/user"
+                );
+              }}
+            >
+              Settings
+              <DropdownMenuShortcut>
+                <Icons.settings className="ml-3 size-5" />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const redirectUrl =
+                  await microsoftAuthUrlMutation.mutateAsync();
+                await router.push(redirectUrl);
+              }}
+            >
+              Authenticate Outlook
+              <DropdownMenuShortcut>
+                <Icons.fingerprint className="ml-3 size-5" />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>
+            Log out
+            <DropdownMenuShortcut>
+              <Icons.logout className="ml-3 size-5" />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       )}
     </DropdownMenu>
