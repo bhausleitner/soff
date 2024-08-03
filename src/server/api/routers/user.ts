@@ -6,6 +6,20 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 const userCreationCache = new Set<string>();
 
 export const userRouter = createTRPCRouter({
+  getOrganization: publicProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findFirst({
+      where: { clerkUserId: ctx.auth.userId! },
+      select: {
+        organization: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    return { name: user?.organization?.name ?? "unknown" };
+  }),
   upsertUser: publicProcedure
     .input(
       z.object({
