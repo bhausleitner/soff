@@ -35,11 +35,11 @@ export function UserNav({ isCollapsed }: UserNavProps) {
         <DropdownMenuTrigger asChild>
           <div
             className={cn(
-              "flex flex-row gap-3 p-3 hover:cursor-pointer hover:bg-accent",
+              "flex w-full flex-row justify-center p-3 hover:cursor-pointer hover:bg-accent",
               isCollapsed && "justify-center"
             )}
           >
-            <Avatar className="h-10 w-10">
+            <Avatar className={cn("h-10 w-10", !isCollapsed && "mr-3")}>
               <AvatarImage
                 src={user?.user?.imageUrl}
                 alt={user?.user?.username ?? ""}
@@ -49,7 +49,7 @@ export function UserNav({ isCollapsed }: UserNavProps) {
               </AvatarFallback>
             </Avatar>
             {!isCollapsed && (
-              <div className="flex cursor-pointer items-center">
+              <div className="flex cursor-pointer items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">{"Berni"}</p>
                   <p className="text-xs text-gray-500">{"ShoesOff"}</p>
@@ -59,7 +59,7 @@ export function UserNav({ isCollapsed }: UserNavProps) {
             )}
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuContent className="m-3 w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">

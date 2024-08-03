@@ -11,6 +11,8 @@ import { Nav } from "./nav";
 import { Icons } from "../icons";
 import { cn } from "~/lib/utils";
 import { Logo } from "./Logo";
+import { Separator } from "../ui/separator";
+import { UserNav } from "./usernav";
 
 export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
@@ -41,10 +43,10 @@ export const PageLayout = (props: PropsWithChildren) => {
       className="fixed h-full"
     >
       <ResizablePanel
-        defaultSize={10}
-        collapsedSize={6}
+        defaultSize={12}
+        collapsedSize={5}
         collapsible={true}
-        minSize={13}
+        minSize={12}
         maxSize={20}
         onCollapse={() => {
           setIsCollapsed(true);
@@ -59,38 +61,48 @@ export const PageLayout = (props: PropsWithChildren) => {
           )}`;
         }}
         className={cn(
-          isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
+          "flex flex-col justify-between",
+          isCollapsed && "min-w-[30px] transition-all duration-300 ease-in-out"
         )}
       >
-        <div
-          className={cn(
-            "m-3 flex flex-row gap-3",
-            isCollapsed && "justify-center"
-          )}
-        >
-          <Logo />
-          {!isCollapsed && (
-            <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
-          )}
+        <div className="flex flex-col">
+          <div
+            className={cn(
+              "m-3 flex flex-row gap-3",
+              isCollapsed && "justify-center"
+            )}
+          >
+            <Logo />
+            {!isCollapsed && (
+              <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
+            )}
+          </div>
+          <Nav
+            isCollapsed={isCollapsed}
+            links={[
+              {
+                title: "Suppliers",
+                href: "/suppliers",
+                icon: Icons.suppliers,
+                subpages: ["rfq", "suppliers"]
+              },
+              {
+                title: "Quotes",
+                href: "/quotes",
+                icon: Icons.quotes,
+                subpages: ["quotes"]
+              }
+            ]}
+          />
         </div>
-        <Nav
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: "Suppliers",
-              href: "/suppliers",
-              icon: Icons.suppliers
-            },
-            {
-              title: "Quotes",
-              href: "/quotes",
-              icon: Icons.quotes
-            }
-          ]}
-        />
+
+        <div>
+          <Separator />
+          <UserNav isCollapsed={isCollapsed} />
+        </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={90} minSize={30}>
+      <ResizablePanel defaultSize={80} minSize={30}>
         <div className="m-5 flex h-screen overflow-hidden">
           <main className="w-full overflow-hidden font-sans antialiased">
             {props.children}

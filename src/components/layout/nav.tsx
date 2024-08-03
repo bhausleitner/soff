@@ -9,8 +9,6 @@ import {
   TooltipTrigger
 } from "~/components/ui/tooltip";
 import { useRouter } from "next/router";
-import { UserNav } from "./usernav";
-import { Separator } from "../ui/separator";
 
 interface NavProps {
   isCollapsed: boolean;
@@ -18,24 +16,37 @@ interface NavProps {
     title: string;
     href: string;
     icon: LucideIcon;
+    subpages: string[];
   }[];
+}
+
+function containsSubpage(subpages: string[], pathname: string) {
+  for (const subpage of subpages) {
+    if (pathname.includes(subpage)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
   const router = useRouter();
+  console.log(router.pathname);
   return (
     <div
       data-collapsed={isCollapsed}
-      className="group flex h-full flex-col justify-between py-2 pb-16 data-[collapsed=true]:py-2"
+      className="group flex flex-col py-2 data-[collapsed=true]:py-2"
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) => {
-          const variant = router.pathname === link.href ? "soff" : "ghost";
+          const variant = containsSubpage(link.subpages, router.pathname)
+            ? "soff"
+            : "ghost";
           return isCollapsed ? (
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href={link.href}
                   className={cn(
                     buttonVariants({ variant: variant, size: "icon" }),
                     "h-9 w-9"
@@ -64,10 +75,6 @@ export function Nav({ links, isCollapsed }: NavProps) {
           );
         })}
       </nav>
-      <div className="px-2">
-        <Separator className="mt-2" />
-        <UserNav isCollapsed={isCollapsed} />
-      </div>
     </div>
   );
 }
