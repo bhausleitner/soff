@@ -109,7 +109,7 @@ export const PageLayout = (props: PropsWithChildren) => {
           <main className="w-full overflow-hidden px-5 pb-3 pt-5 font-sans antialiased">
             {props.children}
           </main>
-          <Toaster position="top-right" richColors={true} theme="light" />
+          <Toaster position="bottom-right" richColors={true} theme="light" />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
