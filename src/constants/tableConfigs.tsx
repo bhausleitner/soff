@@ -2,7 +2,7 @@ import { api } from "~/utils/api";
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
-  maxRowsBeforePagination: 8,
+  maxRowsBeforePagination: 6,
   checkbox: true,
   columns: [
     { header: "Order ID", accessorKey: "id", sortable: true },
@@ -18,7 +18,7 @@ export const supplierOrderTableConfig = {
 
 export const supplierPartTableConfig = {
   placeholder: "Filter part...",
-  maxRowsBeforePagination: 8,
+  maxRowsBeforePagination: 6,
   checkbox: true,
   columns: [
     { header: "Part Number", accessorKey: "partNumber", sortable: true },
@@ -30,7 +30,7 @@ export const supplierPartTableConfig = {
 
 export const supplierQuoteTableConfig = {
   link: "/quotes",
-  maxRowsBeforePagination: 8,
+  maxRowsBeforePagination: 6,
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
@@ -42,7 +42,7 @@ export const supplierQuoteTableConfig = {
 
 export const quoteTableConfig = {
   link: "/quotes",
-  maxRowsBeforePagination: 12,
+  maxRowsBeforePagination: 10,
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
@@ -60,7 +60,7 @@ export const quoteTableConfig = {
 
 export const quoteLineItemTableConfig = {
   placeholder: "Filter line items...",
-  maxRowsBeforePagination: 8,
+  maxRowsBeforePagination: 6,
   checkbox: true,
   columns: [
     { header: "Part ID", accessorKey: "partId", sortable: true },
@@ -73,7 +73,7 @@ export const quoteLineItemTableConfig = {
 
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
-  maxRowsBeforePagination: 12,
+  maxRowsBeforePagination: 10,
   link: "/suppliers",
   checkbox: true,
   columns: [
