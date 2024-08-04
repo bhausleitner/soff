@@ -11,11 +11,18 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from "~/components/ui/resizable";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import ChatBottombar from "~/components/chat/chat-bottombar";
 import ChatTopbar from "~/components/chat/chat-topbar";
 import { ChatList } from "~/components/chat/chat-list";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "~/components/ui/tooltip";
+import Link from "next/link";
+import { cn } from "~/lib/utils";
 
 export default function Exchange() {
   const router = useRouter();
@@ -56,8 +63,10 @@ export default function Exchange() {
     return <Spinner />;
   }
 
+  console.log(data?.newChat?.quotes);
+
   return (
-    <div className="flex h-full flex-col pb-5">
+    <div className="flex h-full flex-col pb-7">
       <div className="pb-4">
         <div className="flex items-center justify-between">
           <SupplierBreadcrumb
@@ -66,10 +75,13 @@ export default function Exchange() {
             rfq={true}
             chatId={chatId}
           />
-          {data?.newChat?.quotes && data?.newChat?.quotes.length > 0 && (
-            <div className="flex items-center space-x-4">
+          <Tooltip>
+            <TooltipTrigger>
               <Button
                 variant="outline"
+                disabled={
+                  !data?.newChat?.quotes || data?.newChat?.quotes.length === 0
+                }
                 onClick={async () => {
                   const quote = data?.newChat?.quotes[0];
                   if (quote) {
@@ -80,8 +92,13 @@ export default function Exchange() {
                 View Quote
                 <Icons.quotes className="ml-2 h-4 w-4" />
               </Button>
-            </div>
-          )}
+            </TooltipTrigger>
+            {(!data?.newChat?.quotes || data?.newChat?.quotes.length === 0) && (
+              <TooltipContent>
+                <p>No quote parsed yet.</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
       </div>
       <div className="flex-grow overflow-hidden">

@@ -74,7 +74,7 @@ const QuotePage = () => {
     <div>
       <div className="flex items-center justify-between pb-4">
         <QuoteBreadcrumb quoteId={quoteId} />
-        <div className="flex items-center">
+        <div className="flex items-center space-x-4">
           {quoteData.chatId && (
             <Button
               variant="outline"
