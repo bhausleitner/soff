@@ -1,5 +1,7 @@
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { GenericTable } from "~/components/common/GenericTable";
+import { SupplierModal } from "~/components/supplier/SupplierModal";
+import { SupplierForm } from "~/components/supplier/SupplierForm";
 import { type Supplier } from "~/server/api/routers/supplier";
 import {
   supplierTableConfig,
@@ -10,22 +12,25 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import { useState } from "react";
 
+const handleSubmit = async () => {
+  try {
+    // To be implemented
+  } catch (error) {
+    // Handle error
+  }
+};
+
 export default function Supplier() {
   const user = useUser();
   const clerkUserId = user.user?.id;
-  const [isOnboarding, setIsOnboarding] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <SupplierBreadcrumb />
-          <Button
-            onClick={async () => {
-              setIsOnboarding(true);
-            }}
-            variant="blue"
-          >
+          <Button onClick={() => setIsModalOpen(true)} variant="blue">
             Supplier
             <Icons.add className="ml-2 h-4 w-4" />
           </Button>
@@ -38,6 +43,9 @@ export default function Supplier() {
           />
         )}
       </div>
+      <SupplierModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <SupplierForm onSubmit={handleSubmit} />
+      </SupplierModal>
     </>
   );
 }
