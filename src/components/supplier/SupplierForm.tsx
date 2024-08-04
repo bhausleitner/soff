@@ -30,6 +30,7 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* TODO: Add form fields */}
       <Input
         name="name"
         placeholder="Supplier Name"
