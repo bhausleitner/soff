@@ -18,12 +18,7 @@ interface ChatTopbarProps {
 }
 
 export const TopbarIcons = [
-  { icon: Icons.phone, link: "https://teams.microsoft.com/", prefix: "Call" },
-  {
-    icon: Icons.video,
-    link: "https://teams.microsoft.com/",
-    prefix: "Video call"
-  }
+  { icon: Icons.phone, link: "https://teams.microsoft.com/", prefix: "Call" }
 ];
 
 export default function ChatTopbar({ supplier }: ChatTopbarProps) {
@@ -38,29 +33,28 @@ export default function ChatTopbar({ supplier }: ChatTopbarProps) {
           </Avatar>
           <div className="flex flex-col">
             <span className="font-medium">{supplier.contactPerson}</span>
+            <span className="text-sm text-gray-500">{supplier.email}</span>
           </div>
         </div>
 
         <div>
-          {TopbarIcons.map((icon, index) => (
-            <Tooltip key={index}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={icon.link}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "h-9 w-9",
-                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                  )}
-                >
-                  <icon.icon size={20} className="text-muted-foreground" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{icon.prefix} on Microsoft Teams.</p>
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="https://teams.microsoft.com/"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                  "h-9 w-9",
+                  "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                )}
+              >
+                <Icons.phone size={20} className="text-muted-foreground" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Call on Microsoft Teams.</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>
