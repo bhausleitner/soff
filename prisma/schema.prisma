@@ -115,7 +115,7 @@ model Quote {
   erpPurchaseOrderId Int?
   chatId             Int?
   chat               Chat?       @relation(fields: [chatId], references: [id])
-  version            Int         @default(0)
+  version            Int         @default(1)
   isActive           Boolean     @default(true)
 
   @@index([status])
