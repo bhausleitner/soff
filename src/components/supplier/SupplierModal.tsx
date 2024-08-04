@@ -20,7 +20,7 @@ export function SupplierModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Supplier</DialogTitle>
+          <DialogTitle>Onboard Supplier</DialogTitle>
         </DialogHeader>
         {children}
       </DialogContent>
