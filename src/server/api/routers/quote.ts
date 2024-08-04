@@ -25,7 +25,9 @@ export const quoteSchema = z.object({
   status: z.nativeEnum(QuoteStatus),
   createdAt: z.date(),
   updatedAt: z.date(),
-  erpPurchaseOrderId: z.number().optional().nullable()
+  erpPurchaseOrderId: z.number().optional().nullable(),
+  chatId: z.number().optional().nullable(),
+  version: z.number()
 });
 
 export const quoteArraySchema = z.array(quoteSchema);
@@ -84,7 +86,7 @@ export const quoteRouter = createTRPCRouter({
     .input(z.object({ quoteId: z.number() }))
     .query(async ({ ctx, input }) => {
       const quote = await ctx.db.quote.findUnique({
-        where: { id: input.quoteId, isActive: true },
+        where: { id: input.quoteId },
         include: {
           supplier: {
             select: {
@@ -107,32 +109,32 @@ export const quoteRouter = createTRPCRouter({
       }
 
       // Fetch the history of quotes for the same supplier
-      if (quote.chatId) {
-        const quoteHistory = await ctx.db.quote.findMany({
-          where: {
-            chatId: quote.chatId,
-            isActive: false
-          },
-          select: {
-            id: true,
-            version: true
-          },
-          orderBy: {
-            version: "asc" // Order by version to maintain the history order
-          }
-        });
-      }
+      const quoteHistory = await ctx.db.quote.findMany({
+        where: {
+          chatId: quote.chatId
+        },
+        select: {
+          id: true,
+          version: true,
+          isActive: true
+        },
+        orderBy: {
+          version: "asc" // Order by version to maintain the history order
+        },
+        distinct: ["version"]
+      });
 
       return {
         ...quote,
         supplierName: quote.supplier.name,
         supplierContactPerson: quote.supplier.contactPerson,
         supplierEmail: quote.supplier.email,
-        erpUrl: quote.supplier.organization?.erpUrl
-        // quoteHistory: quoteHistory.map((q) => ({
-        //   id: q.id,
-        //   version: q.version
-        // }))
+        erpUrl: quote.supplier.organization?.erpUrl,
+        quoteHistory: quoteHistory.map((q) => ({
+          id: q.id,
+          version: q.version,
+          isActive: q.isActive
+        }))
       };
     }),
   getLineItemsByQuoteId: publicProcedure
@@ -210,7 +212,7 @@ export const quoteRouter = createTRPCRouter({
 
         const existingQuote = await ctx.db.quote.findFirst({
           where: { chatId: input.chatId, isActive: true },
-          select: { version: true, id: true }
+          select: { version: true, id: true, erpPurchaseOrderId: true }
         });
 
         if (existingQuote) {
@@ -227,7 +229,8 @@ export const quoteRouter = createTRPCRouter({
               supplierId: input.supplierId,
               version: existingQuote.version + 1,
               price: parsedData.totalPrice,
-              status: QuoteStatus.RECEIVED
+              status: QuoteStatus.RECEIVED,
+              erpPurchaseOrderId: existingQuote.erpPurchaseOrderId
             }
           });
 

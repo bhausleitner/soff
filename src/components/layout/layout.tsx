@@ -62,17 +62,19 @@ export const PageLayout = (props: PropsWithChildren) => {
         }}
         className={cn(
           "flex flex-col justify-between",
-          isCollapsed && "min-w-[30px] transition-all duration-300 ease-in-out"
+          isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
         )}
       >
         <div className="flex flex-col">
           <div
             className={cn(
-              "m-3 flex flex-row gap-3",
-              isCollapsed && "justify-center"
+              "m-3 flex flex-row",
+              isCollapsed ? "justify-center" : "gap-3"
             )}
           >
-            <Logo />
+            <div className="flex-shrink-0">
+              <Logo />
+            </div>
             {!isCollapsed && (
               <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
             )}
@@ -103,8 +105,8 @@ export const PageLayout = (props: PropsWithChildren) => {
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={80} minSize={30}>
-        <div className="m-5 flex h-screen overflow-hidden">
-          <main className="w-full overflow-hidden font-sans antialiased">
+        <div className="flex h-screen overflow-hidden">
+          <main className="w-full overflow-hidden px-5 pb-3 pt-5 font-sans antialiased">
             {props.children}
           </main>
           <Toaster position="top-right" richColors={true} theme="light" />

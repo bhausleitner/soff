@@ -2,6 +2,7 @@ import { api } from "~/utils/api";
 
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
+  maxRowsBeforePagination: 8,
   checkbox: true,
   columns: [
     { header: "Order ID", accessorKey: "id", sortable: true },
@@ -17,6 +18,7 @@ export const supplierOrderTableConfig = {
 
 export const supplierPartTableConfig = {
   placeholder: "Filter part...",
+  maxRowsBeforePagination: 8,
   checkbox: true,
   columns: [
     { header: "Part Number", accessorKey: "partNumber", sortable: true },
@@ -27,7 +29,8 @@ export const supplierPartTableConfig = {
 };
 
 export const supplierQuoteTableConfig = {
-  link: "/quotes/",
+  link: "/quotes",
+  maxRowsBeforePagination: 8,
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
@@ -38,15 +41,15 @@ export const supplierQuoteTableConfig = {
 };
 
 export const quoteTableConfig = {
-  link: "/quotes/",
+  link: "/quotes",
+  maxRowsBeforePagination: 12,
   placeholder: "Filter quotes...",
   checkbox: true,
   columns: [
     {
       header: "Quote ID",
       accessorKey: "id",
-      sortable: true,
-      link: "/quotes/"
+      sortable: true
     },
     { header: "Part ID", accessorKey: "partId", sortable: true },
     { header: "Quantity", accessorKey: "quantity", sortable: true },
@@ -55,14 +58,9 @@ export const quoteTableConfig = {
   ]
 };
 
-export const quoteOrderTableConfig = {
-  placeholder: "Filter orders...",
-  checkbox: true,
-  columns: [{ header: "Order ID", accessorKey: "id", sortable: true }]
-};
-
 export const quoteLineItemTableConfig = {
   placeholder: "Filter line items...",
+  maxRowsBeforePagination: 8,
   checkbox: true,
   columns: [
     { header: "Part ID", accessorKey: "partId", sortable: true },
@@ -75,25 +73,17 @@ export const quoteLineItemTableConfig = {
 
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
-  link: "/suppliers/",
+  maxRowsBeforePagination: 12,
+  link: "/suppliers",
   checkbox: true,
   columns: [
     {
       header: "Name",
       accessorKey: "name",
-      sortable: true,
-      link: "/suppliers/"
+      sortable: true
     },
     { header: "Status", accessorKey: "status", sortable: false },
     { header: "Email", accessorKey: "email", sortable: true }
-    // {
-    //   header: "Actions",
-    //   accessorKey: "actions",
-    //   sortable: false,
-    //   cell: ({ row }: { row: { original: Supplier } }) => (
-    //     <SupplierAction row={row} />
-    //   )
-    // }
   ]
 };
 

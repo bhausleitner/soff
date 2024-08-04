@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import TableLink from "~/components/common/TableLink";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { type TableProps } from "~/types/tableTypes";
@@ -85,10 +84,6 @@ function generateColumns<T extends { id: number }>(
           return col.cell(row);
         }
         const cellValue: string = row.getValue(col.accessorKey);
-        if (col.link) {
-          const linkUrl = col.link + row.original.id;
-          return <TableLink href={linkUrl} text={cellValue}></TableLink>;
-        }
         return <div>{cellValue}</div>;
       }
     });
@@ -124,6 +119,11 @@ export function TableComponent<T extends { id: number }>({
       columnFilters,
       columnVisibility,
       rowSelection
+    },
+    initialState: {
+      pagination: {
+        pageSize: tableConfig.maxRowsBeforePagination ?? 10
+      }
     }
   });
 
@@ -132,7 +132,7 @@ export function TableComponent<T extends { id: number }>({
     .find((column) => column.getCanFilter());
 
   return (
-    <div className="w-full">
+    <div className="flex h-full w-full flex-col">
       <div className="flex items-center py-4">
         {firstFilterableColumn && (
           <Input
@@ -171,7 +171,7 @@ export function TableComponent<T extends { id: number }>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="flex-grow overflow-auto rounded-md border">
         <UITable>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -205,7 +205,7 @@ export function TableComponent<T extends { id: number }>({
                       onClick={async () => {
                         if (tableConfig.link) {
                           await router.push(
-                            `/${tableConfig.link}/${row.original.id}`
+                            `${tableConfig.link}/${row.original.id}`
                           );
                         }
                       }}

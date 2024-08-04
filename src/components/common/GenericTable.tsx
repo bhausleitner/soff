@@ -11,6 +11,7 @@ interface GenericTableProps<T, TQueryArgs = void> {
     args: TQueryArgs
   ) => UseTRPCQueryResult<T[], TRPCClientErrorLike<any>>;
   queryArgs: TQueryArgs;
+  maxSize?: number;
 }
 
 export function GenericTable<T extends { id: number }, TQueryArgs>({
