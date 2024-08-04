@@ -11,6 +11,7 @@ export interface TableConfig {
   checkbox: boolean;
   columns: ColumnConfig[];
   link?: string;
+  maxRowsBeforePagination?: number;
 }
 
 export interface TableProps<T extends { id: number }> {

@@ -13,6 +13,7 @@ import { type LineItem } from "~/server/api/routers/quote";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
+import { QuoteHistory } from "~/components/quote-detail/quote-history";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -75,15 +76,20 @@ const QuotePage = () => {
       <div className="flex items-center justify-between pb-4">
         <QuoteBreadcrumb quoteId={quoteId} />
         <div className="flex items-center space-x-4">
+          <QuoteHistory
+            currentVersion={quoteData.version}
+            quoteHistory={quoteData.quoteHistory}
+          />
           {quoteData.chatId && (
             <Button
               variant="outline"
               onClick={() => router.push(`/rfq/${quoteData.chatId}`)}
             >
+              <Icons.messageCircleMore className="mr-2 h-4 w-4" />
               Show Chat
-              <Icons.messageCircleMore className="ml-2 h-4 w-4" />
             </Button>
           )}
+
           {!erpPurchaseOrderId && (
             <Button
               variant="blue"
@@ -95,8 +101,8 @@ const QuotePage = () => {
                 <Icons.loaderCircle className="h-4 w-4 animate-spin" />
               ) : (
                 <>
+                  <Icons.odoo className="mr-2 h-4 w-4" />
                   Add to Odoo
-                  <Icons.odoo className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -112,8 +118,8 @@ const QuotePage = () => {
                 )
               }
             >
+              <Icons.odooLogo className="mr-2 h-4 w-4" />
               View in Odoo
-              <Icons.odooLogo className="ml-2 h-4 w-4" />
             </Button>
           )}
         </div>

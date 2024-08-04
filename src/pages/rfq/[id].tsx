@@ -11,7 +11,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from "~/components/ui/resizable";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import ChatBottombar from "~/components/chat/chat-bottombar";
 import ChatTopbar from "~/components/chat/chat-topbar";
@@ -21,8 +21,6 @@ import {
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
-import Link from "next/link";
-import { cn } from "~/lib/utils";
 
 export default function Exchange() {
   const router = useRouter();
@@ -63,10 +61,8 @@ export default function Exchange() {
     return <Spinner />;
   }
 
-  console.log(data?.newChat?.quotes);
-
   return (
-    <div className="flex h-full flex-col pb-7">
+    <div className="flex h-full flex-col">
       <div className="pb-4">
         <div className="flex items-center justify-between">
           <SupplierBreadcrumb
@@ -89,8 +85,8 @@ export default function Exchange() {
                   }
                 }}
               >
+                <Icons.quotes className="mr-2 h-4 w-4" />
                 View Quote
-                <Icons.quotes className="ml-2 h-4 w-4" />
               </Button>
             </TooltipTrigger>
             {(!data?.newChat?.quotes || data?.newChat?.quotes.length === 0) && (

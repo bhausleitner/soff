@@ -193,7 +193,7 @@ export default function ChatBottombar({
   };
 
   return (
-    <div className="flex w-full items-center justify-between gap-2 p-2">
+    <div className="flex w-full items-center justify-between gap-2">
       <div className="flex flex-col items-center">
         <Link
           href="#"

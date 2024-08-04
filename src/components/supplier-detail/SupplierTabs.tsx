@@ -20,7 +20,7 @@ interface SupplierTabsProps {
 export function SupplierTabs({ supplierId }: SupplierTabsProps) {
   return (
     <>
-      <Tabs defaultValue="parts" className="space-y-4">
+      <Tabs defaultValue="parts">
         <TabsList>
           <TabsTrigger value="parts">Parts</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>

@@ -31,7 +31,6 @@ function containsSubpage(subpages: string[], pathname: string) {
 
 export function Nav({ links, isCollapsed }: NavProps) {
   const router = useRouter();
-  console.log(router.pathname);
   return (
     <div
       data-collapsed={isCollapsed}
