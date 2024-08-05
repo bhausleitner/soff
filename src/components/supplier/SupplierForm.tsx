@@ -39,7 +39,7 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
     setTimeout(() => {
       setIsGeneratingNDA(false);
       setIsNDAGenerated(true);
-    }, 3000);
+    }, 1000);
   };
 
   const isFormValid = Object.values(formData).every(

@@ -1,7 +1,6 @@
 import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { GenericTable } from "~/components/common/GenericTable";
 import { SupplierModal } from "~/components/supplier/SupplierModal";
-import { SupplierForm } from "~/components/supplier/SupplierForm";
 import { type Supplier } from "~/server/api/routers/supplier";
 import {
   supplierTableConfig,
@@ -23,7 +22,7 @@ export default function Supplier() {
         <div className="flex items-center justify-between">
           <SupplierBreadcrumb />
           <Button onClick={() => setIsModalOpen(true)} variant="blue">
-            Supplier
+            Add Supplier
             <Icons.add className="ml-2 h-4 w-4" />
           </Button>
         </div>

@@ -110,5 +110,36 @@ export const supplierRouter = createTRPCRouter({
       orderArraySchema.parse(orderData);
 
       return orderData;
+    }),
+
+  createSupplier: publicProcedure
+    .input(
+      z.object({
+        companyName: z.string(),
+        contactName: z.string(),
+        contactRole: z.string(),
+        email: z.string().email(),
+        status: z.nativeEnum(Status)
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findFirst({
+        where: { clerkUserId: ctx.auth.userId! },
+        select: { organizationId: true }
+      });
+
+      if (!user?.organizationId) {
+        throw new Error("User or organization not found");
+      }
+
+      await ctx.db.supplier.create({
+        data: {
+          name: input.companyName,
+          contactPerson: input.contactName,
+          email: input.email,
+          status: input.status,
+          organization: { connect: { id: user.organizationId } }
+        }
+      });
     })
 });
