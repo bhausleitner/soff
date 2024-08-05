@@ -25,6 +25,7 @@ export function GenericTable<T extends { id: number }, TQueryArgs>({
 
   useEffect(() => {
     if (refetchTrigger) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       refetch();
     }
   }, [refetchTrigger, refetch]);
