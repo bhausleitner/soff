@@ -4,6 +4,7 @@ export interface ColumnConfig {
   sortable: boolean;
   link?: string;
   cell?: (row: any) => JSX.Element;
+  isBadge?: boolean;
 }
 
 export interface TableConfig {
