@@ -45,6 +45,7 @@ export default function Supplier() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={(data) => {
           // Handle the form submission here
+          console.log(data);
 
           // triggers refetch of supplier table
           toggleRefetch();
