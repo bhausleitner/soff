@@ -3,19 +3,18 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 
-interface SupplierFormProps {
-  onSubmit: (data: SupplierFormData) => void;
-  onGenerateNDA: () => void;
-}
-
-interface SupplierFormData {
+export interface SupplierFormData {
   companyName: string;
   contactName: string;
   contactRole: string;
   email: string;
 }
 
-export function SupplierForm({ onSubmit, onGenerateNDA }: SupplierFormProps) {
+interface SupplierFormProps {
+  onSubmit: (data: SupplierFormData) => void;
+}
+
+export function SupplierForm({ onSubmit }: SupplierFormProps) {
   const [formData, setFormData] = useState<SupplierFormData>({
     companyName: "",
     contactName: "",
@@ -36,12 +35,16 @@ export function SupplierForm({ onSubmit, onGenerateNDA }: SupplierFormProps) {
 
   const handleGenerateNDA = () => {
     setIsGeneratingNDA(true);
-    // onGenerateNDA();
+    // Simulate NDA generation
     setTimeout(() => {
       setIsGeneratingNDA(false);
       setIsNDAGenerated(true);
     }, 3000);
   };
+
+  const isFormValid = Object.values(formData).every(
+    (value: string) => value.trim() !== ""
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,18 +53,21 @@ export function SupplierForm({ onSubmit, onGenerateNDA }: SupplierFormProps) {
         placeholder="Company Name"
         value={formData.companyName}
         onChange={handleChange}
+        required
       />
       <Input
         name="contactName"
         placeholder="Contact Name"
         value={formData.contactName}
         onChange={handleChange}
+        required
       />
       <Input
         name="contactRole"
         placeholder="Contact Role"
         value={formData.contactRole}
         onChange={handleChange}
+        required
       />
       <Input
         name="email"
@@ -69,6 +75,7 @@ export function SupplierForm({ onSubmit, onGenerateNDA }: SupplierFormProps) {
         placeholder="Email Address"
         value={formData.email}
         onChange={handleChange}
+        required
       />
       <div className="flex flex-col space-y-4">
         <Button
@@ -76,20 +83,24 @@ export function SupplierForm({ onSubmit, onGenerateNDA }: SupplierFormProps) {
           onClick={handleGenerateNDA}
           variant={isNDAGenerated ? "outline" : "secondary"}
           className={`w-fit ${isNDAGenerated ? "border-green-500" : ""}`}
-          disabled={isGeneratingNDA || isNDAGenerated}
+          disabled={isGeneratingNDA || isNDAGenerated || !isFormValid}
         >
-          {isGeneratingNDA ? (
-            <Icons.loaderCircle className="h-4 w-4 animate-spin" />
-          ) : isNDAGenerated ? (
-            <>
-              NDA Generated
-              <Icons.check className="ml-2 h-4 w-4 text-green-500" />
-            </>
-          ) : (
-            "Generate NDA"
-          )}
+          <div className="flex w-full items-center justify-start">
+            {isGeneratingNDA ? (
+              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+            ) : isNDAGenerated ? (
+              <>NDA Generated</>
+            ) : (
+              "Generate NDA"
+            )}
+          </div>
         </Button>
-        <Button type="submit" disabled={!isNDAGenerated} className="w-fit">
+        <Button
+          type="submit"
+          variant="soff"
+          disabled={!isNDAGenerated}
+          className="w-fit"
+        >
           Send NDA
         </Button>
       </div>

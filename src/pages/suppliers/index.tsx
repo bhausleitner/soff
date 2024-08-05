@@ -12,14 +12,6 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import { useState } from "react";
 
-const handleSubmit = async () => {
-  try {
-    // To be implemented
-  } catch (error) {
-    // Handle error
-  }
-};
-
 export default function Supplier() {
   const user = useUser();
   const clerkUserId = user.user?.id;
@@ -43,9 +35,14 @@ export default function Supplier() {
           />
         )}
       </div>
-      <SupplierModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <SupplierForm onSubmit={handleSubmit} />
-      </SupplierModal>
+      <SupplierModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={(data) => {
+          // Handle the form submission here
+          console.log(data);
+        }}
+      ></SupplierModal>
     </>
   );
 }
