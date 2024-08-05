@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { TableComponent } from "~/components/common/TableComponent";
 import Spinner from "~/components/spinner";
 import { type TableConfig } from "~/types/tableTypes";
@@ -12,14 +12,22 @@ interface GenericTableProps<T, TQueryArgs = void> {
   ) => UseTRPCQueryResult<T[], TRPCClientErrorLike<any>>;
   queryArgs: TQueryArgs;
   maxSize?: number;
+  refetchTrigger?: boolean;
 }
 
 export function GenericTable<T extends { id: number }, TQueryArgs>({
   tableConfig,
   useQueryHook,
-  queryArgs
+  queryArgs,
+  refetchTrigger = false
 }: GenericTableProps<T, TQueryArgs>) {
-  const { data, isLoading } = useQueryHook(queryArgs);
+  const { data, isLoading, refetch } = useQueryHook(queryArgs);
+
+  useEffect(() => {
+    if (refetchTrigger) {
+      refetch();
+    }
+  }, [refetchTrigger, refetch]);
 
   return (
     <>

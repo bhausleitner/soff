@@ -15,6 +15,11 @@ export default function Supplier() {
   const user = useUser();
   const clerkUserId = user.user?.id;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refetchToggle, setRefetchToggle] = useState(false);
+
+  const toggleRefetch = () => {
+    setRefetchToggle(!refetchToggle);
+  };
 
   return (
     <>
@@ -31,6 +36,7 @@ export default function Supplier() {
             tableConfig={supplierTableConfig}
             useQueryHook={useGetAllSuppliers}
             queryArgs={{ clerkUserId }}
+            refetchTrigger={refetchToggle}
           />
         )}
       </div>
@@ -39,7 +45,9 @@ export default function Supplier() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={(data) => {
           // Handle the form submission here
-          console.log(data);
+
+          // triggers refetch of supplier table
+          toggleRefetch();
         }}
       ></SupplierModal>
     </>
