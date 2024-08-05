@@ -2,24 +2,20 @@ import { useEffect, type PropsWithChildren, useMemo, useState } from "react";
 import { Toaster } from "../ui/sonner";
 import { useUser } from "@clerk/nextjs";
 import { api } from "~/utils/api";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup
-} from "../ui/resizable";
 import { Nav } from "./nav";
 import { Icons } from "../icons";
 import { cn } from "~/lib/utils";
 import { Logo } from "./Logo";
 import { Separator } from "../ui/separator";
 import { UserNav } from "./usernav";
+import { Button } from "../ui/button";
 
 export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
   const upsertUser = api.user.upsertUser.useMutation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableUser = useMemo(() => user, [user?.id, user?.emailAddresses]);
 
   useEffect(() => {
@@ -29,54 +25,56 @@ export const PageLayout = (props: PropsWithChildren) => {
         email: user?.emailAddresses[0]?.emailAddress ?? ""
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stableUser]);
+  }, [stableUser, user, upsertUser]);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      onLayout={(sizes: number[]) => {
-        document.cookie = `react-resizable-panels:layout:mail=${JSON.stringify(
-          sizes
-        )}`;
-      }}
-      className="fixed h-full"
-    >
-      <ResizablePanel
-        defaultSize={12}
-        collapsedSize={5}
-        collapsible={true}
-        minSize={12}
-        maxSize={20}
-        onCollapse={() => {
-          setIsCollapsed(true);
-          document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-            true
-          )}`;
-        }}
-        onResize={() => {
-          setIsCollapsed(false);
-          document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-            false
-          )}`;
-        }}
+    <div className="flex h-screen">
+      <aside
         className={cn(
-          "flex flex-col justify-between",
-          isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
+          "flex flex-col justify-between border-r border-gray-200 transition-all duration-300 ease-in-out",
+          isCollapsed ? "w-20" : "w-60"
         )}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
         <div className="flex flex-col">
           <div
             className={cn(
-              "m-3 flex flex-row",
-              isCollapsed ? "justify-center" : "gap-3"
+              "relative m-3 flex h-12 flex-row items-center",
+              isCollapsed ? "justify-center" : "justify-between"
             )}
           >
-            <div className="flex-shrink-0">
-              <Logo />
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <Logo />
+              </div>
+              {!isCollapsed && (
+                <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
+              )}
             </div>
-            {!isCollapsed && (
-              <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
+            {!isCollapsed && isHovering && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                className="ml-auto"
+              >
+                <Icons.sidebarCollapse className="h-4 w-4" />
+              </Button>
+            )}
+            {isCollapsed && isHovering && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform bg-accent"
+              >
+                <Icons.sidebarExpand className="h-4 w-4" />
+              </Button>
             )}
           </div>
           <Nav
@@ -102,16 +100,11 @@ export const PageLayout = (props: PropsWithChildren) => {
           <Separator />
           <UserNav isCollapsed={isCollapsed} />
         </div>
-      </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={80} minSize={30}>
-        <div className="flex h-screen overflow-hidden">
-          <main className="w-full overflow-hidden px-5 pb-3 pt-5 font-sans antialiased">
-            {props.children}
-          </main>
-          <Toaster position="bottom-right" richColors={true} theme="light" />
-        </div>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      </aside>
+      <main className="flex-1 overflow-hidden px-5 pb-3 pt-5 font-sans antialiased">
+        {props.children}
+      </main>
+      <Toaster position="bottom-right" richColors={true} theme="light" />
+    </div>
   );
 };
