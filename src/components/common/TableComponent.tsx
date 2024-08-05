@@ -33,6 +33,7 @@ import { ArrowUpDown } from "lucide-react";
 import { type TableProps } from "~/types/tableTypes";
 import { useRouter } from "next/router";
 import { cn } from "~/lib/utils";
+import { Badge } from "../ui/badge";
 
 function generateColumns<T extends { id: number }>(
   config: TableProps<T>["tableConfig"]
@@ -82,6 +83,15 @@ function generateColumns<T extends { id: number }>(
       cell: ({ row }) => {
         if (col.cell) {
           return col.cell(row);
+        }
+        if (col.isBadge) {
+          return (
+            <Badge
+              className={` ${row.getValue(col.accessorKey) === "ACTIVE" ? "bg-green-500" : ""} ${row.getValue(col.accessorKey) === "INACTIVE" ? "bg-gray-500" : ""} ${row.getValue(col.accessorKey) === "ONBOARDING" ? "bg-yellow-500" : ""} `}
+            >
+              {row.getValue(col.accessorKey)}
+            </Badge>
+          );
         }
         const cellValue: string = row.getValue(col.accessorKey);
         return <div>{cellValue}</div>;

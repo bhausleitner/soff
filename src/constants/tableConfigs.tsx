@@ -12,7 +12,11 @@ export const supplierOrderTableConfig = {
       accessorKey: "deliveryAddress",
       sortable: true
     },
-    { header: "Status", accessorKey: "status", sortable: true }
+    {
+      header: "Status",
+      accessorKey: "status",
+      sortable: true
+    }
   ]
 };
 
@@ -82,7 +86,12 @@ export const supplierTableConfig = {
       accessorKey: "name",
       sortable: true
     },
-    { header: "Status", accessorKey: "status", sortable: false },
+    {
+      header: "Status",
+      accessorKey: "status",
+      sortable: false,
+      isBadge: true
+    },
     { header: "Email", accessorKey: "email", sortable: true }
   ]
 };
