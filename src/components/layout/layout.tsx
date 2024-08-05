@@ -16,6 +16,7 @@ export const PageLayout = (props: PropsWithChildren) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableUser = useMemo(() => user, [user?.id, user?.emailAddresses]);
 
   useEffect(() => {
@@ -24,8 +25,8 @@ export const PageLayout = (props: PropsWithChildren) => {
         clerkUserId: user?.id ?? "",
         email: user?.emailAddresses[0]?.emailAddress ?? ""
       });
-    }
-  }, [stableUser, user, upsertUser]);
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stableUser]);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
