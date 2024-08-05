@@ -1,6 +1,8 @@
 import {
   AlertTriangle,
   ArrowRight,
+  ArrowLeftFromLine,
+  ArrowRightFromLine,
   Bell,
   BookUser,
   Check,
@@ -99,6 +101,8 @@ export const Icons = {
   profile: User2Icon,
   quotes: CreditCard,
   sendHorizontal: SendHorizontal,
+  sidebarCollapse: ArrowLeftFromLine,
+  sidebarExpand: ArrowRightFromLine,
   settings: Settings,
   sparkles: Sparkles,
   spinner: Loader2,
