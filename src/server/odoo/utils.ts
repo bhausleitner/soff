@@ -1,9 +1,14 @@
 import { type LineItem, type Quote } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
-const db = process.env.ODOO_DB;
-const username = process.env.ODOO_USERNAME;
-const password = process.env.ODOO_PASSWORD;
+// const db = process.env.ODOO_DB;
+// const username = process.env.ODOO_USERNAME;
+// const password = process.env.ODOO_PASSWORD;
+
+const db = "shoesoff";
+const username = "behausleitner@gmail.com";
+const password = "r9BT0d[0NwSt";
+const odooUrl = "https://shoesoff.odoo.com";
 
 interface PurchaseOrder {
   partner_id: number;
@@ -81,3 +86,126 @@ export function createPurchaseOrder(
     );
   });
 }
+
+export function getPurchaseOrder(
+  odooUrl: string,
+  uid: number,
+  purchaseOrderId: number
+): Promise<{ purchaseOrder: PurchaseOrder; messages: Message[] }> {
+  const objectClient = xmlrpc.createClient({
+    url: `${odooUrl}/xmlrpc/2/object`
+  });
+
+  const purchaseOrderPromise = new Promise<PurchaseOrder>((resolve, reject) => {
+    objectClient.methodCall(
+      "execute_kw",
+      [db, uid, password, "purchase.order", "read", [purchaseOrderId]],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (err: any, purchaseOrder: PurchaseOrder[]) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(purchaseOrder[0]);
+      }
+    );
+  });
+
+  const messagesPromise = new Promise<Message[]>((resolve, reject) => {
+    objectClient.methodCall(
+      "execute_kw",
+      [
+        db,
+        uid,
+        password,
+        "mail.message",
+        "search_read",
+        [
+          [
+            ["res_id", "=", purchaseOrderId],
+            ["model", "=", "purchase.order"],
+            "|",
+            ["message_type", "=", "comment"],
+            ["message_type", "=", "note"]
+          ],
+          ["id", "body", "author_id", "date"]
+        ],
+        { order: "date DESC" }
+      ],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (err: any, messages: Message[]) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(messages);
+      }
+    );
+  });
+
+  return Promise.all([purchaseOrderPromise, messagesPromise]).then(
+    ([purchaseOrder, messages]) => ({ purchaseOrder, messages })
+  );
+}
+
+export function addCommentToPurchaseOrder(
+  odooUrl: string,
+  uid: number,
+  purchaseOrderId: number,
+  body: string
+): Promise<number> {
+  const objectClient = xmlrpc.createClient({
+    url: `${odooUrl}/xmlrpc/2/object`
+  });
+
+  return new Promise((resolve, reject) => {
+    objectClient.methodCall(
+      "execute_kw",
+      [
+        db,
+        uid,
+        password,
+        "mail.message",
+        "create",
+        [
+          {
+            model: "purchase.order",
+            res_id: purchaseOrderId,
+            body: body,
+            message_type: "comment"
+          }
+        ]
+      ],
+      (err: any, messageId: number) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(messageId);
+      }
+    );
+  });
+}
+
+const uid = await authenticate(odooUrl);
+
+// console.log("uid");
+// console.log(uid);
+
+const purchaseOrderId = 15; // Replace with the actual purchase order ID
+// const { purchaseOrder, messages } = await getPurchaseOrder(
+//   odooUrl,
+//   uid,
+//   purchaseOrderId
+// );
+
+const messageBody = (quoteId: number) => {
+  return `<p>Jawoi <a target="_blank" rel="noreferrer noopener" href="https://app.soff.ai/quotes/${quoteId}">https://app.soff.ai/quotes/${quoteId}</a></p>`;
+};
+
+console.log(messageBody(2));
+const resp = await addCommentToPurchaseOrder(
+  odooUrl,
+  uid as number,
+  purchaseOrderId,
+  messageBody(2)
+);
+
+console.log(resp);
