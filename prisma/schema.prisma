@@ -198,6 +198,7 @@ model Message {
   chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
   chatParticipantId Int
   outlookMessageId  String?
+  gmailMessageId  String?
   conversationId    String
   fileNames         String[]
 
