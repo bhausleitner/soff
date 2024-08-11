@@ -11,6 +11,8 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import type { AuthObject } from "@clerk/backend/internal";
+
 import { db } from "~/server/db";
 import { getAuth } from "@clerk/nextjs/server";
 
@@ -20,7 +22,16 @@ import { getAuth } from "@clerk/nextjs/server";
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
+
+// Add this type declaration
+export type TRPCContext = {
+  db: typeof db;
+  auth: AuthObject;
+};
+
+export const createTRPCContext = (
+  _opts: CreateNextContextOptions
+): TRPCContext => {
   // return createInnerTRPCContext({});
   return {
     db: db,

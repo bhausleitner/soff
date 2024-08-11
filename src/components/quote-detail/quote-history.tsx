@@ -31,7 +31,6 @@ export function QuoteHistory({
         .find((item) => item.version === currentVersion)
         ?.version.toString()}
       onValueChange={async (value) => {
-        console.log(value);
         const newQuoteId = quoteHistory.find(
           (item) => item.version === parseInt(value)
         )?.id;

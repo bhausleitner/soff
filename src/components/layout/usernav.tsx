@@ -30,6 +30,8 @@ export function UserNav({ isCollapsed }: UserNavProps) {
   const microsoftAuthUrlMutation =
     api.chat.requestMicrosoftAuthUrl.useMutation();
 
+  const googleAuthUrlMutation = api.chat.requestGoogleAuthUrl.useMutation();
+
   const { data: orgResponse, isLoading: isOrgLoading } =
     api.user.getOrganization.useQuery();
 
@@ -110,6 +112,17 @@ export function UserNav({ isCollapsed }: UserNavProps) {
               }}
             >
               Authenticate Outlook
+              <DropdownMenuShortcut>
+                <Icons.fingerprint className="ml-3 size-5" />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const redirectUrl = await googleAuthUrlMutation.mutateAsync();
+                await router.push(redirectUrl);
+              }}
+            >
+              Authenticate Google
               <DropdownMenuShortcut>
                 <Icons.fingerprint className="ml-3 size-5" />
               </DropdownMenuShortcut>

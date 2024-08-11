@@ -6,7 +6,10 @@ import {
 } from "@azure/msal-node";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { msalClient } from "~/server/email/outlook/initMsalClient";
-import { getFileFromS3 } from "~/server/s3/utils";
+import { getFileFromS3, uploadFileToS3 } from "~/server/s3/utils"; // Assuming you have a Context type defined
+import { type TRPCContext } from "~/server/api/trpc";
+import { get, map } from "lodash";
+import { type ChatMessage } from "~/server/api/routers/chat";
 
 export interface Attachment {
   id?: string;
@@ -30,7 +33,7 @@ const MICROSOFT_APP_SCOPES = [
   "mail.readWrite"
 ];
 
-const getNonHashBaseUrl = () =>
+export const getNonHashBaseUrl = () =>
   process.env.VERCEL_URL ? "https://app.soff.ai" : "http://localhost:3000";
 
 export async function initMicrosoftAuthUrl(): Promise<string> {
@@ -219,4 +222,139 @@ export async function getMessageAttachments(
     .get()) as AttachmentsResponse;
 
   return result.value;
+}
+
+export async function syncOutlookMessages(
+  ctx: TRPCContext,
+  chatId: number,
+  conversationId: string,
+  supplierChatParticipantId: number
+) {
+  const msHomeAccountId = get(
+    ctx.auth,
+    "sessionClaims.publicMetadata.microsoftHomeAccountId"
+  );
+
+  if (!msHomeAccountId) {
+    throw Error("Microsoft Account not authorized");
+  }
+
+  const inbox = await getInboxAsync(msHomeAccountId, conversationId);
+
+  if (inbox?.value) {
+    const messagePromises = map(
+      inbox.value,
+      async (outlookMessage: Message) => {
+        const existingMessage = await ctx.db.message.findFirst({
+          where: {
+            outlookMessageId: outlookMessage.id
+          }
+        });
+
+        if (
+          !existingMessage &&
+          outlookMessage.bodyPreview &&
+          supplierChatParticipantId
+        ) {
+          const newMessageObject = await ctx.db.message.create({
+            data: {
+              chatId: chatId,
+              content: outlookMessage.bodyPreview,
+              outlookMessageId: outlookMessage.id,
+              conversationId: conversationId,
+              chatParticipantId: supplierChatParticipantId
+            }
+          });
+
+          if (outlookMessage.hasAttachments) {
+            const attachments = await getMessageAttachments(
+              msHomeAccountId,
+              outlookMessage.id!
+            );
+
+            await uploadFileToS3(
+              attachments,
+              `emailAttachments/${outlookMessage.id}/`,
+              newMessageObject
+            );
+          }
+        }
+      }
+    );
+
+    await Promise.all(messagePromises);
+  }
+}
+
+export async function sendOutlookAndCreateMessage(
+  ctx: TRPCContext,
+  inputChatMessage: ChatMessage,
+  supplierEmail: string
+) {
+  // use lodash to get the msHomeAccountid
+  const msHomeAccountId = get(
+    ctx.auth,
+    "sessionClaims.publicMetadata.microsoftHomeAccountId"
+  );
+
+  if (!msHomeAccountId) {
+    throw Error("Microsoft Account not authorized");
+  }
+
+  // get last messageId that is not from current user
+  const lastForeignMessage = await ctx.db.message.findFirst({
+    where: {
+      chatId: inputChatMessage.chatId,
+      chatParticipantId: inputChatMessage.chatParticipantId
+    },
+    orderBy: {
+      createdAt: "desc"
+    },
+    select: {
+      outlookMessageId: true,
+      conversationId: true
+    }
+  });
+
+  if (lastForeignMessage?.outlookMessageId) {
+    // existing thread
+    await replyEmailAsync(
+      msHomeAccountId,
+      inputChatMessage.content,
+      inputChatMessage.fileNames,
+      supplierEmail,
+      lastForeignMessage.outlookMessageId
+    );
+
+    // Create a new message object in the database
+    await ctx.db.message.create({
+      data: {
+        chatId: inputChatMessage.chatId,
+        content: inputChatMessage.content,
+        chatParticipantId: inputChatMessage.chatParticipantId,
+        conversationId: lastForeignMessage.conversationId ?? "",
+        fileNames: inputChatMessage.fileNames
+      }
+    });
+  } else {
+    // new thread
+    const { newMessageId, conversationId } = await sendInitialEmail(
+      msHomeAccountId,
+      "Message from Soff Chat",
+      inputChatMessage.content,
+      inputChatMessage.fileNames,
+      supplierEmail
+    );
+    // Create a new message object in the database
+    await ctx.db.message.create({
+      data: {
+        chatId: inputChatMessage.chatId,
+        content: inputChatMessage.content,
+        chatParticipantId: inputChatMessage.chatParticipantId,
+        outlookMessageId: newMessageId,
+        conversationId: conversationId,
+        fileNames: inputChatMessage.fileNames
+      }
+    });
+  }
 }
