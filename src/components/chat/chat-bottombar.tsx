@@ -17,11 +17,13 @@ import {
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
+import { type EmailProvider } from "@prisma/client";
 
 interface ChatBottombarProps {
   chatParticipantUserId: number;
   chatId: number;
   updateFrontendMessages: (newMessage: ChatMessage) => void;
+  emailProvider: EmailProvider;
 }
 
 interface FileWithHash extends File {
@@ -32,7 +34,8 @@ interface FileWithHash extends File {
 export default function ChatBottombar({
   updateFrontendMessages,
   chatId,
-  chatParticipantUserId
+  chatParticipantUserId,
+  emailProvider
 }: ChatBottombarProps) {
   const [textContent, setTextContent] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -145,7 +148,10 @@ export default function ChatBottombar({
       };
 
       try {
-        const sendMessagePromise = sendMessage.mutateAsync(newChatMessage);
+        const sendMessagePromise = sendMessage.mutateAsync({
+          chatMessage: newChatMessage,
+          emailProvider
+        });
 
         toast.promise(sendMessagePromise, {
           loading: "Sending E-Mail...",

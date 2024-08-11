@@ -21,6 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
+import { EmailProvider } from "@prisma/client";
 
 export default function Exchange() {
   const router = useRouter();
@@ -33,9 +34,16 @@ export default function Exchange() {
     data?.newChat?.messages ?? []
   );
 
+  const [emailProvider, setEmailProvider] = useState<EmailProvider>(
+    data?.emailProvider ?? EmailProvider.GMAIL
+  );
+
   useEffect(() => {
     if (data?.newChat?.messages) {
       setChatMessages(data.newChat.messages);
+    }
+    if (data?.emailProvider) {
+      setEmailProvider(data.emailProvider);
     }
   }, [data]);
 
@@ -116,6 +124,7 @@ export default function Exchange() {
               chatId={chatId}
               chatParticipantUserId={chatParticipantUserId}
               updateFrontendMessages={updateFrontendMessages}
+              emailProvider={emailProvider}
             />
           </ResizablePanel>
           <ResizableHandle withHandle />

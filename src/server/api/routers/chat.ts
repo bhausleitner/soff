@@ -1,15 +1,17 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
-  getInboxAsync,
-  getMessageAttachments,
-  replyEmailAsync,
-  sendInitialEmail
+  sendOutlookAndCreateMessage,
+  syncOutlookMessages
 } from "~/server/email/outlook/outlookHelper";
-import { uploadFileToS3 } from "~/server/s3/utils";
 import { initMicrosoftAuthUrl } from "~/server/email/outlook/outlookHelper";
-import { get, map } from "lodash";
-import { type Message } from "@microsoft/microsoft-graph-types";
+import { EmailProvider } from "@prisma/client";
+
+import {
+  getAuthUrl,
+  sendGmailAndCreateMessage,
+  syncGmailMessages
+} from "~/server/email/gmail/gmailHelper";
 
 const createChatSchema = z.object({
   supplierId: z.number()
@@ -23,6 +25,7 @@ const chatMessageSchema = z.object({
   updatedAt: z.date(),
   fileNames: z.array(z.string()),
   outlookMessageId: z.string().nullable().optional(),
+  gmailMessageId: z.string().nullable().optional(),
   conversationId: z.string().nullable().optional(),
   chatParticipantId: z.number()
 });
@@ -32,6 +35,10 @@ export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export const chatRouter = createTRPCRouter({
   requestMicrosoftAuthUrl: publicProcedure.mutation(async () => {
     const authUrl = await initMicrosoftAuthUrl();
+    return authUrl;
+  }),
+  requestGoogleAuthUrl: publicProcedure.mutation(async () => {
+    const authUrl = await getAuthUrl();
     return authUrl;
   }),
   createChat: publicProcedure
@@ -93,7 +100,17 @@ export const chatRouter = createTRPCRouter({
             select: {
               id: true,
               supplier: true,
-              user: true
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  organization: {
+                    select: {
+                      emailProvider: true
+                    }
+                  }
+                }
+              }
             }
           },
           messages: true
@@ -105,68 +122,31 @@ export const chatRouter = createTRPCRouter({
         (participant) => participant.supplier !== null
       );
 
-      // get conversationId from first message
+      // get the users email provider
+      const emailProvider = chat?.chatParticipants.find((p) => p.user)?.user
+        ?.organization?.emailProvider;
 
+      // get conversationId from first message
       const conversationId = chat?.messages?.[0]?.conversationId;
 
-      if (conversationId) {
-        const msHomeAccountId = get(
-          ctx.auth,
-          "sessionClaims.publicMetadata.microsoftHomeAccountId"
-        );
-
-        if (!msHomeAccountId) {
-          throw Error("Microsoft Account not authorized");
-        }
-
-        const inbox = await getInboxAsync(msHomeAccountId, conversationId);
-
-        // iterate through inbox and check if chatmessage object has been already created
-        if (inbox?.value) {
-          // Use map to create an array of promises
-          const messagePromises = map(
-            inbox.value,
-            async (outlookMessage: Message) => {
-              const existingMessage = await ctx.db.message.findFirst({
-                where: {
-                  outlookMessageId: outlookMessage.id
-                }
-              });
-
-              // Create message object if no existing message AND new message has a bodyPreview
-              if (
-                !existingMessage &&
-                outlookMessage.bodyPreview &&
-                supplierChatParticipant
-              ) {
-                const newMessageObject = await ctx.db.message.create({
-                  data: {
-                    chatId: input.chatId,
-                    content: outlookMessage.bodyPreview,
-                    outlookMessageId: outlookMessage.id,
-                    conversationId: conversationId,
-                    chatParticipantId: supplierChatParticipant.id
-                  }
-                });
-
-                if (outlookMessage.hasAttachments) {
-                  const attachments = await getMessageAttachments(
-                    msHomeAccountId,
-                    outlookMessage.id!
-                  );
-
-                  await uploadFileToS3(
-                    attachments,
-                    `emailAttachments/${outlookMessage.id}/`,
-                    newMessageObject
-                  );
-                }
-              }
-            }
-          );
-
-          // Wait for all promises to resolve
-          await Promise.all(messagePromises);
+      if (conversationId && supplierChatParticipant?.id) {
+        switch (emailProvider) {
+          case EmailProvider.OUTLOOK:
+            await syncOutlookMessages(
+              ctx,
+              input.chatId,
+              conversationId,
+              supplierChatParticipant.id
+            );
+            break;
+          case EmailProvider.GMAIL:
+            await syncGmailMessages(
+              ctx,
+              input.chatId,
+              conversationId,
+              supplierChatParticipant.id
+            );
+            break;
         }
       }
 
@@ -189,35 +169,30 @@ export const chatRouter = createTRPCRouter({
             },
             select: {
               id: true
-              // Add other relevant fields you want to return
             }
           }
         }
       });
 
-      return { newChat };
+      return { newChat, emailProvider };
     }),
   sendEmail: publicProcedure
-    .input(chatMessageSchema)
+    .input(
+      z.object({
+        chatMessage: chatMessageSchema,
+        emailProvider: z.nativeEnum(EmailProvider)
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      if (input.content === "fail") {
+      // for UI failure testing
+      if (input.chatMessage.content === "fail") {
         throw Error;
-      }
-
-      // use lodash to get the msHomeAccountid
-      const msHomeAccountId = get(
-        ctx.auth,
-        "sessionClaims.publicMetadata.microsoftHomeAccountId"
-      );
-
-      if (!msHomeAccountId) {
-        throw Error("Microsoft Account not authorized");
       }
 
       // get supplier email from chat object
       const chatParticipant = await ctx.db.chatParticipant.findFirst({
         where: {
-          chatId: input.chatId,
+          chatId: input.chatMessage.chatId,
           supplierId: {
             not: null
           }
@@ -231,63 +206,22 @@ export const chatRouter = createTRPCRouter({
         throw Error("Supplier email not found");
       }
 
-      // get last messageId that is not from current user
-      const lastForeignMessage = await ctx.db.message.findFirst({
-        where: {
-          chatId: input.chatId,
-          chatParticipantId: chatParticipant.id
-        },
-        orderBy: {
-          createdAt: "desc"
-        },
-        select: {
-          outlookMessageId: true,
-          conversationId: true
-        }
-      });
-      const lastForeignMessageId = lastForeignMessage?.outlookMessageId;
-
       try {
-        if (lastForeignMessageId) {
-          // existing thread
-          await replyEmailAsync(
-            msHomeAccountId,
-            input.content,
-            input.fileNames,
-            chatParticipant.supplier.email,
-            lastForeignMessageId
-          );
-
-          // Create a new message object in the database
-          await ctx.db.message.create({
-            data: {
-              chatId: input.chatId,
-              content: input.content,
-              chatParticipantId: input.chatParticipantId,
-              conversationId: lastForeignMessage.conversationId,
-              fileNames: input.fileNames
-            }
-          });
-        } else {
-          // new thread
-          const { newMessageId, conversationId } = await sendInitialEmail(
-            msHomeAccountId,
-            "Message from Soff Chat",
-            input.content,
-            input.fileNames,
-            chatParticipant.supplier.email
-          );
-          // Create a new message object in the database
-          await ctx.db.message.create({
-            data: {
-              chatId: input.chatId,
-              content: input.content,
-              chatParticipantId: input.chatParticipantId,
-              outlookMessageId: newMessageId,
-              conversationId: conversationId,
-              fileNames: input.fileNames
-            }
-          });
+        switch (input.emailProvider) {
+          case EmailProvider.OUTLOOK:
+            await sendOutlookAndCreateMessage(
+              ctx,
+              input.chatMessage,
+              chatParticipant.supplier.email
+            );
+            break;
+          case EmailProvider.GMAIL:
+            await sendGmailAndCreateMessage(
+              ctx,
+              input.chatMessage,
+              chatParticipant.supplier.email
+            );
+            break;
         }
       } catch (error) {
         throw new Error(`Failed to process request: ${String(error)}`);
