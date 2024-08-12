@@ -5,10 +5,10 @@ import { api } from "~/utils/api";
 import { Nav } from "./nav";
 import { Icons } from "../icons";
 import { cn } from "~/lib/utils";
-import { Logo } from "./Logo";
 import { Separator } from "../ui/separator";
 import { UserNav } from "./usernav";
 import { Button } from "../ui/button";
+import { LogoBlackNoBackground } from "./LogoBlackNoBackground";
 
 export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
@@ -33,7 +33,7 @@ export const PageLayout = (props: PropsWithChildren) => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="bg-sidebar flex h-screen">
       <aside
         className={cn(
           "flex flex-col justify-between border-r border-gray-200 transition-all duration-300 ease-in-out",
@@ -49,13 +49,10 @@ export const PageLayout = (props: PropsWithChildren) => {
               isCollapsed ? "justify-center" : "justify-between"
             )}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 px-2">
               <div className="flex-shrink-0">
-                <Logo />
+                <LogoBlackNoBackground />
               </div>
-              {!isCollapsed && (
-                <h3 className="text-3xl font-medium tracking-tight">Soff</h3>
-              )}
             </div>
             {!isCollapsed && isHovering && (
               <Button
