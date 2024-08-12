@@ -40,13 +40,15 @@ export function FileList({
             </div>
             <div className="ml-4 flex flex-wrap gap-2">
               {message.fileNames.map((fileName: string, index: number) => {
+                const messageId =
+                  message.outlookMessageId || message.gmailMessageId;
                 return (
                   <div key={index} className="mb-2">
                     <Attachment
                       chatId={message.chatId}
                       fileKey={
                         !isUserMessage
-                          ? `emailAttachments/${message.outlookMessageId}/${fileName}`
+                          ? `emailAttachments/${messageId}/${fileName}`
                           : `${fileName}`
                       }
                       isUserMessage={isUserMessage}

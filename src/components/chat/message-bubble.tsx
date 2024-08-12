@@ -16,6 +16,8 @@ export function MessageBubble({
   isUserMessage,
   supplierId
 }: MessageBubbleProps) {
+  const messageId = chatMessage.outlookMessageId || chatMessage.gmailMessageId;
+
   return (
     <div
       className={cn(
@@ -32,7 +34,7 @@ export function MessageBubble({
                 key={index}
                 fileKey={
                   !isUserMessage
-                    ? `emailAttachments/${chatMessage.outlookMessageId}/${fileName}`
+                    ? `emailAttachments/${messageId}/${fileName}`
                     : `${fileName}`
                 }
                 isUserMessage={isUserMessage}
