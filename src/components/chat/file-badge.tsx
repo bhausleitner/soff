@@ -37,7 +37,7 @@ export function FileBadge({
           >
             <Icons.download
               size={15}
-              className="text-gray-600 hover:text-blue-500"
+              className="hover:text-blue text-gray-600"
             />
           </div>
         ) : (
