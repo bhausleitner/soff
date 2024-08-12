@@ -199,7 +199,7 @@ export default function ChatBottombar({
   };
 
   return (
-    <div className="flex w-full items-center justify-between gap-2">
+    <div className="flex w-full items-center justify-between gap-2 pb-1 pr-2 pt-2">
       <div className="flex flex-col items-center">
         <Link
           href="#"
@@ -256,6 +256,7 @@ export default function ChatBottombar({
             name="textContent"
             placeholder="Aa"
             className="flex h-9 w-full resize-none items-center overflow-hidden rounded-full border bg-background"
+            disabled={isSending}
           ></Textarea>
 
           <div className="absolute bottom-0.5 right-2">
@@ -321,7 +322,13 @@ export default function ChatBottombar({
               )}
             </TooltipTrigger>
             <TooltipContent>
-              {uploading ? <p>Uploading files...</p> : <p>Click to send.</p>}
+              {uploading ? (
+                <p>Uploading files...</p>
+              ) : textContent.trim() ? (
+                <p>Click to send.</p>
+              ) : (
+                <p>Click for Thumbs Up!</p>
+              )}
             </TooltipContent>
           </Tooltip>
         )}

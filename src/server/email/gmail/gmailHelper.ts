@@ -122,7 +122,6 @@ export async function sendGmailAndCreateMessage(
       identifier: googleGrantId,
       requestBody: {
         to: [{ name: "Name", email: supplierEmail }],
-        replyTo: [{ name: "Name", email: supplierEmail }],
         subject: "Message from Soff API",
         body: inputChatMessage.content,
         replyToMessageId: lastForeignMessage?.gmailMessageId ?? undefined
