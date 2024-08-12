@@ -16,7 +16,7 @@ export function MessageBubble({
   isUserMessage,
   supplierId
 }: MessageBubbleProps) {
-  const messageId = chatMessage.outlookMessageId || chatMessage.gmailMessageId;
+  const messageId = chatMessage.outlookMessageId ?? chatMessage.gmailMessageId;
 
   return (
     <div
