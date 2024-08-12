@@ -21,7 +21,7 @@ export default function AuthenticationPage() {
         <div className="absolute inset-0 bg-zinc-900" />
         <div className="relative z-20 flex items-center gap-3 text-lg font-medium">
           <Logo />
-          <h2 className="text-3xl font-semibold tracking-tight">Soff</h2>
+          <h2 className="text-3xl font-semibold tracking-tight">soff</h2>
         </div>
       </div>
       <div className="flex h-full items-center justify-center p-4 lg:p-8">

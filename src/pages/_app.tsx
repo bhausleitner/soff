@@ -20,7 +20,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       >
         <TooltipProvider delayDuration={0}>
           <Head>
-            <title>Soff</title>
+            <title>soff</title>
             <meta
               name="description"
               content="Built somewhere inbetween Hayes & Glen Park"

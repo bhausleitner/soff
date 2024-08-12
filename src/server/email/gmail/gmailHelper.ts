@@ -1,5 +1,5 @@
 // tbd
-import { get, map } from "lodash";
+import { get } from "lodash";
 import Nylas, { type Message } from "nylas";
 import { type TRPCContext } from "~/server/api/trpc";
 import { getNonHashBaseUrl } from "~/server/email/outlook/outlookHelper";
