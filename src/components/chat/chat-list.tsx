@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { cn } from "~/lib/utils";
 import { type ChatMessage } from "~/server/api/routers/chat";
-import { map } from "lodash";
+import { map, orderBy } from "lodash";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageBubble } from "~/components/chat/message-bubble";
 
@@ -43,15 +43,17 @@ export function ChatList({
         if (scrollTop > maxScrollTop) {
           container.scrollTop = maxScrollTop;
         }
-      }, 100); // Adjust this timeout if needed
+      }, 100);
     }
   }, [chatMessages]);
+
+  const sortedMessages = orderBy(chatMessages, ["createdAt"], ["asc"]);
 
   return (
     <div className="h-full overflow-y-auto" ref={messagesContainerRef}>
       <div className="min-h-full">
         <AnimatePresence>
-          {map(chatMessages, (chatMessage, index) => {
+          {map(sortedMessages, (chatMessage, index) => {
             const isLastMessage = index === chatMessages.length - 1;
             return (
               <motion.div

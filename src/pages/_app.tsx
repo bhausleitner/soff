@@ -8,11 +8,13 @@ import AuthenticationPage from "~/components/layout/auth-landing";
 import { fontInter } from "~/constants/font";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import NextTopLoader from "nextjs-toploader";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
       <SpeedInsights />
+      <NextTopLoader color="#4261FE" showSpinner={false} />
       <ClerkProvider
         appearance={{
           elements: {
@@ -22,7 +24,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       >
         <TooltipProvider delayDuration={0}>
           <Head>
-            <title>soff</title>
+            <title>Soff</title>
             <meta
               name="description"
               content="Built somewhere inbetween Hayes & Glen Park"
