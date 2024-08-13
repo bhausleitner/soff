@@ -43,6 +43,7 @@
     "@trpc/react-query": "next",
     "@trpc/server": "next",
     "@types/lodash": "^4.17.4",
+    "@vercel/speed-insights": "^1.0.12",
     "aws-sdk": "^2.1664.0",
     "canvas": "^2.11.2",
     "class-variance-authority": "^0.7.0",
