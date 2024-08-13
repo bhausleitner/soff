@@ -51,10 +51,12 @@ function generateColumns<T extends { id: number }>(
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="checked:bg-blue"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
+          className="checked:bg-blue-500"
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
@@ -213,7 +215,7 @@ export function TableComponent<T extends { id: number }>({
                       key={cell.id}
                       className={cn(tableConfig.link && "cursor-pointer")}
                       onClick={async () => {
-                        if (tableConfig.link) {
+                        if (tableConfig.link && cell.column.id !== "select") {
                           await router.push(
                             `${tableConfig.link}/${row.original.id}`
                           );
