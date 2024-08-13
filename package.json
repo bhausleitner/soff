@@ -58,6 +58,7 @@
     "lucide-react": "^0.379.0",
     "next": "^14.2.1",
     "next-themes": "^0.3.0",
+    "nextjs-toploader": "^1.6.12",
     "nylas": "^7.5.2",
     "openai": "^4.53.2",
     "pdfjs-dist": "^3.11.174",

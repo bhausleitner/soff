@@ -5,11 +5,8 @@ import { api } from "~/utils/api";
 import { Nav } from "./nav";
 import { Icons } from "../icons";
 import { cn } from "~/lib/utils";
-import { Separator } from "../ui/separator";
 import { UserNav } from "./usernav";
 import { Button } from "../ui/button";
-import { LogoBlackNoBackground } from "./LogoBlackNoBackground";
-import { Logo } from "./Logo";
 import { LogoEdgy } from "./LogoEdgy";
 
 export const PageLayout = (props: PropsWithChildren) => {
@@ -38,7 +35,7 @@ export const PageLayout = (props: PropsWithChildren) => {
     <div className="flex h-screen">
       <aside
         className={cn(
-          "bg-sidebar flex flex-col justify-between transition-all duration-300 ease-in-out",
+          "bg-sidebar duration-400 flex flex-col justify-between transition-all ease-in-out",
           isCollapsed ? "w-20" : "w-50"
         )}
         onMouseEnter={() => setIsHovering(true)}
@@ -103,8 +100,8 @@ export const PageLayout = (props: PropsWithChildren) => {
           <UserNav isCollapsed={isCollapsed} />
         </div>
       </aside>
-      <main className="bg-sidebar flex flex-1 flex-col overflow-hidden p-4 pl-0 font-sans antialiased">
-        <div className="drop-shadow-s flex flex-1 flex-col rounded-xl bg-white drop-shadow-md">
+      <main className="bg-sidebar flex h-full flex-1 flex-col overflow-hidden p-4 pl-0 font-sans antialiased">
+        <div className="drop-shadow-s flex h-full flex-1 flex-col rounded-xl bg-white drop-shadow-md">
           <div className="flex-1 overflow-auto p-4">{props.children}</div>
         </div>
       </main>

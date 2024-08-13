@@ -42,12 +42,12 @@ export function UserNav({ isCollapsed }: UserNavProps) {
       <DropdownMenuTrigger asChild>
         <div
           className={cn(
-            "flex w-full flex-row justify-center p-3 hover:cursor-pointer hover:bg-accent",
+            "flex w-64 w-full flex-row justify-center p-5 hover:cursor-pointer hover:bg-accent",
             isCollapsed && "justify-center"
           )}
         >
           {isLoading ? (
-            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="bg-soff h-10 w-10 rounded-full" />
           ) : (
             <Avatar className={cn("h-10 w-10", !isCollapsed && "mr-3")}>
               <AvatarImage src={user?.imageUrl} alt={user?.username ?? ""} />
@@ -61,8 +61,8 @@ export function UserNav({ isCollapsed }: UserNavProps) {
               <div>
                 {isLoading ? (
                   <>
-                    <Skeleton className="mb-1 h-4 w-20" />
-                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="bg-soff mb-1 h-4 w-20" />
+                    <Skeleton className="bg-soff h-3 w-16" />
                   </>
                 ) : (
                   <>
