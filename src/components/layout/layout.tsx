@@ -9,6 +9,8 @@ import { Separator } from "../ui/separator";
 import { UserNav } from "./usernav";
 import { Button } from "../ui/button";
 import { LogoBlackNoBackground } from "./LogoBlackNoBackground";
+import { Logo } from "./Logo";
+import { LogoEdgy } from "./LogoEdgy";
 
 export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
@@ -33,11 +35,11 @@ export const PageLayout = (props: PropsWithChildren) => {
   };
 
   return (
-    <div className="bg-sidebar flex h-screen">
+    <div className="flex h-screen">
       <aside
         className={cn(
-          "flex flex-col justify-between border-r border-gray-200 transition-all duration-300 ease-in-out",
-          isCollapsed ? "w-20" : "w-60"
+          "bg-sidebar flex flex-col justify-between transition-all duration-300 ease-in-out",
+          isCollapsed ? "w-20" : "w-50"
         )}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
@@ -51,14 +53,17 @@ export const PageLayout = (props: PropsWithChildren) => {
           >
             <div className="flex items-center gap-3 px-2">
               <div className="flex-shrink-0">
-                <LogoBlackNoBackground />
+                <LogoEdgy />
               </div>
             </div>
             {!isCollapsed && isHovering && (
               <Button
-                variant="ghost"
+                variant="sidebar"
                 size="icon"
-                onClick={toggleSidebar}
+                onClick={() => {
+                  toggleSidebar();
+                  setIsHovering(false);
+                }}
                 className="ml-auto"
               >
                 <Icons.sidebarCollapse className="h-4 w-4" />
@@ -66,7 +71,7 @@ export const PageLayout = (props: PropsWithChildren) => {
             )}
             {isCollapsed && isHovering && (
               <Button
-                variant="ghost"
+                variant="sidebar"
                 size="icon"
                 onClick={toggleSidebar}
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform bg-accent"
@@ -95,12 +100,13 @@ export const PageLayout = (props: PropsWithChildren) => {
         </div>
 
         <div>
-          <Separator />
           <UserNav isCollapsed={isCollapsed} />
         </div>
       </aside>
-      <main className="flex-1 overflow-hidden px-5 pb-3 pt-5 font-sans antialiased">
-        {props.children}
+      <main className="bg-sidebar flex flex-1 flex-col overflow-hidden p-4 pl-0 font-sans antialiased">
+        <div className="drop-shadow-s flex flex-1 flex-col rounded-xl bg-white drop-shadow-md">
+          <div className="flex-1 overflow-auto p-4">{props.children}</div>
+        </div>
       </main>
       <Toaster position="bottom-right" richColors={true} theme="light" />
     </div>
