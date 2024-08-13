@@ -7,10 +7,12 @@ import { PageLayout } from "~/components/layout/layout";
 import AuthenticationPage from "~/components/layout/auth-landing";
 import { fontInter } from "~/constants/font";
 import { TooltipProvider } from "~/components/ui/tooltip";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
+      <SpeedInsights />
       <ClerkProvider
         appearance={{
           elements: {
