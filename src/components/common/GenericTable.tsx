@@ -13,13 +13,15 @@ interface GenericTableProps<T, TQueryArgs = void> {
   queryArgs: TQueryArgs;
   maxSize?: number;
   refetchTrigger?: boolean;
+  handleSelectedRowIdsChange?: (checked: number[]) => void;
 }
 
 export function GenericTable<T extends { id: number }, TQueryArgs>({
   tableConfig,
   useQueryHook,
   queryArgs,
-  refetchTrigger = false
+  refetchTrigger = false,
+  handleSelectedRowIdsChange
 }: GenericTableProps<T, TQueryArgs>) {
   const { data, isLoading, refetch } = useQueryHook(queryArgs);
 
@@ -35,7 +37,11 @@ export function GenericTable<T extends { id: number }, TQueryArgs>({
       {isLoading ? (
         <Spinner />
       ) : (
-        <TableComponent tableConfig={tableConfig} data={data ?? []} />
+        <TableComponent
+          tableConfig={tableConfig}
+          data={data ?? []}
+          onSelectedRowIdsChange={handleSelectedRowIdsChange}
+        />
       )}
     </>
   );
