@@ -14,6 +14,9 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
 import { QuoteHistory } from "~/components/quote-detail/quote-history";
+import { Dialog, DialogTrigger } from "~/components/ui/dialog";
+import { useFileHandling } from "~/hooks/use-file-handling";
+import { FilePreviewDialog } from "~/components/common/FilePreviewDialog";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -22,6 +25,15 @@ const QuotePage = () => {
   const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
     null
   );
+
+  const {
+    isOpen,
+    setIsOpen,
+    isDownloading,
+    handleDownload,
+    handleClose,
+    handleOpen
+  } = useFileHandling();
 
   const purchaseOrderMutation = api.quote.createPurchaseOrder.useMutation();
 
@@ -86,13 +98,30 @@ const QuotePage = () => {
               onClick={() => router.push(`/rfq/${quoteData.chatId}`)}
             >
               <Icons.messageCircleMore className="mr-2 h-4 w-4" />
-              Show Chat
+              View Chat
             </Button>
           )}
 
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" onClick={handleOpen}>
+                <Icons.fileText className="mr-2 h-4 w-4" />
+                View PDF
+              </Button>
+            </DialogTrigger>
+            <FilePreviewDialog
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              fileKey={quoteData.fileKey}
+              isDownloading={isDownloading}
+              handleDownload={handleDownload}
+              handleClose={handleClose}
+            />
+          </Dialog>
+
           {!erpPurchaseOrderId && (
             <Button
-              variant="blue"
+              variant="soff"
               className="w-36"
               onClick={() => handleAddToOdoo()}
               disabled={isCreatingPO}

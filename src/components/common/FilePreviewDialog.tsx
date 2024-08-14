@@ -67,7 +67,9 @@ export function FilePreviewDialog({
             )}
           </Button>
           {additionalButtons}
-          <Button onClick={handleClose}>Close</Button>
+          <Button variant="soff" onClick={handleClose}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

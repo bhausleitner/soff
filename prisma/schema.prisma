@@ -117,6 +117,7 @@ model Quote {
   chat               Chat?       @relation(fields: [chatId], references: [id])
   version            Int         @default(1)
   isActive           Boolean     @default(true)
+  fileKey            String?
 
   @@index([status])
   @@index([supplierId])
