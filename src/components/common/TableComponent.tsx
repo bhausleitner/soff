@@ -34,6 +34,17 @@ import { type TableProps } from "~/types/tableTypes";
 import { useRouter } from "next/router";
 import { cn } from "~/lib/utils";
 import { Badge } from "../ui/badge";
+import { type Status, type QuoteStatus } from "@prisma/client";
+
+const statusClassMap: Record<QuoteStatus | Status, string> = {
+  ACTIVE: "bg-green-500",
+  INACTIVE: "bg-gray-500",
+  ONBOARDING: "bg-yellow-500",
+  RECEIVED: "bg-yellow-500",
+  WAITING: "bg-gray-500",
+  CONFIRMED: "bg-green-500",
+  REJECTED: "bg-red-500"
+};
 
 function generateColumns<T extends { id: number }>(
   config: TableProps<T>["tableConfig"]
@@ -83,13 +94,16 @@ function generateColumns<T extends { id: number }>(
           col.header
         ),
       cell: ({ row }) => {
+        const accessorKey: string = row.getValue(col.accessorKey);
         if (col.cell) {
           return col.cell(row);
         }
         if (col.isBadge) {
           return (
             <Badge
-              className={` ${row.getValue(col.accessorKey) === "ACTIVE" ? "bg-green-500" : ""} ${row.getValue(col.accessorKey) === "INACTIVE" ? "bg-gray-500" : ""} ${row.getValue(col.accessorKey) === "ONBOARDING" ? "bg-yellow-500" : ""} `}
+              className={cn(
+                statusClassMap[accessorKey as keyof typeof statusClassMap]
+              )}
             >
               {row.getValue(col.accessorKey)}
             </Badge>
