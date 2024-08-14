@@ -99,8 +99,7 @@ export const quoteRouter = createTRPCRouter({
                 }
               }
             }
-          },
-          lineItems: true // Include line items if needed
+          }
         }
       });
 
@@ -230,7 +229,8 @@ export const quoteRouter = createTRPCRouter({
               version: existingQuote.version + 1,
               price: parsedData.totalPrice,
               status: QuoteStatus.RECEIVED,
-              erpPurchaseOrderId: existingQuote.erpPurchaseOrderId
+              erpPurchaseOrderId: existingQuote.erpPurchaseOrderId,
+              fileKey: input.fileKey
             }
           });
 
@@ -254,7 +254,8 @@ export const quoteRouter = createTRPCRouter({
               chatId: input.chatId,
               supplierId: input.supplierId,
               price: parsedData.totalPrice,
-              status: QuoteStatus.RECEIVED
+              status: QuoteStatus.RECEIVED,
+              fileKey: input.fileKey
             }
           });
 

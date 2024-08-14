@@ -95,7 +95,12 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
             )}
           </div>
         </Button>
-        <Button type="submit" disabled={!isNDAGenerated} className="w-fit">
+        <Button
+          variant="soff"
+          type="submit"
+          disabled={!isNDAGenerated}
+          className="w-fit"
+        >
           Send NDA
         </Button>
       </div>
