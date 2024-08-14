@@ -55,10 +55,10 @@ export const quoteTableConfig = {
       accessorKey: "id",
       sortable: true
     },
+    { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
     { header: "Part ID", accessorKey: "partId", sortable: true },
     { header: "Quantity", accessorKey: "quantity", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true },
-    { header: "Status", accessorKey: "status", sortable: true }
+    { header: "Price", accessorKey: "price", sortable: true }
   ]
 };
 
