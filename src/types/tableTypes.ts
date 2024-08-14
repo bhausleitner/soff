@@ -18,4 +18,5 @@ export interface TableConfig {
 export interface TableProps<T extends { id: number }> {
   tableConfig: TableConfig;
   data: T[];
+  onSelectedRowIdsChange?: (checked: number[]) => void;
 }

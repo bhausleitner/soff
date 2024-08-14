@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -120,7 +120,8 @@ function generateColumns<T extends { id: number }>(
 
 export function TableComponent<T extends { id: number }>({
   tableConfig,
-  data
+  data,
+  onSelectedRowIdsChange
 }: TableProps<T>) {
   const columns = generateColumns(tableConfig);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -128,6 +129,16 @@ export function TableComponent<T extends { id: number }>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const router = useRouter();
+
+  // if the parent component wants to access the selected row ids -> pass it up
+  useEffect(() => {
+    if (onSelectedRowIdsChange) {
+      onSelectedRowIdsChange(
+        table.getSelectedRowModel().rows.map((row) => row.original.id)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection]);
 
   const table = useReactTable({
     data: data,
