@@ -48,6 +48,8 @@ model MsalTokenCache {
   cache     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
 }
 
 model Post {
@@ -57,6 +59,7 @@ model Post {
   updatedAt DateTime @updatedAt
 
   @@index([name])
+  @@index([createdAt])
 }
 
 model Supplier {
@@ -75,21 +78,26 @@ model Supplier {
   chatParticipants ChatParticipant[]
   organizationId   Int?
   organization     Organization?     @relation(fields: [organizationId], references: [id])
+  requestForQuotes RequestForQuote[]
 
   @@index([name])
   @@index([organizationId])
   @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Part {
-  id         Int            @id @default(autoincrement())
-  partNumber String?
-  partName   String
-  cadFile    String?
-  suppliers  SupplierPart[]
-  lineItems  LineItem[]
+  id               Int               @id @default(autoincrement())
+  partNumber       String?
+  partName         String
+  cadFile          String?
+  suppliers        SupplierPart[]
+  lineItems        LineItem[]
+  requestForQuotes RequestForQuote[]
 
   @@index([partName])
+  @@index([partNumber])
 }
 
 model SupplierPart {
@@ -99,6 +107,8 @@ model SupplierPart {
   partId     Int
 
   @@id([supplierId, partId])
+  @@index([supplierId])
+  @@index([partId])
 }
 
 model Quote {
@@ -121,6 +131,22 @@ model Quote {
 
   @@index([status])
   @@index([supplierId])
+  @@index([createdAt])
+  @@index([isActive])
+}
+
+model RequestForQuote {
+  id             Int          @id @default(autoincrement())
+  parts          Part[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  suppliers      Supplier[]
+  chats          Chat[]
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([createdAt])
 }
 
 model QuoteComparison {
@@ -128,6 +154,8 @@ model QuoteComparison {
   quoteIds  Int[]
   data      Json
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 model LineItem {
@@ -157,20 +185,25 @@ model Order {
 
   @@index([status])
   @@index([quoteId])
+  @@index([orderDate])
+  @@index([deliveryDate])
 }
 
 model Organization {
-  id            Int            @id @default(autoincrement())
-  name          String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  emailProvider EmailProvider?
-  erpUrl        String?
-  erp           Erp?
-  suppliers     Supplier[]
-  users         User[]
+  id               Int               @id @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  emailProvider    EmailProvider?
+  erpUrl           String?
+  erp              Erp?
+  suppliers        Supplier[]
+  users            User[]
+  requestForQuotes RequestForQuote[]
 
   @@index([name])
+  @@index([emailProvider])
+  @@index([erp])
 }
 
 model User {
@@ -185,15 +218,21 @@ model User {
 
   @@index([email])
   @@index([organizationId])
+  @@index([clerkUserId])
 }
 
 model Chat {
-  id               Int               @id @default(autoincrement())
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  messages         Message[]
-  chatParticipants ChatParticipant[]
-  quotes           Quote[]
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  messages          Message[]
+  chatParticipants  ChatParticipant[]
+  quotes            Quote[]
+  requestForQuote   RequestForQuote?  @relation(fields: [requestForQuoteId], references: [id])
+  requestForQuoteId Int?
+
+  @@index([requestForQuoteId])
+  @@index([createdAt])
 }
 
 model Message {
@@ -212,6 +251,8 @@ model Message {
 
   @@index([chatId])
   @@index([chatParticipantId])
+  @@index([createdAt])
+  @@index([conversationId])
 }
 
 model ChatParticipant {

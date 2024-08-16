@@ -17,7 +17,6 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { cn } from "~/lib/utils";
-import { useEffect } from "react";
 
 interface UserNavProps {
   isCollapsed: boolean;
