@@ -17,13 +17,14 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { cn } from "~/lib/utils";
+import { useEffect } from "react";
 
 interface UserNavProps {
   isCollapsed: boolean;
 }
 
 export function UserNav({ isCollapsed }: UserNavProps) {
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { user, isLoaded: isUserLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const { signOut } = useClerk();
 
@@ -33,8 +34,12 @@ export function UserNav({ isCollapsed }: UserNavProps) {
   const googleAuthUrlMutation = api.chat.requestGoogleAuthUrl.useMutation();
 
   const { data: orgResponse, isLoading: isOrgLoading } =
-    api.user.getOrganization.useQuery();
+    api.user.getOrganization.useQuery(undefined, {
+      enabled: isUserLoaded && isSignedIn && !user.publicMetadata.organization
+    });
 
+  const organization =
+    (user?.publicMetadata.organization as string) || orgResponse?.name;
   const isLoading = !isUserLoaded || isOrgLoading;
 
   return (
@@ -47,7 +52,7 @@ export function UserNav({ isCollapsed }: UserNavProps) {
           )}
         >
           {isLoading ? (
-            <Skeleton className="bg-soff h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full bg-soff" />
           ) : (
             <Avatar className={cn("h-10 w-10", !isCollapsed && "mr-3")}>
               <AvatarImage src={user?.imageUrl} alt={user?.username ?? ""} />
@@ -61,13 +66,13 @@ export function UserNav({ isCollapsed }: UserNavProps) {
               <div>
                 {isLoading ? (
                   <>
-                    <Skeleton className="bg-soff mb-1 h-4 w-20" />
-                    <Skeleton className="bg-soff h-3 w-16" />
+                    <Skeleton className="mb-1 h-4 w-20 bg-soff" />
+                    <Skeleton className="h-3 w-16 bg-soff" />
                   </>
                 ) : (
                   <>
                     <p className="text-sm font-medium">{user?.firstName}</p>
-                    <p className="text-xs text-gray-500">{orgResponse?.name}</p>
+                    <p className="text-xs text-gray-500">{organization}</p>
                   </>
                 )}
               </div>

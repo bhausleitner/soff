@@ -18,6 +18,12 @@ export const userRouter = createTRPCRouter({
       }
     });
 
+    await clerkClient?.users.updateUserMetadata(ctx.auth.userId!, {
+      publicMetadata: {
+        organization: user?.organization?.name ?? "unknown"
+      }
+    });
+
     return { name: user?.organization?.name ?? "unknown" };
   }),
   upsertUser: publicProcedure
