@@ -40,11 +40,6 @@ export async function reconcileAndCompareQuotes(
     ]
   });
 
-  console.log("inputPrompt");
-  console.log(inputPrompt);
-  console.log("`${JSON.stringify(quotes)}`");
-  console.log(`${JSON.stringify(quotes)}`);
-
   const responseString = response.choices[0]?.message.content;
   const jsonRegex = /```json\n([\s\S]*?)\n```/;
   const match = responseString?.match(jsonRegex);
