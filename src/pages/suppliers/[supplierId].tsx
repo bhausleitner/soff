@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { SupplierInfo } from "~/components/supplier-detail/SupplierInfo";
 import { SupplierTabs } from "~/components/supplier-detail/SupplierTabs";
 import { api } from "~/utils/api";
-import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import Spinner from "~/components/spinner";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 const SupplierPage = () => {
   const router = useRouter();
@@ -38,7 +38,12 @@ const SupplierPage = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <SupplierBreadcrumb name={data.name} />
+        <BreadCrumbWrapper
+          items={[
+            { label: "Suppliers", href: "/suppliers" },
+            { label: data.name, href: `/suppliers/${data.id}` }
+          ]}
+        />
         <div className="flex items-center">
           <Button
             className="w-32"
@@ -50,7 +55,7 @@ const SupplierPage = () => {
                 supplierId: data.id
               });
 
-              await router.push(`/rfq/${chatId}`);
+              await router.push(`/chat/${chatId}`);
               setIsCreatingRFQ(false);
             }}
             disabled={isCreatingRFQ}
