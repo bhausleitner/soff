@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import Spinner from "~/components/spinner";
-import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import { QuoteInfo } from "~/components/quote-detail/QuoteInfo";
 import {
   quoteLineItemTableConfig,
@@ -17,6 +16,7 @@ import { QuoteHistory } from "~/components/quote-detail/quote-history";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { useFileHandling } from "~/hooks/use-file-handling";
 import { FilePreviewDialog } from "~/components/common/FilePreviewDialog";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -86,7 +86,12 @@ const QuotePage = () => {
   return (
     <div>
       <div className="flex items-center justify-between pb-4">
-        <QuoteBreadcrumb quoteIds={[quoteId]} />
+        <BreadCrumbWrapper
+          items={[
+            { label: "Quotes", href: "/quotes" },
+            { label: `Quote #${quoteId}`, href: `/quotes/${quoteId}` }
+          ]}
+        />
         <div className="flex items-center space-x-4">
           <QuoteHistory
             currentVersion={quoteData.version}
@@ -95,7 +100,7 @@ const QuotePage = () => {
           {quoteData.chatId && (
             <Button
               variant="outline"
-              onClick={() => router.push(`/rfq/${quoteData.chatId}`)}
+              onClick={() => router.push(`/chat/${quoteData.chatId}`)}
             >
               <Icons.messageCircleMore className="mr-2 h-4 w-4" />
               View Chat

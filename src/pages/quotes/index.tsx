@@ -1,4 +1,3 @@
-import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import { GenericTable } from "~/components/common/GenericTable";
 import { type Quote } from "~/server/api/routers/quote";
 import { quoteTableConfig, useGetAllQuotes } from "~/constants/tableConfigs";
@@ -12,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 export default function Quote() {
   const user = useUser();
@@ -29,7 +29,7 @@ export default function Quote() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between pb-4">
-        <QuoteBreadcrumb />
+        <BreadCrumbWrapper items={[{ label: "Quotes", href: "/quotes" }]} />
         <Tooltip>
           <TooltipTrigger asChild>
             <span>

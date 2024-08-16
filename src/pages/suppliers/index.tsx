@@ -1,4 +1,3 @@
-import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { GenericTable } from "~/components/common/GenericTable";
 import { SupplierModal } from "~/components/supplier/SupplierModal";
 import { type Supplier } from "~/server/api/routers/supplier";
@@ -10,6 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import { useState } from "react";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 export default function Supplier() {
   const user = useUser();
@@ -25,7 +25,9 @@ export default function Supplier() {
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <SupplierBreadcrumb />
+          <BreadCrumbWrapper
+            items={[{ label: "Suppliers", href: "/suppliers" }]}
+          />
           <Button onClick={() => setIsModalOpen(true)} variant="blue">
             Add Supplier
             <Icons.add className="ml-2 h-4 w-4" />

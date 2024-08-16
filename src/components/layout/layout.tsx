@@ -84,13 +84,19 @@ export const PageLayout = (props: PropsWithChildren) => {
                 title: "Suppliers",
                 href: "/suppliers",
                 icon: Icons.suppliers,
-                subpages: ["rfq", "suppliers"]
+                subpages: ["chat", "suppliers"]
               },
               {
                 title: "Quotes",
                 href: "/quotes",
                 icon: Icons.quotes,
                 subpages: ["quotes"]
+              },
+              {
+                title: "RFQs",
+                href: "/rfqs",
+                icon: Icons.package,
+                subpages: ["rfqs"]
               }
             ]}
           />

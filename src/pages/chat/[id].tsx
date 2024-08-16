@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { find, get } from "lodash";
-import { SupplierBreadcrumb } from "~/components/supplier-detail/SupplierBreadcrumb";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import Spinner from "~/components/spinner";
 import { ChatMetadata } from "~/components/chat/chat-metadata";
@@ -22,6 +21,7 @@ import {
   TooltipTrigger
 } from "~/components/ui/tooltip";
 import { EmailProvider } from "@prisma/client";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 export default function Exchange() {
   const router = useRouter();
@@ -73,11 +73,12 @@ export default function Exchange() {
     <div className="flex h-full flex-col">
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <SupplierBreadcrumb
-            name={supplier.name}
-            supplierId={supplier.id}
-            rfq={true}
-            chatId={chatId}
+          <BreadCrumbWrapper
+            items={[
+              { label: "Suppliers", href: "/suppliers" },
+              { label: supplier.name, href: `/suppliers/${supplier.id}` },
+              { label: `Chat #${chatId}`, href: `/chat/${chatId}` }
+            ]}
           />
           <Tooltip>
             <TooltipTrigger>

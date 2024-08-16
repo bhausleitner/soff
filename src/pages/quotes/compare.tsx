@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { QuoteBreadcrumb } from "~/components/quote-detail/QuoteBreadcrumb";
 import CompareHeader from "./compare-header";
 import { api } from "~/utils/api";
 import {
@@ -13,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import Spinner from "~/components/spinner";
 import { type QuoteComparison } from "~/utils/quote-helper";
 import { Separator } from "~/components/ui/separator";
+import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 export default function Compare() {
   const router = useRouter();
@@ -42,7 +42,18 @@ export default function Compare() {
       {/* Header section */}
       <div className="flex-shrink-0">
         <div className="flex items-center justify-between pb-4">
-          <QuoteBreadcrumb quoteIds={idArray} />
+          <BreadCrumbWrapper
+            items={[
+              {
+                label: "Quotes",
+                href: "/quotes"
+              },
+              {
+                label: `Compare #${idArray.join(" vs. #")}`,
+                href: `/quotes/compare?ids=${idArray.join(",")}`
+              }
+            ]}
+          />
         </div>
         {!isMetaDataLoading && (
           <div
