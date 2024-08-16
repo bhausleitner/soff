@@ -20,6 +20,7 @@ const PROMPT_OUTPUT_FORMAT: QuoteComparison[] = [
 export async function reconcileAndCompareQuotes(
   quotes: Pick<Quote, "id">[]
 ): Promise<QuoteComparison[]> {
+  const inputPrompt = `I want to compare these quotes. Reconcile the line-items. The output format should be: ${JSON.stringify(PROMPT_OUTPUT_FORMAT)}`;
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -28,7 +29,7 @@ export async function reconcileAndCompareQuotes(
         content: [
           {
             type: "text",
-            text: `I want to compare these quotes. Reconcile the line-items. The output format should be: ${JSON.stringify(PROMPT_OUTPUT_FORMAT)}`
+            text: inputPrompt
           },
           {
             type: "text",
@@ -39,12 +40,17 @@ export async function reconcileAndCompareQuotes(
     ]
   });
 
+  console.log("inputPrompt");
+  console.log(inputPrompt);
+  console.log("`${JSON.stringify(quotes)}`");
+  console.log(`${JSON.stringify(quotes)}`);
+
   const responseString = response.choices[0]?.message.content;
   const jsonRegex = /```json\n([\s\S]*?)\n```/;
   const match = responseString?.match(jsonRegex);
 
   if (!match?.[1]) {
-    throw new Error("No JSON data found");
+    throw new Error("No JSON data found", { cause: responseString });
   }
 
   const parsedData = JSON.parse(match[1]) as QuoteComparison[];

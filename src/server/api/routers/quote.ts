@@ -176,9 +176,6 @@ export const quoteRouter = createTRPCRouter({
         }
       });
 
-      // wait for 5 seconds
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
       // if quotecomparison does not exist
       const existingQuoteComparison = await ctx.db.quoteComparison.findFirst({
         where: { quoteIds: { equals: input } }

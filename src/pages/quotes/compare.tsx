@@ -126,7 +126,7 @@ export default function Compare() {
                                   onMouseEnter={(e) => e.currentTarget.click()}
                                   onMouseLeave={(e) => e.currentTarget.click()}
                                 >
-                                  <DiffBadge number={12} />
+                                  {/* <DiffBadge number={12} /> */}
                                   <span className="text-heading-3 font-heading-3 text-default-font text-right">
                                     {formatCurrency(
                                       quote.price / quote.quantity
@@ -169,31 +169,34 @@ export default function Compare() {
           </div>
         </div>
       )}
-      {/* separator that goes across the entier width of the page */}
-      <div className="flex-shrink-0 pb-4">
-        <Separator className="w-full" />
-      </div>
-      <div className="flex-shrink-0">
-        <div
-          className={`grid grid-cols-${columnCount} gap-4`}
-          style={{
-            gridTemplateColumns: `repeat(${columnCount}, minmax(150px, 1fr))`
-          }}
-        >
-          <div className="col-span-1 p-2 font-bold">
-            <span className="text-caption-bold font-caption-bold text-subtext-color text-s">
-              Total
-            </span>
+      {!isMetaDataLoading && (
+        <>
+          <div className="flex-shrink-0 pb-4">
+            <Separator className="w-full" />
           </div>
-          {quotesMetaData?.map((quote, index) => (
-            <div key={index} className="flex items-center justify-end px-2">
-              <span className="text-heading-3 font-heading-3 text-default-font text-right font-bold">
-                {formatCurrency(quote.price)}
-              </span>
+          <div className="flex-shrink-0">
+            <div
+              className={`grid grid-cols-${columnCount} gap-4`}
+              style={{
+                gridTemplateColumns: `repeat(${columnCount}, minmax(150px, 1fr))`
+              }}
+            >
+              <div className="col-span-1 p-2 font-bold">
+                <span className="text-caption-bold font-caption-bold text-subtext-color text-s">
+                  Total
+                </span>
+              </div>
+              {quotesMetaData?.map((quote, index) => (
+                <div key={index} className="flex items-center justify-end px-2">
+                  <span className="text-heading-3 font-heading-3 text-default-font text-right font-bold">
+                    {formatCurrency(quote.price)}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
