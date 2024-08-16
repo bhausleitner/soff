@@ -6,6 +6,10 @@ import openai from "~/server/openai/config";
 import { getFileFromS3 } from "~/server/s3/utils";
 import { convertPdfToImage } from "~/server/openai/utils";
 import * as odooUtils from "~/server/odoo/utils";
+import {
+  type QuoteComparison,
+  reconcileAndCompareQuotes
+} from "~/utils/quote-helper";
 
 export const lineItemSchema = z.object({
   id: z.number(),
@@ -135,6 +139,68 @@ export const quoteRouter = createTRPCRouter({
           isActive: q.isActive
         }))
       };
+    }),
+  getQuoteHeadersByIds: publicProcedure
+    .input(z.array(z.number()))
+    .query(async ({ ctx, input }) => {
+      const quotes = await ctx.db.quote.findMany({
+        where: { id: { in: input } },
+        select: {
+          id: true,
+          fileKey: true,
+          price: true,
+          supplier: {
+            select: {
+              name: true
+            }
+          }
+        }
+      });
+
+      return quotes;
+    }),
+  getQuoteComparison: publicProcedure
+    .input(z.array(z.number()))
+    .query(async ({ ctx, input }) => {
+      const quotes = await ctx.db.quote.findMany({
+        where: { id: { in: input } },
+        select: {
+          id: true,
+          lineItems: {
+            select: {
+              description: true,
+              price: true,
+              quantity: true
+            }
+          }
+        }
+      });
+
+      // wait for 5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      // if quotecomparison does not exist
+      const existingQuoteComparison = await ctx.db.quoteComparison.findFirst({
+        where: { quoteIds: { equals: input } }
+      });
+
+      if (existingQuoteComparison) {
+        return JSON.parse(
+          existingQuoteComparison.data as string
+        ) as QuoteComparison[];
+      }
+
+      const newQuoteComparison: QuoteComparison[] =
+        await reconcileAndCompareQuotes(quotes);
+
+      await ctx.db.quoteComparison.create({
+        data: {
+          quoteIds: input,
+          data: JSON.stringify(newQuoteComparison)
+        }
+      });
+
+      return newQuoteComparison;
     }),
   getLineItemsByQuoteId: publicProcedure
     .input(quoteIdSchema)

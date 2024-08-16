@@ -86,7 +86,7 @@ const QuotePage = () => {
   return (
     <div>
       <div className="flex items-center justify-between pb-4">
-        <QuoteBreadcrumb quoteId={quoteId} />
+        <QuoteBreadcrumb quoteIds={[quoteId]} />
         <div className="flex items-center space-x-4">
           <QuoteHistory
             currentVersion={quoteData.version}

@@ -83,7 +83,7 @@ model Supplier {
 
 model Part {
   id         Int            @id @default(autoincrement())
-  partNumber String?        
+  partNumber String?
   partName   String
   cadFile    String?
   suppliers  SupplierPart[]
@@ -121,6 +121,13 @@ model Quote {
 
   @@index([status])
   @@index([supplierId])
+}
+
+model QuoteComparison {
+  id        Int      @id @default(autoincrement())
+  quoteIds  Int[]
+  data      Json
+  createdAt DateTime @default(now())
 }
 
 model LineItem {
@@ -199,7 +206,7 @@ model Message {
   chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
   chatParticipantId Int
   outlookMessageId  String?
-  gmailMessageId  String?
+  gmailMessageId    String?
   conversationId    String
   fileNames         String[]
 

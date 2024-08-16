@@ -9,10 +9,10 @@ import {
 } from "~/components/ui/breadcrumb";
 
 interface QuoteBreadcrumbProps {
-  quoteId?: number;
+  quoteIds?: number[];
 }
 
-export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
+export function QuoteBreadcrumb({ quoteIds }: QuoteBreadcrumbProps) {
   return (
     <div className="mt-5">
       <Breadcrumb>
@@ -22,17 +22,21 @@ export function QuoteBreadcrumb({ quoteId }: QuoteBreadcrumbProps) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            {quoteId ? (
+            {quoteIds ? (
               <BreadcrumbLink href="/quotes">Quotes</BreadcrumbLink>
             ) : (
               <BreadcrumbPage>Quotes</BreadcrumbPage>
             )}
           </BreadcrumbItem>
-          {quoteId && (
+          {quoteIds && quoteIds.length > 0 && (
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Quote #{quoteId}</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {quoteIds.length === 1
+                    ? `Quote #${quoteIds[0]}`
+                    : `Compare ${quoteIds.map((id) => `${id}`).join(" v. ")}`}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </>
           )}
