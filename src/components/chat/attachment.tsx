@@ -65,8 +65,8 @@ export function Attachment({
         <Icons.loaderCircle className="h-4 w-4 animate-spin" />
       ) : (
         <>
+          <Icons.sparkles className="mr-2 h-4 w-4" />
           Parse Quote
-          <Icons.sparkles className="ml-2 h-4 w-4" />
         </>
       )}
     </Button>
