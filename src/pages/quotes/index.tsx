@@ -42,7 +42,7 @@ export default function Quote() {
                   );
                 }}
               >
-                <Icons.scale className="mr-2 h-4 w-4" />
+                <Icons.sparkles className="mr-2 h-4 w-4" />
                 Compare Quotes
               </Button>
             </span>
