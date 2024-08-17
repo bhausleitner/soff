@@ -14,3 +14,8 @@ export function formatCurrency(amount: number): string {
   // Combine the parts and return with a dollar sign
   return `$${formattedIntegerPart}.${decimalPart}`;
 }
+
+export function convertToHtml(plainText: string): string {
+  // Replace line breaks with <br> tags
+  return plainText.replace(/\n/g, "<br>");
+}

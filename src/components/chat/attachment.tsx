@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { FileBadge } from "~/components/chat/file-badge";
@@ -15,6 +15,15 @@ interface AttachmentProps {
   supplierId: number;
   chatId: number;
 }
+
+// Create a forwarded ref version of FileBadge
+const ForwardedFileBadge = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<typeof FileBadge>
+>((props, ref) => <FileBadge {...props} ref={ref} />);
+
+// Add display name for better debugging
+ForwardedFileBadge.displayName = "ForwardedFileBadge";
 
 export function Attachment({
   chatId,
@@ -74,8 +83,8 @@ export function Attachment({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild className="mt-2">
-        <FileBadge
+      <DialogTrigger asChild>
+        <ForwardedFileBadge
           fileName={fileName}
           handleOpen={handleOpen}
           handleDownload={() => handleDownload(fileKey)}

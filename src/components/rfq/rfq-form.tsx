@@ -21,6 +21,7 @@ import {
 import MultipleSelector, { type Option } from "~/components/ui/multi-select";
 import { api } from "~/utils/api";
 import { Icons } from "../icons";
+import type { ChatMessage } from "~/server/api/routers/chat";
 
 import { type RfqLineItem } from "@prisma/client";
 
@@ -59,6 +60,7 @@ export function RFQFormDialog({
   const [emailBody, setEmailBody] = useState<string>("");
   const emailBodyRef = useRef<HTMLTextAreaElement>(null);
   const rfqMutation = api.rfq.createRequestForQuote.useMutation();
+  const sendMessage = api.chat.sendEmail.useMutation();
 
   // s3 file handling
   const getUploadUrlMutation = api.s3.generateUploadUrl.useMutation();
@@ -68,6 +70,9 @@ export function RFQFormDialog({
   const { data: supplierData } = api.supplier.getAllSuppliers.useQuery({
     clerkUserId
   });
+
+  // Fetch Email Provider
+  const { data: emailProvider } = api.user.getEmailProvider.useQuery();
 
   // Convert supplier data to options for MultipleSelector
   const supplierOptions: Option[] = supplierData
@@ -261,25 +266,44 @@ export function RFQFormDialog({
       alert("Please select at least one supplier.");
       return;
     }
-    console.log("Sending RFQs", {
-      parts: validParts,
-      suppliers: selectedSuppliers,
-      emailSubject,
-      emailBody
-    });
 
     // create RFQ
-    await rfqMutation.mutateAsync({
-      supplierIds: selectedSuppliers.map((supplier) =>
-        parseInt(supplier.value)
-      ),
-      messageBody: emailBody,
-      rfqLineItems: validParts.map((part) => ({
-        description: part.description!,
-        quantity: part.quantity!,
-        fileNames: part.files.map((file) => file.fileKey).filter(Boolean)
-      }))
-    });
+    const { userChatParticipantToSupplierMap, chatToSupplierMap } =
+      await rfqMutation.mutateAsync({
+        supplierIds: selectedSuppliers.map((supplier) =>
+          parseInt(supplier.value)
+        ),
+        messageBody: emailBody,
+        rfqLineItems: validParts.map((part) => ({
+          description: part.description!,
+          quantity: part.quantity!,
+          fileNames: part.files.map((file) => file.fileKey).filter(Boolean)
+        }))
+      });
+
+    // send message to each selected suppliers
+    await Promise.all(
+      selectedSuppliers.map(async (supplier) => {
+        const newChatMessage: ChatMessage = {
+          id: 0,
+          chatId: chatToSupplierMap[parseInt(supplier.value)]!,
+          content: emailBody,
+          fileNames: validParts
+            .map((part) => part.files.map((file) => file.fileKey))
+            .flat()
+            .filter(Boolean),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          chatParticipantId:
+            userChatParticipantToSupplierMap[parseInt(supplier.value)]!
+        };
+
+        return sendMessage.mutateAsync({
+          chatMessage: newChatMessage,
+          emailProvider: emailProvider!
+        });
+      })
+    );
 
     refetchTrigger();
     setSendingRFQ(false);

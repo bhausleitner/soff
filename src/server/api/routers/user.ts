@@ -26,6 +26,19 @@ export const userRouter = createTRPCRouter({
 
     return { name: user?.organization?.name ?? "unknown" };
   }),
+  getEmailProvider: publicProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findFirst({
+      where: { clerkUserId: ctx.auth.userId! },
+      select: {
+        organization: {
+          select: {
+            emailProvider: true
+          }
+        }
+      }
+    });
+    return user?.organization?.emailProvider;
+  }),
   upsertUser: publicProcedure
     .input(
       z.object({
