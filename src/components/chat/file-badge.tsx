@@ -66,3 +66,6 @@ export const FileBadge = forwardRef<HTMLDivElement, FileBadgeProps>(
     );
   }
 );
+
+// Add display name for better debugging
+FileBadge.displayName = "FileBadge";

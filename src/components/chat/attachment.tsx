@@ -22,6 +22,9 @@ const ForwardedFileBadge = forwardRef<
   React.ComponentProps<typeof FileBadge>
 >((props, ref) => <FileBadge {...props} ref={ref} />);
 
+// Add display name for better debugging
+ForwardedFileBadge.displayName = "ForwardedFileBadge";
+
 export function Attachment({
   chatId,
   fileKey,

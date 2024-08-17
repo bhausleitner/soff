@@ -282,26 +282,28 @@ export function RFQFormDialog({
       });
 
     // send message to each selected suppliers
-    selectedSuppliers.map(async (supplier) => {
-      const newChatMessage: ChatMessage = {
-        id: 0,
-        chatId: chatToSupplierMap[parseInt(supplier.value)]!,
-        content: emailBody,
-        fileNames: validParts
-          .map((part) => part.files.map((file) => file.fileKey))
-          .flat()
-          .filter(Boolean),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        chatParticipantId:
-          userChatParticipantToSupplierMap[parseInt(supplier.value)]!
-      };
+    await Promise.all(
+      selectedSuppliers.map(async (supplier) => {
+        const newChatMessage: ChatMessage = {
+          id: 0,
+          chatId: chatToSupplierMap[parseInt(supplier.value)]!,
+          content: emailBody,
+          fileNames: validParts
+            .map((part) => part.files.map((file) => file.fileKey))
+            .flat()
+            .filter(Boolean),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          chatParticipantId:
+            userChatParticipantToSupplierMap[parseInt(supplier.value)]!
+        };
 
-      await sendMessage.mutateAsync({
-        chatMessage: newChatMessage,
-        emailProvider: emailProvider!
-      });
-    });
+        return sendMessage.mutateAsync({
+          chatMessage: newChatMessage,
+          emailProvider: emailProvider!
+        });
+      })
+    );
 
     refetchTrigger();
     setSendingRFQ(false);
