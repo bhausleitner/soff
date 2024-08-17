@@ -18,21 +18,25 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import { Paperclip, Trash2, X, Plus } from "lucide-react";
 import MultipleSelector, { type Option } from "~/components/ui/multi-select";
 import { api } from "~/utils/api";
 import { Icons } from "../icons";
 
-interface Part {
-  id: number;
-  description: string;
-  quantity: number;
+import { type RfqLineItem } from "@prisma/client";
+
+import { v4 as uuidv4 } from "uuid";
+
+type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
+
+interface Part extends PartialRfqLineItem {
   files: FileObject[];
 }
 
 interface FileObject {
   id: number;
   file: File;
+  isUploading: boolean;
+  fileKey: string;
 }
 
 export function RFQFormDialog({
@@ -56,6 +60,10 @@ export function RFQFormDialog({
   const emailBodyRef = useRef<HTMLTextAreaElement>(null);
   const rfqMutation = api.rfq.createRequestForQuote.useMutation();
 
+  // s3 file handling
+  const getUploadUrlMutation = api.s3.generateUploadUrl.useMutation();
+  const deleteFile = api.s3.deleteFile.useMutation();
+
   // Fetch all suppliers
   const { data: supplierData } = api.supplier.getAllSuppliers.useQuery({
     clerkUserId
@@ -71,17 +79,16 @@ export function RFQFormDialog({
 
   useEffect(() => {
     if (emailBodyRef.current) {
+      const textArea = emailBodyRef.current;
       const resizeTextArea = () => {
-        emailBodyRef.current!.style.height = "auto";
-        emailBodyRef.current!.style.height =
-          emailBodyRef.current!.scrollHeight + "px";
+        textArea.style.height = "auto";
+        textArea.style.height = textArea.scrollHeight + "px";
       };
       resizeTextArea();
-      emailBodyRef.current.addEventListener("input", resizeTextArea);
+      textArea.addEventListener("input", resizeTextArea);
       return () => {
-        if (emailBodyRef.current) {
-          //eslint-disable-next-line react-hooks/exhaustive-deps
-          emailBodyRef.current.removeEventListener("input", resizeTextArea);
+        if (textArea) {
+          textArea.removeEventListener("input", resizeTextArea);
         }
       };
     }
@@ -141,29 +148,80 @@ export function RFQFormDialog({
     setParts(newParts);
   };
 
-  const handleFileChange = (
+  const handleFileChange = async (
     id: number,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newFiles = Array.from(e.target.files ?? []);
-    const newParts = parts.map((part) =>
-      part.id === id
-        ? {
-            ...part,
-            files: [
-              ...part.files,
-              ...newFiles.map((file, index) => ({
-                id: Date.now() + index,
-                file
-              }))
-            ]
-          }
-        : part
+    const updatedFiles: FileObject[] = newFiles.map((file) => ({
+      id: Date.now(),
+      file: file,
+      isUploading: true,
+      fileKey: `rfqModal/${uuidv4()}/${file.name}`
+    }));
+
+    // Add files to the part immediately to show loading state
+    setParts((prevParts) =>
+      prevParts.map((part) =>
+        part.id === id
+          ? { ...part, files: [...part.files, ...updatedFiles] }
+          : part
+      )
     );
-    setParts(newParts);
+
+    for (const fileObj of updatedFiles) {
+      try {
+        // Get S3 upload URL
+        const { uploadUrl } = await getUploadUrlMutation.mutateAsync({
+          fileKey: fileObj.fileKey,
+          fileType: fileObj.file.type
+        });
+
+        // Upload file to S3
+        await fetch(uploadUrl, {
+          method: "PUT",
+          body: fileObj.file,
+          headers: {
+            "Content-Type": fileObj.file.type
+          }
+        });
+
+        // Update file object with S3 URL and set isUploading to false
+        setParts((prevParts) =>
+          prevParts.map((part) =>
+            part.id === id
+              ? {
+                  ...part,
+                  files: part.files.map((file) =>
+                    file.id === fileObj.id
+                      ? {
+                          ...file,
+                          isUploading: false
+                        }
+                      : file
+                  )
+                }
+              : part
+          )
+        );
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // Handle error (e.g., show a notification to the user)
+        setParts((prevParts) =>
+          prevParts.map((part) =>
+            part.id === id
+              ? {
+                  ...part,
+                  files: part.files.filter((file) => file.id !== fileObj.id)
+                }
+              : part
+          )
+        );
+      }
+    }
   };
 
-  const handleDeleteFile = (partId: number, fileId: number) => {
+  const handleDeleteFile = async (partId: number, fileId: number) => {
     const newParts = parts.map((part) =>
       part.id === partId
         ? {
@@ -172,6 +230,19 @@ export function RFQFormDialog({
           }
         : part
     );
+    // delete files from s3
+    let fileKeyToDelete: string | undefined;
+    outerLoop: for (const part of parts) {
+      if (part.id === partId) {
+        for (const file of part.files) {
+          fileKeyToDelete = file.fileKey;
+          break outerLoop;
+        }
+      }
+    }
+    if (fileKeyToDelete) {
+      void deleteFile.mutateAsync({ fileKey: fileKeyToDelete });
+    }
     setParts(newParts);
   };
 
@@ -202,7 +273,12 @@ export function RFQFormDialog({
       supplierIds: selectedSuppliers.map((supplier) =>
         parseInt(supplier.value)
       ),
-      messageBody: emailBody
+      messageBody: emailBody,
+      rfqLineItems: validParts.map((part) => ({
+        description: part.description!,
+        quantity: part.quantity!,
+        fileNames: part.files.map((file) => file.fileKey).filter(Boolean)
+      }))
     });
 
     refetchTrigger();
@@ -232,7 +308,7 @@ export function RFQFormDialog({
                     <TableHead className="sticky top-0 bg-white">
                       Quantity*
                     </TableHead>
-                    <TableHead className="sticky top-0 bg-white">
+                    <TableHead className="sticky top-0 w-48 bg-white">
                       Files
                     </TableHead>
                     <TableHead className="sticky top-0 bg-white"></TableHead>
@@ -240,109 +316,125 @@ export function RFQFormDialog({
                 </TableHeader>
                 <TableBody>
                   <AnimatePresence>
-                    {parts.map((part) => (
-                      <motion.tr
-                        key={part.id}
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <TableCell>
-                          <Input
-                            value={part.description}
-                            onChange={(e) =>
-                              handlePartChange(
-                                part.id,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter description"
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            value={part.quantity}
-                            onChange={(e) =>
-                              handlePartChange(
-                                part.id,
-                                "quantity",
-                                parseInt(e.target.value, 10)
-                              )
-                            }
-                            placeholder="Enter quantity"
-                            required
-                            min="1"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col space-y-2">
-                            <div className="flex items-center">
-                              <Input
-                                id={`part-files-${part.id}`}
-                                type="file"
-                                onChange={(e) => handleFileChange(part.id, e)}
-                                className="hidden"
-                                multiple
-                              />
-                              <Label
-                                htmlFor={`part-files-${part.id}`}
-                                className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input px-4 py-2 text-sm font-normal ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-                              >
-                                <Paperclip className="mr-2 h-4 w-4" />
-                                Attach Files
-                              </Label>
-                            </div>
-                            <AnimatePresence>
-                              {part.files.length > 0 && (
-                                <motion.ul
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: "auto" }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  className="mt-2 space-y-1 text-sm"
+                    {parts.map((part, index) => (
+                      <React.Fragment key={part.id}>
+                        <motion.tr
+                          initial={{ opacity: 0, y: -20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <TableCell>
+                            <Input
+                              value={part.description ?? ""}
+                              onChange={(e) =>
+                                handlePartChange(
+                                  part.id,
+                                  "description",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter description"
+                              required
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={part.quantity ?? ""}
+                              onChange={(e) =>
+                                handlePartChange(
+                                  part.id,
+                                  "quantity",
+                                  parseInt(e.target.value, 10)
+                                )
+                              }
+                              placeholder="Enter quantity"
+                              required
+                              min="1"
+                            />
+                          </TableCell>
+                          <TableCell className="w-48">
+                            <div className="flex flex-col space-y-2">
+                              <div className="flex items-center">
+                                <Input
+                                  id={`part-files-${part.id}`}
+                                  type="file"
+                                  onChange={(e) => handleFileChange(part.id, e)}
+                                  className="hidden"
+                                  multiple
+                                />
+                                <Label
+                                  htmlFor={`part-files-${part.id}`}
+                                  className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input px-4 py-2 text-sm font-normal ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                                 >
-                                  {part.files.map((fileObj) => (
-                                    <motion.li
-                                      key={fileObj.id}
-                                      initial={{ opacity: 0, x: -20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: -20 }}
-                                      transition={{ duration: 0.2 }}
-                                      className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1"
-                                    >
-                                      <span className="truncate">
-                                        {fileObj.file.name}
-                                      </span>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                          handleDeleteFile(part.id, fileObj.id)
-                                        }
+                                  <Icons.paperClip className="mr-2 h-4 w-4" />
+                                  Attach Files
+                                </Label>
+                              </div>
+                              <AnimatePresence>
+                                {part.files.length > 0 && (
+                                  <motion.ul
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="mt-2 space-y-1 text-sm"
+                                  >
+                                    {part.files.map((fileObj) => (
+                                      <motion.li
+                                        key={fileObj.id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="flex items-center justify-between rounded-md bg-blue-50 px-2 py-1"
                                       >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    </motion.li>
-                                  ))}
-                                </motion.ul>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeletePart(part.id)}
-                            disabled={parts.length === 1}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </motion.tr>
+                                        <span className="max-w-[120px] truncate">
+                                          {fileObj.file.name}
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() =>
+                                            handleDeleteFile(
+                                              part.id,
+                                              fileObj.id
+                                            )
+                                          }
+                                        >
+                                          {fileObj.isUploading ? (
+                                            <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+                                          ) : (
+                                            <Icons.close className="h-4 w-4 hover:text-red-600" />
+                                          )}
+                                        </Button>
+                                      </motion.li>
+                                    ))}
+                                  </motion.ul>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeletePart(part.id)}
+                              disabled={parts.length === 1}
+                              className="hover:text-red-600"
+                            >
+                              <Icons.trash className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </motion.tr>
+                        {index < parts.length - 1 && (
+                          <tr>
+                            <td colSpan={4} className="p-0">
+                              <hr className="border-t border-gray-200" />
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </AnimatePresence>
                 </TableBody>
@@ -358,7 +450,7 @@ export function RFQFormDialog({
                 className="w-full rounded-xl py-2 text-blue-500 hover:text-blue-700"
                 onClick={handleAddPart}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Icons.add className="mr-2 h-4 w-4" />
                 Add New Part
               </Button>
             </motion.div>

@@ -25,13 +25,20 @@ export const rfqRouter = createTRPCRouter({
     .input(
       z.object({
         messageBody: z.string(),
-        supplierIds: z.array(z.number())
+        supplierIds: z.array(z.number()),
+        rfqLineItems: z.array(
+          z.object({
+            description: z.string(),
+            quantity: z.number(),
+            fileNames: z.array(z.string())
+          })
+        )
       })
     )
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findFirst({
         where: { clerkUserId: ctx.auth.userId! },
-        select: { organizationId: true }
+        select: { organizationId: true, id: true }
       });
 
       if (!user?.organizationId) {
@@ -54,28 +61,44 @@ export const rfqRouter = createTRPCRouter({
         }
       });
 
+      // create rfq line items
+      await Promise.all(
+        input.rfqLineItems.map(async (item) => {
+          return ctx.db.rfqLineItem.create({
+            data: {
+              requestForQuoteId: newRfqObject.id,
+              ...item
+            }
+          });
+        })
+      );
+
       // iterate through supplierIds and create chat objects and chat participants
-      // input.supplierIds.map(async (supplierId) => {
-      //   // create chat object
-      //   const chatObject = await ctx.db.chat.create({
-      //     data: {}
-      //   });
+      await Promise.all(
+        input.supplierIds.map(async (supplierId) => {
+          // create chat object
+          const chatObject = await ctx.db.chat.create({
+            data: {}
+          });
 
-      //   // create supplier chat participant
-      //   await ctx.db.chatParticipant.create({
-      //     data: {
-      //       chatId: chatObject.id,
-      //       supplierId: input.supplierId
-      //     }
-      //   });
+          // create supplier chat participant
+          await ctx.db.chatParticipant.create({
+            data: {
+              chatId: chatObject.id,
+              supplierId: supplierId
+            }
+          });
 
-      //   // create user chat participant
-      //   await ctx.db.chatParticipant.create({
-      //     data: {
-      //       chatId: chatObject.id,
-      //       userId: user.id
-      //     }
-      //   });
-      // });
+          // create user chat participant
+          await ctx.db.chatParticipant.create({
+            data: {
+              chatId: chatObject.id,
+              userId: user.id
+            }
+          });
+        })
+      );
+
+      return newRfqObject;
     })
 });

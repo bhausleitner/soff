@@ -19,6 +19,17 @@ export const s3Router = createTRPCRouter({
 
       return { signedUrl: s3.getSignedUrl("getObject", params) };
     }),
+  generateUploadUrl: publicProcedure
+    .input(z.object({ fileKey: z.string(), fileType: z.string() }))
+    .mutation(async ({ input }) => {
+      const { fileKey, fileType } = input;
+      const params = {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: fileKey,
+        ContentType: fileType
+      };
+      return { uploadUrl: s3.getSignedUrl("putObject", params) };
+    }),
   generateUploadUrls: publicProcedure
     .input(
       z.array(
