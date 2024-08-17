@@ -19,10 +19,6 @@ export default function Rfqs() {
   const [refetchToggle, setRefetchToggle] = useState(false);
 
   const toggleRefetch = () => {
-    console.log("jaiiii");
-    console.log("jaiiii");
-    console.log("jaiiii");
-    console.log("jaiiii");
     setRefetchToggle(!refetchToggle);
   };
   return (

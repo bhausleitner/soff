@@ -19,9 +19,6 @@ export default function Quote() {
   const [checkedQuotes, setCheckedQuotes] = useState<number[]>([]);
   const router = useRouter();
 
-  console.log("checkedQuotes");
-  console.log(checkedQuotes);
-
   const handleCheckedQuotes = (ids: number[]) => {
     setCheckedQuotes(ids);
   };

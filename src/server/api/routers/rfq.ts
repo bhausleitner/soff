@@ -134,6 +134,8 @@ export const rfqRouter = createTRPCRouter({
       );
 
       // iterate through supplierIds and create chat objects and chat participants
+      const chatToSupplierMap: Record<number, number> = {};
+      const userChatParticipantToSupplierMap: Record<number, number> = {};
       await Promise.all(
         input.supplierIds.map(async (supplierId) => {
           // create chat object
@@ -142,6 +144,8 @@ export const rfqRouter = createTRPCRouter({
               requestForQuoteId: newRfqObject.id
             }
           });
+
+          chatToSupplierMap[supplierId] = chatObject.id;
 
           // create supplier chat participant
           await ctx.db.chatParticipant.create({
@@ -152,15 +156,17 @@ export const rfqRouter = createTRPCRouter({
           });
 
           // create user chat participant
-          await ctx.db.chatParticipant.create({
+          const userChatParticipant = await ctx.db.chatParticipant.create({
             data: {
               chatId: chatObject.id,
               userId: user.id
             }
           });
+
+          userChatParticipantToSupplierMap[supplierId] = userChatParticipant.id;
         })
       );
 
-      return newRfqObject;
+      return { chatToSupplierMap, userChatParticipantToSupplierMap };
     })
 });

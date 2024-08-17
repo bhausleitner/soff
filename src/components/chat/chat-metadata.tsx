@@ -17,24 +17,24 @@ export function ChatMetadata({
   return (
     <div className="flex h-full flex-col overflow-y-auto overflow-x-hidden">
       <div className="px-4">
-        <Tabs defaultValue="receivedFiles" className="w-full">
+        <Tabs defaultValue="sentFiles" className="w-full">
           <TabsList>
-            <TabsTrigger value="receivedFiles">Received Files</TabsTrigger>
             <TabsTrigger value="sentFiles">Sent Files</TabsTrigger>
+            <TabsTrigger value="receivedFiles">Received Files</TabsTrigger>
           </TabsList>
-          <TabsContent value="receivedFiles">
-            <FileList
-              messages={messages}
-              chatParticipantUserId={chatParticipantUserId}
-              isUserMessage={false}
-              supplierId={supplier.id}
-            />
-          </TabsContent>
           <TabsContent value="sentFiles">
             <FileList
               messages={messages}
               chatParticipantUserId={chatParticipantUserId}
               isUserMessage={true}
+              supplierId={supplier.id}
+            />
+          </TabsContent>
+          <TabsContent value="receivedFiles">
+            <FileList
+              messages={messages}
+              chatParticipantUserId={chatParticipantUserId}
+              isUserMessage={false}
               supplierId={supplier.id}
             />
           </TabsContent>

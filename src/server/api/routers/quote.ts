@@ -262,11 +262,6 @@ export const quoteRouter = createTRPCRouter({
           ]
         });
 
-        console.log("Here parsing");
-        console.log("Here parsing");
-        console.log("Here parsing");
-        console.log("Here parsing");
-
         const responseString = response.choices[0]?.message.content;
         const jsonRegex = /```json\n([\s\S]*?)\n```/;
         const match = responseString?.match(jsonRegex);
@@ -276,10 +271,6 @@ export const quoteRouter = createTRPCRouter({
         }
 
         const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
-
-        console.log("parsed data");
-        console.log(parsedData);
-        console.log(parsedData);
 
         const existingQuote = await ctx.db.quote.findFirst({
           where: { chatId: input.chatId, isActive: true },

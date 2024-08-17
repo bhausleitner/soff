@@ -7,6 +7,7 @@ import { htmlToText } from "html-to-text";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import { type CreateAttachmentRequest } from "nylas";
 import { getFileFromS3, uploadFileToS3 } from "~/server/s3/utils";
+import { convertToHtml } from "~/utils/string-format";
 
 export const GOOGLE_APP_REDIRECT_ROUTE = "/api/googleCallback";
 
@@ -146,12 +147,16 @@ export async function sendGmailAndCreateMessage(
   ]);
 
   try {
+    const htmlBody = `<div style="font-family: Arial, sans-serif; font-size: 14px;">
+      ${convertToHtml(inputChatMessage.content)}
+    </div>`;
+
     const { data: createdDraft } = await nylas.drafts.create({
       identifier: googleGrantId,
       requestBody: {
         to: [{ name: supplierName, email: supplierEmail }],
         subject: "Message from Soff API",
-        body: inputChatMessage.content,
+        body: htmlBody,
         replyToMessageId: lastForeignMessage?.gmailMessageId ?? undefined,
         attachments
       }

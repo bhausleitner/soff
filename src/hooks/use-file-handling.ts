@@ -10,11 +10,6 @@ export function useFileHandling() {
   const downloadFileMutation = api.s3.downloadFile.useMutation();
 
   const handleDownload = async (fileKey: string) => {
-    console.log("fileKeyfileKeyfileKey");
-    console.log("fileKeyfileKeyfileKey");
-    console.log("fileKeyfileKeyfileKey");
-    console.log(fileKey);
-
     setIsDownloading(true);
 
     try {
