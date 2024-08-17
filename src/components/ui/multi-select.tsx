@@ -470,7 +470,7 @@ const MultipleSelector = React.forwardRef<
                   key={option.value}
                   variant="outline"
                   className={cn(
-                    "bg-blue-100 text-gray-800 hover:bg-blue-200",
+                    "bg-blue-50 text-gray-800 hover:bg-blue-200",
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                     "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
                     badgeClassName

@@ -144,15 +144,16 @@ model Quote {
 }
 
 model RequestForQuote {
-  id             Int          @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   parts          Part[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   suppliers      Supplier[]
   chats          Chat[]
   organizationId Int
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  status         RfqStatus    @default(REQUESTED)
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  status         RfqStatus     @default(REQUESTED)
+  lineItems      RfqLineItem[]
 
   @@index([organizationId])
   @@index([createdAt])
@@ -166,6 +167,18 @@ model QuoteComparison {
 
   @@index([createdAt])
 }
+
+model RfqLineItem {
+  id                Int             @id @default(autoincrement())
+  quantity          Int?
+  description       String?
+  fileNames         String[]
+  requestForQuoteId Int
+  requestForQuote   RequestForQuote @relation(fields: [requestForQuoteId], references: [id])
+
+  @@index([requestForQuoteId])
+}
+
 
 model LineItem {
   id          Int     @id @default(autoincrement())
