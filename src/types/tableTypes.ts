@@ -5,6 +5,7 @@ export interface ColumnConfig {
   link?: string;
   cell?: (row: any) => JSX.Element;
   isBadge?: boolean;
+  isDate?: boolean;
 }
 
 export interface TableConfig {
