@@ -10,7 +10,7 @@ import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 
 const SupplierPage = () => {
   const router = useRouter();
-  const supplierId = parseInt(router.query.supplierId as string, 10);
+  const supplierId = parseInt(router.query.supplierId as string);
   const [isCreatingRFQ, setIsCreatingRFQ] = useState(false);
 
   const createChat = api.chat.createChat.useMutation();
