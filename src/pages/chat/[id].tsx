@@ -26,6 +26,7 @@ import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 export default function Exchange() {
   const router = useRouter();
   const chatId = Number(router.query.id);
+  const rfqId = Number(router.query.rfqId);
   const { data } = api.chat.getChat.useQuery({
     chatId: chatId
   });
@@ -73,13 +74,24 @@ export default function Exchange() {
     <div className="flex h-full flex-col">
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <BreadCrumbWrapper
-            items={[
-              { label: "Suppliers", href: "/suppliers" },
-              { label: supplier.name, href: `/suppliers/${supplier.id}` },
-              { label: `Chat #${chatId}`, href: `/chat/${chatId}` }
-            ]}
-          />
+          {!rfqId && (
+            <BreadCrumbWrapper
+              items={[
+                { label: "Suppliers", href: "/suppliers" },
+                { label: supplier.name, href: `/suppliers/${supplier.id}` },
+                { label: `Chat #${chatId}`, href: `/chat/${chatId}` }
+              ]}
+            />
+          )}
+          {rfqId && (
+            <BreadCrumbWrapper
+              items={[
+                { label: "RFQs", href: "/rfqs" },
+                { label: `RFQ #${rfqId}`, href: `/rfqs/${rfqId}` },
+                { label: `Chat #${chatId}`, href: `/chat/${chatId}` }
+              ]}
+            />
+          )}
           <Tooltip>
             <TooltipTrigger>
               <Button

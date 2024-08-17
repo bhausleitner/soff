@@ -55,7 +55,7 @@ export function FilePreviewDialog({
         </div>
         <DialogFooter>
           <Button
-            className="w-30"
+            className="w-32"
             onClick={() => fileKey && handleDownload(fileKey)}
             variant="outline"
             disabled={isDownloading}
@@ -67,7 +67,7 @@ export function FilePreviewDialog({
             )}
           </Button>
           {additionalButtons}
-          <Button variant="soff" onClick={handleClose}>
+          <Button variant="soff" onClick={handleClose} className="w-32">
             Close
           </Button>
         </DialogFooter>

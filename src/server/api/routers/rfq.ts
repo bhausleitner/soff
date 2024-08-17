@@ -2,6 +2,66 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const rfqRouter = createTRPCRouter({
+  getRfq: publicProcedure
+    .input(
+      z.object({
+        rfqId: z.number()
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const rfqDetails = await ctx.db.requestForQuote.findUnique({
+        where: { id: input.rfqId },
+        include: {
+          lineItems: true,
+          suppliers: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              contactPerson: true,
+              status: true
+            }
+          },
+          chats: {
+            select: {
+              id: true,
+              chatParticipants: {
+                where: {
+                  supplierId: { not: null }
+                },
+                select: {
+                  supplierId: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!rfqDetails) {
+        throw new Error("RFQ not found");
+      }
+
+      // Create a map of supplier IDs to chat IDs
+      const supplierChatMap = new Map(
+        rfqDetails.chats.map((chat) => [
+          chat.chatParticipants[0]?.supplierId,
+          chat.id
+        ])
+      );
+
+      // Add chat IDs to supplier objects
+      const suppliersWithChatIds = rfqDetails.suppliers.map((supplier) => ({
+        ...supplier,
+        chatId: supplierChatMap.get(supplier.id) ?? null
+      }));
+
+      return {
+        rfqLineItems: rfqDetails.lineItems,
+        suppliers: suppliersWithChatIds,
+        status: rfqDetails.status
+      };
+    }),
   getAllRequestsForQuotes: publicProcedure
     .input(z.object({ clerkUserId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -78,7 +138,9 @@ export const rfqRouter = createTRPCRouter({
         input.supplierIds.map(async (supplierId) => {
           // create chat object
           const chatObject = await ctx.db.chat.create({
-            data: {}
+            data: {
+              requestForQuoteId: newRfqObject.id
+            }
           });
 
           // create supplier chat participant

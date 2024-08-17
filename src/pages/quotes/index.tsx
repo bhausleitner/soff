@@ -27,7 +27,7 @@ export default function Quote() {
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       <div className="flex items-center justify-between pb-4">
         <BreadCrumbWrapper items={[{ label: "Quotes", href: "/quotes" }]} />
         <Tooltip>

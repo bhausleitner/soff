@@ -99,7 +99,7 @@ export const supplierTableConfig = {
 export const rfqTableConfig = {
   placeholder: "Filter RFQs...",
   maxRowsBeforePagination: 9,
-  link: "/rfq",
+  link: "/rfqs",
   checkbox: true,
   columns: [
     { header: "RFQ ID", accessorKey: "id", sortable: true },
