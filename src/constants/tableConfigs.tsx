@@ -96,6 +96,23 @@ export const supplierTableConfig = {
   ]
 };
 
+export const rfqTableConfig = {
+  placeholder: "Filter RFQs...",
+  maxRowsBeforePagination: 9,
+  link: "/rfqs",
+  checkbox: true,
+  columns: [
+    { header: "RFQ ID", accessorKey: "id", sortable: true },
+    { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
+    {
+      header: "Requested At",
+      accessorKey: "createdAt",
+      sortable: true,
+      isDate: true
+    }
+  ]
+};
+
 export const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
   api.part.getPartsBySupplierId.useQuery(args);
 export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
@@ -108,8 +125,12 @@ export const useGetOrdersByQuoteQuery = (args: { quoteId: number }) =>
 
 export const useGetAllQuotes = (args: { clerkUserId: string }) =>
   api.quote.getAllQuotes.useQuery(args);
+
 export const useGetAllSuppliers = (args: { clerkUserId: string }) =>
   api.supplier.getAllSuppliers.useQuery(args);
 
 export const useGetLineItemsByQuoteQuery = (args: { quoteId: number }) =>
   api.quote.getLineItemsByQuoteId.useQuery(args);
+
+export const useGetAllRequestsForQuotes = (args: { clerkUserId: string }) =>
+  api.rfq.getAllRequestsForQuotes.useQuery(args);

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "RfqStatus" ADD VALUE 'REQUESTED';

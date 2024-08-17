@@ -34,16 +34,21 @@ import { type TableProps } from "~/types/tableTypes";
 import { useRouter } from "next/router";
 import { cn } from "~/lib/utils";
 import { Badge } from "../ui/badge";
-import { type Status, type QuoteStatus } from "@prisma/client";
+import { type Status, type QuoteStatus, type RfqStatus } from "@prisma/client";
+import { formatDate } from "~/utils/time";
 
-const statusClassMap: Record<QuoteStatus | Status, string> = {
+const statusClassMap: Record<QuoteStatus | Status | RfqStatus, string> = {
   ACTIVE: "bg-green-500",
   INACTIVE: "bg-gray-500",
   ONBOARDING: "bg-yellow-500",
+  REQUESTED: "bg-yellow-500",
   RECEIVED: "bg-yellow-500",
   WAITING: "bg-gray-500",
   CONFIRMED: "bg-green-500",
-  REJECTED: "bg-red-500"
+  REJECTED: "bg-red-500",
+  REVIEW: "bg-gray-500",
+  CLOSED: "bg-gray-500",
+  AWARDED: "bg-green-500"
 };
 
 function generateColumns<T extends { id: number }>(
@@ -108,6 +113,10 @@ function generateColumns<T extends { id: number }>(
               {row.getValue(col.accessorKey)}
             </Badge>
           );
+        }
+        if (col.isDate) {
+          const cellValue: string = row.getValue(col.accessorKey);
+          return <div>{formatDate(cellValue)}</div>;
         }
         const cellValue: string = row.getValue(col.accessorKey);
         return <div>{cellValue}</div>;

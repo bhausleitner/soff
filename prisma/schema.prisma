@@ -32,6 +32,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum RfqStatus {
+  ACTIVE
+  REQUESTED
+  REVIEW
+  CLOSED
+  AWARDED
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -144,6 +152,7 @@ model RequestForQuote {
   chats          Chat[]
   organizationId Int
   organization   Organization @relation(fields: [organizationId], references: [id])
+  status         RfqStatus    @default(REQUESTED)
 
   @@index([organizationId])
   @@index([createdAt])
