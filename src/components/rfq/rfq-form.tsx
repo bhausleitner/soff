@@ -491,6 +491,7 @@ export function RFQFormDialog({
                   </p>
                 }
                 onChange={(value) => setSelectedSuppliers(value)}
+                hideClearAllButton={true}
               />
             </div>
           </div>

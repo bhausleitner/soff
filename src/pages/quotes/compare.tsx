@@ -17,6 +17,10 @@ import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 export default function Compare() {
   const router = useRouter();
   const { ids } = router.query;
+  const rfqId = parseInt(router.query.rfqId as string);
+
+  console.log("ids");
+  console.log(ids);
 
   const [idArray, setIdArray] = useState<number[]>([]);
 
@@ -42,18 +46,38 @@ export default function Compare() {
       {/* Header section */}
       <div className="flex-shrink-0">
         <div className="flex items-center justify-between pb-4">
-          <BreadCrumbWrapper
-            items={[
-              {
-                label: "Quotes",
-                href: "/quotes"
-              },
-              {
-                label: `Compare #${idArray.join(" vs. #")}`,
-                href: `/quotes/compare?ids=${idArray.join(",")}`
-              }
-            ]}
-          />
+          {!rfqId && (
+            <BreadCrumbWrapper
+              items={[
+                {
+                  label: "Quotes",
+                  href: "/quotes"
+                },
+                {
+                  label: `Quote #${idArray.join(" vs. #")}`,
+                  href: `/quotes/compare?ids=${idArray.join(",")}`
+                }
+              ]}
+            />
+          )}
+          {!isNaN(rfqId) && (
+            <BreadCrumbWrapper
+              items={[
+                {
+                  label: "RFQs",
+                  href: "/rfqs"
+                },
+                {
+                  label: `RFQ #${rfqId}`,
+                  href: `/rfqs/${rfqId}`
+                },
+                {
+                  label: `Quote #${idArray.join(" vs. #")}`,
+                  href: `/quotes/compare?ids=${idArray.join(",")}&rfqId=${rfqId}`
+                }
+              ]}
+            />
+          )}
         </div>
         {!isMetaDataLoading && (
           <div

@@ -41,6 +41,7 @@ export function Attachment({
   } = useFileHandling();
   const [isParsing, setIsParsing] = useState(false);
   const router = useRouter();
+  const rfqId = parseInt(router.query.rfqId as string);
 
   const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
 
@@ -52,7 +53,7 @@ export function Attachment({
         fileKey,
         supplierId
       });
-      await router.push(`/quotes/${quoteId}`);
+      await router.push(`/quotes/${quoteId}${rfqId ? `?rfqId=${rfqId}` : ""}`);
     } catch (error) {
       console.error("Error in handleCreateQuote:", error);
       toast.error("Failed to create quote. Please reach out to admin.");

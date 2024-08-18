@@ -12,6 +12,7 @@ import {
   TooltipTrigger
 } from "~/components/ui/tooltip";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
+import CompareQuotesButton from "~/components/quote-detail/quote-compare";
 
 export default function Quote() {
   const user = useUser();
@@ -27,29 +28,7 @@ export default function Quote() {
     <div>
       <div className="flex items-center justify-between pb-4">
         <BreadCrumbWrapper items={[{ label: "Quotes", href: "/quotes" }]} />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <Button
-                disabled={checkedQuotes.length < 2}
-                variant="outline"
-                onClick={async () => {
-                  await router.push(
-                    `/quotes/compare?ids=${checkedQuotes.join(",")}`
-                  );
-                }}
-              >
-                <Icons.sparkles className="mr-2 h-4 w-4" />
-                Compare Quotes
-              </Button>
-            </span>
-          </TooltipTrigger>
-          {checkedQuotes.length < 2 && (
-            <TooltipContent>
-              <p>Select at least two quotes.</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
+        <CompareQuotesButton checkedQuotes={checkedQuotes} />
       </div>
       {clerkUserId && (
         <GenericTable<Quote, { clerkUserId: string }>

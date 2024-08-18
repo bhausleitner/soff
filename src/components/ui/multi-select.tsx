@@ -543,7 +543,7 @@ const MultipleSelector = React.forwardRef<
                 onChange?.(selected.filter((s) => s.fixed));
               }}
               className={cn(
-                "absolute right-0 h-6 w-6 p-0",
+                "absolute right-0 h-10 w-6 p-0",
                 (hideClearAllButton ??
                   disabled ??
                   selected.length < 1 ??

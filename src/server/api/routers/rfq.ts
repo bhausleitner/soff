@@ -32,6 +32,14 @@ export const rfqRouter = createTRPCRouter({
                 select: {
                   supplierId: true
                 }
+              },
+              quotes: {
+                where: {
+                  isActive: true
+                },
+                select: {
+                  id: true
+                }
               }
             }
           }
@@ -42,23 +50,35 @@ export const rfqRouter = createTRPCRouter({
         throw new Error("RFQ not found");
       }
 
-      // Create a map of supplier IDs to chat IDs
-      const supplierChatMap = new Map(
+      // Create a map of supplier IDs to chat IDs and quote IDs
+      const supplierInfoMap = new Map(
         rfqDetails.chats.map((chat) => [
           chat.chatParticipants[0]?.supplierId,
-          chat.id
+          {
+            chatId: chat.id,
+            quoteId: chat.quotes[0]?.id ?? null
+          }
         ])
       );
 
-      // Add chat IDs to supplier objects
-      const suppliersWithChatIds = rfqDetails.suppliers.map((supplier) => ({
-        ...supplier,
-        chatId: supplierChatMap.get(supplier.id) ?? null
-      }));
+      // Add chat IDs and quote IDs to supplier objects
+      const suppliersWithChatAndQuoteIds = rfqDetails.suppliers.map(
+        (supplier) => {
+          const info = supplierInfoMap.get(supplier.id) ?? {
+            chatId: null,
+            quoteId: null
+          };
+          return {
+            ...supplier,
+            chatId: info.chatId,
+            quoteId: info.quoteId
+          };
+        }
+      );
 
       return {
         rfqLineItems: rfqDetails.lineItems,
-        suppliers: suppliersWithChatIds,
+        suppliers: suppliersWithChatAndQuoteIds,
         status: rfqDetails.status
       };
     }),

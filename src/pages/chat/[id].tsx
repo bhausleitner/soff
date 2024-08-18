@@ -22,6 +22,7 @@ import {
 } from "~/components/ui/tooltip";
 import { EmailProvider } from "@prisma/client";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
+import { ViewQuoteButton } from "~/components/quote-detail/quote-viewer";
 
 export default function Exchange() {
   const router = useRouter();
@@ -83,7 +84,7 @@ export default function Exchange() {
               ]}
             />
           )}
-          {rfqId && (
+          {!isNaN(rfqId) && (
             <BreadCrumbWrapper
               items={[
                 { label: "RFQs", href: "/rfqs" },
@@ -92,30 +93,10 @@ export default function Exchange() {
               ]}
             />
           )}
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                variant="outline"
-                disabled={
-                  !data?.newChat?.quotes || data?.newChat?.quotes.length === 0
-                }
-                onClick={async () => {
-                  const quote = data?.newChat?.quotes[0];
-                  if (quote) {
-                    await router.push(`/quotes/${quote.id}`);
-                  }
-                }}
-              >
-                <Icons.quotes className="mr-2 h-4 w-4" />
-                View Quote
-              </Button>
-            </TooltipTrigger>
-            {(!data?.newChat?.quotes || data?.newChat?.quotes.length === 0) && (
-              <TooltipContent>
-                <p>No quote parsed yet.</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
+          <ViewQuoteButton
+            quoteId={data?.newChat?.quotes?.[0]?.id}
+            rfqId={rfqId}
+          />
         </div>
       </div>
       <div className="flex-grow overflow-hidden">

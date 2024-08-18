@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { api } from "~/utils/api";
@@ -14,13 +14,36 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 
-import { statusClassMap } from "~/components/common/TableComponent";
+import {
+  statusClassMap,
+  TableComponent
+} from "~/components/common/TableComponent";
 import { cn } from "~/lib/utils";
 import { Attachment } from "~/components/chat/attachment";
+import { ViewChatButton } from "~/components/chat/view-chat";
+import { ViewQuoteButton } from "~/components/quote-detail/quote-viewer";
+import { Icons } from "~/components/icons";
+import CompareQuotesButton from "~/components/quote-detail/quote-compare";
+import { Checkbox } from "~/components/ui/checkbox";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { Tooltip, TooltipContent } from "~/components/ui/tooltip";
 
 export default function RfqPage() {
   const router = useRouter();
   const rfqId = parseInt(router.query.rfqId as string);
+  const [checkedRows, setCheckedRows] = useState<number[]>([]);
+
+  const handleCheckedRows = (supplierId: number) => {
+    setCheckedRows((prev) =>
+      prev.includes(supplierId)
+        ? prev.filter((id) => id !== supplierId)
+        : [...prev, supplierId]
+    );
+  };
+
+  useEffect(() => {
+    console.log(checkedRows);
+  }, [checkedRows]);
 
   const { data: rfqData, isLoading } = api.rfq.getRfq.useQuery({ rfqId });
 
@@ -82,23 +105,54 @@ export default function RfqPage() {
         )}
 
         <Card className="flex flex-1 flex-col">
-          <CardHeader>
-            <CardTitle>Requested Suppliers</CardTitle>
-          </CardHeader>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">Requested Suppliers</h3>
+              <CompareQuotesButton
+                checkedQuotes={
+                  checkedRows.map(
+                    (id) =>
+                      rfqData?.suppliers.find((supplier) => supplier.id === id)
+                        ?.quoteId
+                  ) as number[]
+                }
+                rfqId={rfqId}
+              />
+            </div>
+          </CardContent>
           <CardContent className="flex-1 overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[50px]">Select</TableHead>
                   <TableHead>Supplier</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead>Chat</TableHead>
                   <TableHead>Quote</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rfqData?.suppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
+                    <TableCell>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Checkbox
+                            disabled={supplier.quoteId === null}
+                            checked={checkedRows.includes(supplier.id)}
+                            onCheckedChange={() =>
+                              handleCheckedRows(supplier.id)
+                            }
+                          />
+                        </TooltipTrigger>
+                        {supplier.quoteId === null && (
+                          <TooltipContent side="right">
+                            <p>No quote available yet :-)</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TableCell>
                     <TableCell>{supplier.name}</TableCell>
                     <TableCell>{supplier.contactPerson}</TableCell>
                     <TableCell>
@@ -113,19 +167,14 @@ export default function RfqPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          await router.push(
-                            `/chat/${supplier.chatId}?rfqId=${rfqId}`
-                          );
-                        }}
-                      >
-                        View Chat
-                      </Button>
+                      <ViewChatButton chatId={supplier.chatId!} rfqId={rfqId} />
                     </TableCell>
-                    <TableCell>Quote</TableCell>
+                    <TableCell>
+                      <ViewQuoteButton
+                        quoteId={supplier.quoteId!}
+                        rfqId={rfqId}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
