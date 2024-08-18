@@ -17,10 +17,12 @@ import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { useFileHandling } from "~/hooks/use-file-handling";
 import { FilePreviewDialog } from "~/components/common/FilePreviewDialog";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
+import { ViewChatButton } from "~/components/chat/view-chat";
 
 const QuotePage = () => {
   const router = useRouter();
-  const quoteId = parseInt(router.query.quoteId as string, 10);
+  const quoteId = parseInt(router.query.quoteId as string);
+  const rfqId = parseInt(router.query.rfqId as string);
   const [isCreatingPO, setIsCreatingPO] = useState(false);
   const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
     null
@@ -86,27 +88,31 @@ const QuotePage = () => {
   return (
     <div>
       <div className="flex items-center justify-between pb-4">
-        <BreadCrumbWrapper
-          items={[
-            { label: "Quotes", href: "/quotes" },
-            { label: `Quote #${quoteId}`, href: `/quotes/${quoteId}` }
-          ]}
-        />
+        {!rfqId && (
+          <BreadCrumbWrapper
+            items={[
+              { label: "Quotes", href: "/quotes" },
+              { label: `Quote #${quoteId}`, href: `/quotes/${quoteId}` }
+            ]}
+          />
+        )}
+        {!isNaN(rfqId) && (
+          <BreadCrumbWrapper
+            items={[
+              { label: "RFQs", href: "/rfqs" },
+              { label: `RFQ #${rfqId}`, href: `/rfqs/${rfqId}` },
+              { label: `Quote #${quoteId}`, href: `/quotes/${quoteId}` }
+            ]}
+          />
+        )}
         <div className="flex items-center space-x-4">
           <QuoteHistory
             currentVersion={quoteData.version}
             quoteHistory={quoteData.quoteHistory}
           />
           {quoteData.chatId && (
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/chat/${quoteData.chatId}`)}
-            >
-              <Icons.messageCircleMore className="mr-2 h-4 w-4" />
-              View Chat
-            </Button>
+            <ViewChatButton chatId={quoteData.chatId} rfqId={rfqId} />
           )}
-
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={handleOpen}>

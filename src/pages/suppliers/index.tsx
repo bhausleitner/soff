@@ -30,7 +30,7 @@ export default function Supplier() {
           />
           <Button onClick={() => setIsModalOpen(true)} variant="blue">
             Add Supplier
-            <Icons.add className="ml-2 h-4 w-4" />
+            <Icons.add className="ml-2 h-5 w-5" />
           </Button>
         </div>
         {clerkUserId && (
