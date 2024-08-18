@@ -187,6 +187,10 @@ export const rfqRouter = createTRPCRouter({
         })
       );
 
-      return { chatToSupplierMap, userChatParticipantToSupplierMap };
+      return {
+        chatToSupplierMap,
+        userChatParticipantToSupplierMap,
+        rfqId: newRfqObject.id
+      };
     })
 });

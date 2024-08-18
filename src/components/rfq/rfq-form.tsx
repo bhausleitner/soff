@@ -22,10 +22,12 @@ import MultipleSelector, { type Option } from "~/components/ui/multi-select";
 import { api } from "~/utils/api";
 import { Icons } from "../icons";
 import type { ChatMessage } from "~/server/api/routers/chat";
+import { toast } from "sonner";
 
 import { type RfqLineItem } from "@prisma/client";
 
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
@@ -51,6 +53,7 @@ export function RFQFormDialog({
   clerkUserId: string;
   refetchTrigger: () => void;
 }) {
+  const router = useRouter();
   const [parts, setParts] = useState<Part[]>([
     { id: 1, description: "", quantity: 1, files: [] }
   ]);
@@ -251,6 +254,10 @@ export function RFQFormDialog({
     setParts(newParts);
   };
 
+  const getCurrentDateTime = () => {
+    return new Date().toLocaleString();
+  };
+
   const handleSendRFQs = async () => {
     setSendingRFQ(true);
     const validParts = parts.filter(
@@ -267,9 +274,9 @@ export function RFQFormDialog({
       return;
     }
 
-    // create RFQ
-    const { userChatParticipantToSupplierMap, chatToSupplierMap } =
-      await rfqMutation.mutateAsync({
+    try {
+      // Create RFQ with toast
+      const rfqCreationPromise = rfqMutation.mutateAsync({
         supplierIds: selectedSuppliers.map((supplier) =>
           parseInt(supplier.value)
         ),
@@ -281,33 +288,61 @@ export function RFQFormDialog({
         }))
       });
 
-    // send message to each selected suppliers
-    await Promise.all(
-      selectedSuppliers.map(async (supplier) => {
-        const newChatMessage: ChatMessage = {
-          id: 0,
-          chatId: chatToSupplierMap[parseInt(supplier.value)]!,
-          content: emailBody,
-          fileNames: validParts
-            .map((part) => part.files.map((file) => file.fileKey))
-            .flat()
-            .filter(Boolean),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          chatParticipantId:
-            userChatParticipantToSupplierMap[parseInt(supplier.value)]!
-        };
+      toast.promise(rfqCreationPromise, {
+        loading: "Creating RFQ Package...",
+        success: "RFQ Package created successfully!",
+        error: "Failed to create RFQ Package. Please try again.",
+        description: getCurrentDateTime()
+      });
 
-        return sendMessage.mutateAsync({
-          chatMessage: newChatMessage,
-          emailProvider: emailProvider!
-        });
-      })
-    );
+      const { userChatParticipantToSupplierMap, chatToSupplierMap, rfqId } =
+        await rfqCreationPromise;
 
-    refetchTrigger();
-    setSendingRFQ(false);
-    setOpen(false);
+      // send message to each selected supplier
+      await Promise.all(
+        selectedSuppliers.map(async (supplier) => {
+          const newChatMessage: ChatMessage = {
+            id: 0,
+            chatId: chatToSupplierMap[parseInt(supplier.value)]!,
+            content: emailBody,
+            fileNames: validParts
+              .map((part) => part.files.map((file) => file.fileKey))
+              .flat()
+              .filter(Boolean),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            chatParticipantId:
+              userChatParticipantToSupplierMap[parseInt(supplier.value)]!
+          };
+
+          const sendMessagePromise = sendMessage.mutateAsync({
+            chatMessage: newChatMessage,
+            emailProvider: emailProvider!
+          });
+
+          toast.promise(sendMessagePromise, {
+            loading: `Sending E-Mail to ${supplier.label}...`,
+            success: `E-Mail sent to ${supplier.label}!`,
+            error: `Failed sending E-Mail to ${supplier.label}. Please try again.`,
+            description: getCurrentDateTime()
+          });
+
+          return sendMessagePromise;
+        })
+      );
+
+      refetchTrigger();
+      setOpen(false);
+      await router.push(`/rfqs/${rfqId}`);
+    } catch (error) {
+      console.error("Error in RFQ process:", error);
+      toast.error("An error occurred in the RFQ process. Please try again.", {
+        duration: 5000,
+        icon: "❌"
+      });
+    } finally {
+      setSendingRFQ(false);
+    }
   };
 
   return (
