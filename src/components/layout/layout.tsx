@@ -111,7 +111,12 @@ export const PageLayout = (props: PropsWithChildren) => {
           <div className="flex-1 overflow-auto p-4">{props.children}</div>
         </div>
       </main>
-      <Toaster position="bottom-right" richColors={true} theme="light" />
+      <Toaster
+        position="bottom-right"
+        richColors={true}
+        theme="light"
+        expand={true}
+      />
     </div>
   );
 };
