@@ -41,20 +41,114 @@ const quoteIdSchema = z.object({
   quoteId: z.number()
 });
 
-interface ParsedQuoteData {
-  totalPrice: number;
-  lineItems: {
-    partId: number | null;
-    quantity: number;
-    price: number;
-    description: string;
-  }[];
-}
+export const parsedQuoteSchema = z.object({
+  lineItems: z.array(
+    z.object({
+      quantity: z.number(),
+      unitPrice: z.number(),
+      description: z.string(),
+      rfqLineItemId: z.number().optional()
+    })
+  )
+});
+
+export type ParsedQuoteData = z.infer<typeof parsedQuoteSchema>;
 
 export type Quote = z.infer<typeof quoteSchema>;
 export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const quoteRouter = createTRPCRouter({
+  createQuote: publicProcedure
+    .input(
+      z.object({
+        supplierId: z.number(),
+        chatId: z.number(),
+        fileKey: z.string(),
+        parsedData: parsedQuoteSchema
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const existingQuote = await ctx.db.quote.findFirst({
+          where: { chatId: input.chatId, isActive: true },
+          select: { version: true, id: true, erpPurchaseOrderId: true }
+        });
+
+        if (existingQuote) {
+          await ctx.db.quote.update({
+            where: {
+              id: existingQuote.id
+            },
+            data: { isActive: false }
+          });
+
+          const newQuote = await ctx.db.quote.create({
+            data: {
+              chatId: input.chatId,
+              supplierId: input.supplierId,
+              version: existingQuote.version + 1,
+              price: input.parsedData?.lineItems.reduce(
+                (acc: number, item: { unitPrice: number }) =>
+                  acc + item.unitPrice,
+                0
+              ),
+              status: QuoteStatus.RECEIVED,
+              erpPurchaseOrderId: existingQuote.erpPurchaseOrderId,
+              fileKey: input.fileKey
+            }
+          });
+
+          await Promise.all(
+            input.parsedData.lineItems.map((lineItem) =>
+              ctx.db.lineItem.create({
+                data: {
+                  quoteId: newQuote.id,
+                  description: lineItem.description,
+                  quantity: lineItem.quantity,
+                  price: lineItem.unitPrice,
+                  rfqLineItemId: lineItem.rfqLineItemId
+                }
+              })
+            )
+          );
+
+          return newQuote.id.toString();
+        } else {
+          const newQuote = await ctx.db.quote.create({
+            data: {
+              chatId: input.chatId,
+              supplierId: input.supplierId,
+              price: input.parsedData?.lineItems.reduce(
+                (acc: number, item: { unitPrice: number }) =>
+                  acc + item.unitPrice,
+                0
+              ),
+              status: QuoteStatus.RECEIVED,
+              fileKey: input.fileKey
+            }
+          });
+
+          await Promise.all(
+            input.parsedData.lineItems.map((lineItem) =>
+              ctx.db.lineItem.create({
+                data: {
+                  quoteId: newQuote.id,
+                  description: lineItem.description,
+                  quantity: lineItem.quantity,
+                  price: lineItem.unitPrice,
+                  rfqLineItemId: lineItem.rfqLineItemId
+                }
+              })
+            )
+          );
+
+          return { quoteId: newQuote.id.toString() };
+        }
+      } catch (error) {
+        console.error("Error in createQuote:", error);
+        throw new Error(`Error in createQuote: ${String(error)}`);
+      }
+    }),
   getAllQuotes: publicProcedure
     .input(z.object({ clerkUserId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -221,15 +315,13 @@ export const quoteRouter = createTRPCRouter({
 
       return orderData;
     }),
-  createQuoteFromPdf: publicProcedure
+  parseQuoteDatafromPdf: publicProcedure
     .input(
       z.object({
-        fileKey: z.string(),
-        chatId: z.number(),
-        supplierId: z.number()
+        fileKey: z.string()
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       try {
         const pdfData = await getFileFromS3(input.fileKey);
 
@@ -249,7 +341,7 @@ export const quoteRouter = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: 'Given the following quote data, parse it into the specified JSON format: {"totalPrice": 1000, "lineItems": [{"partId": 1, "quantity": 10, "price": 100, "description": "Part 1 Description"}, {"partId": 2, "quantity": 5, "price": 200, "description": "Part 2 Description"}]}'
+                  text: 'Given the following quote data, parse it into the specified JSON format: {"lineItems": [{"quantity": 10, "unitPrice": 100, "description": "Part 1 Description"}, {"quantity": 5, "unitPrice": 200, "description": "Part 2 Description"}]}'
                 },
                 {
                   type: "image_url",
@@ -272,74 +364,10 @@ export const quoteRouter = createTRPCRouter({
 
         const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
 
-        const existingQuote = await ctx.db.quote.findFirst({
-          where: { chatId: input.chatId, isActive: true },
-          select: { version: true, id: true, erpPurchaseOrderId: true }
-        });
-
-        if (existingQuote) {
-          await ctx.db.quote.update({
-            where: {
-              id: existingQuote.id
-            },
-            data: { isActive: false }
-          });
-
-          const newQuote = await ctx.db.quote.create({
-            data: {
-              chatId: input.chatId,
-              supplierId: input.supplierId,
-              version: existingQuote.version + 1,
-              price: parsedData.totalPrice,
-              status: QuoteStatus.RECEIVED,
-              erpPurchaseOrderId: existingQuote.erpPurchaseOrderId,
-              fileKey: input.fileKey
-            }
-          });
-
-          await Promise.all(
-            parsedData.lineItems.map((lineItem) =>
-              ctx.db.lineItem.create({
-                data: {
-                  quoteId: newQuote.id,
-                  description: lineItem.description,
-                  quantity: lineItem.quantity,
-                  price: lineItem.price
-                }
-              })
-            )
-          );
-
-          return newQuote.id.toString();
-        } else {
-          const newQuote = await ctx.db.quote.create({
-            data: {
-              chatId: input.chatId,
-              supplierId: input.supplierId,
-              price: parsedData.totalPrice,
-              status: QuoteStatus.RECEIVED,
-              fileKey: input.fileKey
-            }
-          });
-
-          await Promise.all(
-            parsedData.lineItems.map((lineItem) =>
-              ctx.db.lineItem.create({
-                data: {
-                  quoteId: newQuote.id,
-                  description: lineItem.description,
-                  quantity: lineItem.quantity,
-                  price: lineItem.price
-                }
-              })
-            )
-          );
-
-          return newQuote.id.toString();
-        }
+        return parsedData;
       } catch (error) {
-        console.error("Error in createQuoteFromPdf:", error);
-        throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
+        console.error("Error in parseQuoteDatafromPdf:", error);
+        throw new Error(`Error in parseQuoteDatafromPdf: ${String(error)}`);
       }
     }),
 

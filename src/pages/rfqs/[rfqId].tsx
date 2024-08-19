@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { api } from "~/utils/api";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import {
   Table,
   TableBody,
@@ -12,17 +12,12 @@ import {
   TableRow
 } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 
-import {
-  statusClassMap,
-  TableComponent
-} from "~/components/common/TableComponent";
+import { statusClassMap } from "~/components/common/TableComponent";
 import { cn } from "~/lib/utils";
 import { Attachment } from "~/components/chat/attachment";
 import { ViewChatButton } from "~/components/chat/view-chat";
 import { ViewQuoteButton } from "~/components/quote-detail/quote-viewer";
-import { Icons } from "~/components/icons";
 import CompareQuotesButton from "~/components/quote-detail/quote-compare";
 import { Checkbox } from "~/components/ui/checkbox";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";

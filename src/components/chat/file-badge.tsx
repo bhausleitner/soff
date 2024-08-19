@@ -11,10 +11,13 @@ interface FileBadgeProps {
 }
 
 export const FileBadge = forwardRef<HTMLDivElement, FileBadgeProps>(
-  (
-    { fileName, handleOpen, handleRemove, handleDownload, uploading = false },
-    ref
-  ) => {
+  ({
+    fileName,
+    handleOpen,
+    handleRemove,
+    handleDownload,
+    uploading = false
+  }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
