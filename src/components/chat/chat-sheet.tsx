@@ -14,14 +14,8 @@ import ChatTopbar from "~/components/chat/chat-topbar";
 import { ChatList } from "~/components/chat/chat-list";
 import { EmailProvider } from "@prisma/client";
 
-export default function ChatSheetContent({
-  chatId,
-  rfqId
-}: {
-  chatId: number;
-  rfqId?: number;
-}) {
-  const { data, isLoading } = api.chat.getChat.useQuery({
+export default function ChatSheetContent({ chatId }: { chatId: number }) {
+  const { data } = api.chat.getChat.useQuery({
     chatId: chatId
   });
 

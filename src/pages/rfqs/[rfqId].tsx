@@ -40,7 +40,7 @@ export default function RfqPage() {
     console.log(checkedRows);
   }, [checkedRows]);
 
-  const { data: rfqData, isLoading } = api.rfq.getRfq.useQuery({ rfqId });
+  const { data: rfqData } = api.rfq.getRfq.useQuery({ rfqId });
 
   return (
     <div className="flex h-full flex-col space-y-4">

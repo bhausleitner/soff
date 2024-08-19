@@ -47,7 +47,7 @@ export function ViewChatButton({
           </Button>
         </SheetHeader>
         <div className="mt-4 h-[calc(100vh-100px)]">
-          <ChatSheetContent chatId={chatId} rfqId={rfqId} />
+          <ChatSheetContent chatId={chatId} />
         </div>
       </SheetContent>
     </Sheet>
