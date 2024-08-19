@@ -256,20 +256,6 @@ export const quoteRouter = createTRPCRouter({
   getQuoteComparison: publicProcedure
     .input(z.array(z.number()))
     .query(async ({ ctx, input }) => {
-      const quotes = await ctx.db.quote.findMany({
-        where: { id: { in: input } },
-        select: {
-          id: true,
-          lineItems: {
-            select: {
-              description: true,
-              price: true,
-              quantity: true
-            }
-          }
-        }
-      });
-
       // if quotecomparison does not exist
       const existingQuoteComparison = await ctx.db.quoteComparison.findFirst({
         where: { quoteIds: { equals: input } }
@@ -281,8 +267,38 @@ export const quoteRouter = createTRPCRouter({
         ) as QuoteComparison[];
       }
 
+      // if no quotecomparison exists, create a new one
+      const quotes = await ctx.db.quote.findMany({
+        where: { id: { in: input } },
+        select: {
+          id: true,
+          lineItems: {
+            select: {
+              description: true,
+              price: true,
+              quantity: true,
+              rfqLineItem: {
+                select: {
+                  id: true,
+                  description: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const processedQuotes = quotes.map((quote) => ({
+        ...quote,
+        lineItems: quote.lineItems.map((item) => ({
+          ...item,
+          rfqLineItemDescription: item?.rfqLineItem?.description,
+          rfqLineItem: undefined
+        }))
+      }));
+
       const newQuoteComparison: QuoteComparison[] =
-        await reconcileAndCompareQuotes(quotes);
+        await reconcileAndCompareQuotes(processedQuotes);
 
       await ctx.db.quoteComparison.create({
         data: {

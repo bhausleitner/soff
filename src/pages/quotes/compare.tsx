@@ -14,16 +14,16 @@ import { type QuoteComparison } from "~/utils/quote-helper";
 import { Separator } from "~/components/ui/separator";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { toast } from "sonner";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { Switch } from "~/components/ui/switch";
+import { Label } from "~/components/ui/label";
 
 export default function Compare() {
   const router = useRouter();
   const { ids } = router.query;
   const rfqId = parseInt(router.query.rfqId as string);
-
-  console.log("ids");
-  console.log(ids);
-
   const [idArray, setIdArray] = useState<number[]>([]);
+  const [detailedMode, setDetailedMode] = useState(true);
 
   useEffect(() => {
     if (typeof ids === "string") {
@@ -56,7 +56,6 @@ export default function Compare() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header section */}
       <div className="flex-shrink-0">
         <div className="flex items-center justify-between pb-4">
           {!rfqId && (
@@ -91,6 +90,14 @@ export default function Compare() {
               ]}
             />
           )}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="detailed-mode"
+              checked={detailedMode}
+              onCheckedChange={setDetailedMode}
+            />
+            <Label htmlFor="detailed-mode">Details on Hover</Label>
+          </div>
         </div>
         {!isMetaDataLoading && (
           <div
@@ -163,7 +170,7 @@ export default function Compare() {
                         >
                           <div className="col-span-1 flex min-h-20 items-center p-4">
                             <span className="text-caption-bold font-caption-bold text-subtext-color text-s">
-                              {lineItem.lineItemDescription?.slice(0, 50)}
+                              {lineItem.rfqLineItemDescription?.slice(0, 100)}
                             </span>
                           </div>
                           {quotesMetaData?.map((metaQuote) => {
@@ -191,35 +198,54 @@ export default function Compare() {
                                     </span>
                                   </div>
                                 </PopoverTrigger>
-                                {quote && (
-                                  <PopoverContent className="w-56">
-                                    <div className="text-xs text-gray-600">
-                                      <ul className="m-0 list-none p-0">
-                                        <li className="flex justify-between">
-                                          <span>Quantity:</span>
-                                          <span>
-                                            {quote?.quantity ?? "N/A"}
+                                {quote && detailedMode && (
+                                  <PopoverContent>
+                                    <div className="p-4">
+                                      <div className="space-y-4">
+                                        <div>
+                                          <h4 className="text-sm font-medium text-gray-500">
+                                            Lineitem:
+                                          </h4>
+                                          <p className="text-sm">
+                                            {quote?.originalDescription ??
+                                              "N/A"}
+                                          </p>
+                                        </div>
+                                        <Separator />
+                                        <div className="space-y-2">
+                                          <div className="flex justify-between">
+                                            <span className="text-sm text-gray-500">
+                                              Quantity:
+                                            </span>
+                                            <span className="text-sm font-medium">
+                                              {quote?.quantity ?? "N/A"}
+                                            </span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-sm text-gray-500">
+                                              Unit Price:
+                                            </span>
+                                            <span className="text-sm font-medium">
+                                              {quote
+                                                ? formatCurrency(
+                                                    quote.price / quote.quantity
+                                                  )
+                                                : "N/A"}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <Separator />
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-sm font-medium text-gray-500">
+                                            Total Price:
                                           </span>
-                                        </li>
-                                        <li className="flex justify-between">
-                                          <span>Unit Price:</span>
-                                          <span>
-                                            {quote
-                                              ? formatCurrency(
-                                                  quote.price / quote.quantity
-                                                )
-                                              : "N/A"}
-                                          </span>
-                                        </li>
-                                        <li className="flex justify-between font-semibold">
-                                          <span>Total Price:</span>
-                                          <span>
+                                          <span className="text-lg font-semibold">
                                             {quote
                                               ? formatCurrency(quote.price)
                                               : "N/A"}
                                           </span>
-                                        </li>
-                                      </ul>
+                                        </div>
+                                      </div>
                                     </div>
                                   </PopoverContent>
                                 )}
