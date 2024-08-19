@@ -2,17 +2,37 @@ import { type Quote } from "@prisma/client";
 import openai from "~/server/openai/config";
 
 export interface QuoteComparison {
-  lineItemDescription: string;
-  quotes: { quoteId: number; price: number; quantity: number }[];
+  rfqLineItemDescription: string;
+  quotes: {
+    quoteId: number;
+    price: number;
+    quantity: number;
+    originalDescription: string;
+  }[];
 }
 
 const PROMPT_OUTPUT_FORMAT: QuoteComparison[] = [
   {
-    lineItemDescription: "this is the first reconciled lineitem",
+    rfqLineItemDescription: "this is the first reconciled lineitem",
     quotes: [
-      { quoteId: 3, price: 21450, quantity: 1 },
-      { quoteId: 4, price: 24000, quantity: 1 },
-      { quoteId: 5, price: 21450, quantity: 1 }
+      {
+        quoteId: 3,
+        price: 21450,
+        quantity: 1,
+        originalDescription: "original description from this quote"
+      },
+      {
+        quoteId: 4,
+        price: 24000,
+        quantity: 1,
+        originalDescription: "original description from this quote"
+      },
+      {
+        quoteId: 5,
+        price: 21450,
+        quantity: 1,
+        originalDescription: "original description from this quote"
+      }
     ]
   }
 ];
