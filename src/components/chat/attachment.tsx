@@ -2,7 +2,6 @@ import React, { useState, forwardRef } from "react";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { FileBadge } from "~/components/chat/file-badge";
-import { api } from "~/utils/api";
 import { Icons } from "~/components/icons";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -43,17 +42,14 @@ export function Attachment({
   const router = useRouter();
   const rfqId = parseInt(router.query.rfqId as string);
 
-  const createQuoteMutation = api.quote.createQuoteFromPdf.useMutation();
+  // const parseQuoteData = api.quote.parseQuoteDatafromPdf.useMutation();
 
   const handleCreateQuote = async () => {
     try {
       setIsParsing(true);
-      const quoteId = await createQuoteMutation.mutateAsync({
-        chatId,
-        fileKey,
-        supplierId
-      });
-      await router.push(`/quotes/${quoteId}${rfqId ? `?rfqId=${rfqId}` : ""}`);
+      await router.push(
+        `/quotes/parsing?fileKey=${fileKey}&supplierId=${supplierId}&chatId=${chatId}&rfqId=${rfqId}`
+      );
     } catch (error) {
       console.error("Error in handleCreateQuote:", error);
       toast.error("Failed to create quote. Please reach out to admin.");
@@ -75,8 +71,8 @@ export function Attachment({
         <Icons.loaderCircle className="h-4 w-4 animate-spin" />
       ) : (
         <>
-          <Icons.sparkles className="mr-2 h-4 w-4" />
           Parse Quote
+          <Icons.sparkles className="ml-2 h-4 w-4" />
         </>
       )}
     </Button>

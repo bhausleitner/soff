@@ -175,6 +175,7 @@ model RfqLineItem {
   fileNames         String[]
   requestForQuoteId Int
   requestForQuote   RequestForQuote @relation(fields: [requestForQuoteId], references: [id])
+  lineItems         LineItem[]
 
   @@index([requestForQuoteId])
 }
@@ -188,12 +189,15 @@ model LineItem {
   price       Float?
   leadTime    String?
   quoteId     Int
+  rfqLineItemId Int?
 
   part  Part? @relation(fields: [partId], references: [id])
   quote Quote @relation(fields: [quoteId], references: [id])
+  rfqLineItem RfqLineItem? @relation(fields: [rfqLineItemId], references: [id])
 
   @@index([partId])
   @@index([quoteId])
+  @@index([rfqLineItemId])
 }
 
 model Order {

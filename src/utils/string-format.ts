@@ -19,3 +19,21 @@ export function convertToHtml(plainText: string): string {
   // Replace line breaks with <br> tags
   return plainText.replace(/\n/g, "<br>");
 }
+
+export const extractFilenameParts = (path: string): [string, string] => {
+  // Get the part after the last '/'
+  const filenameWithExtension: string = path.split("/").pop() ?? "";
+
+  // Split the filename and extension
+  const lastDotIndex: number = filenameWithExtension.lastIndexOf(".");
+
+  if (lastDotIndex === -1) {
+    // No extension found
+    return [filenameWithExtension, ""];
+  }
+
+  const filename: string = filenameWithExtension.slice(0, lastDotIndex);
+  const extension: string = filenameWithExtension.slice(lastDotIndex + 1);
+
+  return [filename, extension];
+};

@@ -10,16 +10,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from "~/components/ui/resizable";
-import { Button } from "~/components/ui/button";
-import { Icons } from "~/components/icons";
 import ChatBottombar from "~/components/chat/chat-bottombar";
 import ChatTopbar from "~/components/chat/chat-topbar";
 import { ChatList } from "~/components/chat/chat-list";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from "~/components/ui/tooltip";
 import { EmailProvider } from "@prisma/client";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { ViewQuoteButton } from "~/components/quote-detail/quote-viewer";

@@ -2,6 +2,21 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const rfqRouter = createTRPCRouter({
+  getRfqFromChatId: publicProcedure
+    .input(
+      z.object({
+        chatId: z.number()
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const rfq = await ctx.db.requestForQuote.findFirst({
+        where: { chats: { some: { id: input.chatId } } },
+        include: {
+          lineItems: true
+        }
+      });
+      return rfq;
+    }),
   getRfq: publicProcedure
     .input(
       z.object({
