@@ -16,12 +16,13 @@ import { ChatList } from "~/components/chat/chat-list";
 import { EmailProvider } from "@prisma/client";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { ViewQuoteButton } from "~/components/quote-detail/quote-viewer";
+import { toast } from "sonner";
 
 export default function Exchange() {
   const router = useRouter();
   const chatId = Number(router.query.id);
   const rfqId = Number(router.query.rfqId);
-  const { data } = api.chat.getChat.useQuery({
+  const { data, isLoading } = api.chat.getChat.useQuery({
     chatId: chatId
   });
 

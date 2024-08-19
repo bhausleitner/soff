@@ -13,6 +13,7 @@ import Spinner from "~/components/spinner";
 import { type QuoteComparison } from "~/utils/quote-helper";
 import { Separator } from "~/components/ui/separator";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
+import { toast } from "sonner";
 
 export default function Compare() {
   const router = useRouter();
@@ -38,6 +39,18 @@ export default function Compare() {
       data: QuoteComparison[] | undefined;
       isLoading: boolean;
     };
+
+  useEffect(() => {
+    if (isBodyDataLoading) {
+      toast.loading("Running comparison...", {
+        duration: Infinity,
+        id: "loading-toast"
+      });
+    } else {
+      toast.dismiss("loading-toast");
+      toast.success("Comparison finished!");
+    }
+  }, [isBodyDataLoading]);
 
   const columnCount = (quotesMetaData?.length ?? 0) + 1;
 

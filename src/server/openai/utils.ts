@@ -1,20 +1,10 @@
-import { createCanvas } from "canvas";
-// import * as pdfjsLib from "pdfjs-dist";
+import { createCanvas, DOMMatrix } from "canvas";
 import { pdfjs } from "react-pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 
-// import {
-//   getDocument,
-//   GlobalWorkerOptions
-// } from "pdfjs-dist/legacy/build/pdf.js";
-
-// import { type RenderParameters } from "pdfjs-dist/types/src/display/api";
-
-// GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-
-// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// this is the reason why I'm allowing any (if we switch to reducto, we can get rid of this)
+global.DOMMatrix = DOMMatrix as any;
 
 // Function to convert ArrayBuffer to Uint8Array
 const arrayBufferToUint8Array = (buffer: ArrayBuffer): Uint8Array => {

@@ -79,6 +79,18 @@ const PDFParserPage = () => {
     }
   }, [parsedQuoteData]);
 
+  useEffect(() => {
+    if (isParsingQuote || isLoadingRfq) {
+      toast.loading("Parsing data from Quote...", {
+        duration: Infinity,
+        id: "loading-toast"
+      });
+    } else {
+      toast.dismiss("loading-toast");
+      toast.success("Quote data parsed successfully!");
+    }
+  }, [isParsingQuote, isLoadingRfq]);
+
   const handleCellEdit = (
     index: number,
     field: keyof ParsedQuoteData["lineItems"][number],
