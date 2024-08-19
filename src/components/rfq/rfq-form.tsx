@@ -362,9 +362,9 @@ export function RFQFormDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead className="sticky top-0 bg-white">
-                      Description*
+                      Part Description*
                     </TableHead>
-                    <TableHead className="sticky top-0 bg-white">
+                    <TableHead className="sticky top-0 w-28 bg-white">
                       Quantity*
                     </TableHead>
                     <TableHead className="sticky top-0 w-48 bg-white">

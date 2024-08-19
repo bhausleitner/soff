@@ -3,7 +3,6 @@ import { type Quote } from "~/server/api/routers/quote";
 import { quoteTableConfig, useGetAllQuotes } from "~/constants/tableConfigs";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { useRouter } from "next/router";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import CompareQuotesButton from "~/components/quote-detail/quote-compare";
 

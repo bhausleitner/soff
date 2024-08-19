@@ -14,7 +14,6 @@ import { type QuoteComparison } from "~/utils/quote-helper";
 import { Separator } from "~/components/ui/separator";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { toast } from "sonner";
-import { ScrollArea } from "~/components/ui/scroll-area";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 
