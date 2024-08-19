@@ -56,11 +56,15 @@ const PDFParserPage = () => {
   const router = useRouter();
   const { fileKey, supplierId, chatId, rfqId } = router.query;
   const [name, extension] = extractFilenameParts(fileKey as string);
+  const [isManuallyParsing, setIsManuallyParsing] = useState(false);
 
-  const { data: parsedQuoteData, isLoading: isParsingQuote } =
-    api.quote.parseQuoteDatafromPdf.useQuery({
-      fileKey: fileKey as string
-    });
+  const {
+    data: parsedQuoteData,
+    isLoading: isParsingQuote,
+    refetch: refetchParsing
+  } = api.quote.parseQuoteDatafromPdf.useQuery({
+    fileKey: fileKey as string
+  });
 
   const { data: rfq, isLoading: isLoadingRfq } =
     api.rfq.getRfqFromChatId.useQuery({
@@ -80,7 +84,7 @@ const PDFParserPage = () => {
   }, [parsedQuoteData]);
 
   useEffect(() => {
-    if (isParsingQuote || isLoadingRfq) {
+    if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
       toast.loading("Parsing data from Quote...", {
         duration: Infinity,
         id: "loading-toast"
@@ -89,7 +93,7 @@ const PDFParserPage = () => {
       toast.dismiss("loading-toast");
       toast.success("Quote data parsed successfully!");
     }
-  }, [isParsingQuote, isLoadingRfq]);
+  }, [isParsingQuote, isLoadingRfq, isManuallyParsing]);
 
   const handleCellEdit = (
     index: number,
@@ -131,8 +135,17 @@ const PDFParserPage = () => {
     return `${description.substring(0, maxLength)}...`;
   };
 
+  const handleRetryParsing = async () => {
+    setIsManuallyParsing(true);
+    try {
+      await refetchParsing();
+    } finally {
+      setIsManuallyParsing(false);
+    }
+  };
+
   const renderTableContent = () => {
-    if (isParsingQuote || isLoadingRfq) {
+    if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
       const skeletonCount = rfq?.lineItems?.length ?? 3;
       return (
         <TableBody>
@@ -231,26 +244,75 @@ const PDFParserPage = () => {
 
   return (
     <>
-      <BreadCrumbWrapper
-        items={[
-          {
-            label: "RFQs",
-            href: "/rfqs"
-          },
-          {
-            label: `RFQ #${String(rfqId) ?? ""}`,
-            href: `/rfqs/${String(rfqId) ?? ""}`
-          },
-          {
-            label: `Chat #${String(chatId) ?? ""}`,
-            href: `/chat/${String(chatId) ?? ""}`
-          },
-          {
-            label: "Quote Parsing",
-            href: `/quotes/parsing`
-          }
-        ]}
-      />
+      <div className="flex flex-row justify-between">
+        <BreadCrumbWrapper
+          items={[
+            {
+              label: "RFQs",
+              href: "/rfqs"
+            },
+            {
+              label: `RFQ #${String(rfqId) ?? ""}`,
+              href: `/rfqs/${String(rfqId) ?? ""}`
+            },
+            {
+              label: `Chat #${String(chatId) ?? ""}`,
+              href: `/chat/${String(chatId) ?? ""}`
+            },
+            {
+              label: "Quote Parsing",
+              href: `/quotes/parsing`
+            }
+          ]}
+        />
+        <div className="flex flex-row gap-4">
+          <Button
+            className="w-40"
+            variant="outline"
+            onClick={handleRetryParsing}
+            disabled={isManuallyParsing || isParsingQuote || isLoadingRfq}
+          >
+            {isManuallyParsing ? (
+              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                Retry Parsing
+                <Icons.rescan className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+          <Button
+            variant="soff"
+            onClick={() => {
+              void toast.promise(
+                createQuoteMutation.mutateAsync({
+                  supplierId: Number(supplierId),
+                  chatId: Number(chatId),
+                  fileKey: String(fileKey),
+                  parsedData: parsedData
+                }),
+                {
+                  loading: "Adding quote...",
+                  success: (result) => {
+                    const quoteId =
+                      typeof result === "object" && "quoteId" in result
+                        ? result.quoteId
+                        : result;
+                    void router.push(
+                      `/quotes/${quoteId}?rfqId=${String(rfqId) ?? ""}`
+                    );
+                    return "Quote added successfully!";
+                  },
+                  error: "Failed to add quote. Please try again."
+                }
+              );
+            }}
+          >
+            Add Quote
+            <Icons.quotes className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
       <div className="mt-5">
         <ResizablePanelGroup
           direction="horizontal"
@@ -288,38 +350,6 @@ const PDFParserPage = () => {
                   {renderTableContent()}
                 </Table>
               </CardContent>
-              <CardFooter className="justify-end">
-                <Button
-                  variant="soff"
-                  onClick={() => {
-                    void toast.promise(
-                      createQuoteMutation.mutateAsync({
-                        supplierId: Number(supplierId),
-                        chatId: Number(chatId),
-                        fileKey: String(fileKey),
-                        parsedData: parsedData
-                      }),
-                      {
-                        loading: "Creating quote...",
-                        success: (result) => {
-                          const quoteId =
-                            typeof result === "object" && "quoteId" in result
-                              ? result.quoteId
-                              : result;
-                          void router.push(
-                            `/quotes/${quoteId}?rfqId=${String(rfqId) ?? ""}`
-                          );
-                          return "Quote created successfully!";
-                        },
-                        error: "Failed to create quote. Please try again."
-                      }
-                    );
-                  }}
-                >
-                  Create Quote
-                  <Icons.quotes className="ml-2 h-4 w-4" />
-                </Button>
-              </CardFooter>
             </Card>
           </ResizablePanel>
         </ResizablePanelGroup>
