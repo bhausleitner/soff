@@ -287,14 +287,8 @@ const PDFParserPage = () => {
                 }),
                 {
                   loading: "Adding quote...",
-                  success: (result) => {
-                    const quoteId =
-                      typeof result === "object" && "quoteId" in result
-                        ? result.quoteId
-                        : result;
-                    void router.push(
-                      `/quotes/${quoteId}?rfqId=${String(rfqId) ?? ""}`
-                    );
+                  success: () => {
+                    void router.push(`/rfqs/${String(rfqId)}`);
                     return "Quote added successfully!";
                   },
                   error: "Failed to add quote. Please try again."
