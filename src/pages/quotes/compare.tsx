@@ -52,7 +52,7 @@ export default function Compare() {
     if (typeof ids === "string") {
       const newIdArray = ids.split(",").filter(Boolean).map(Number);
       setIdArray(newIdArray);
-      setSelectedQuotes(newIdArray);
+      // setSelectedQuotes(newIdArray);
     }
   }, [ids]);
 
@@ -73,7 +73,7 @@ export default function Compare() {
       });
     } else {
       toast.dismiss("loading-toast");
-      toast.success("Comparison finished!");
+      // toast.success("Comparison finished!");
     }
   }, [isBodyDataLoading]);
 
