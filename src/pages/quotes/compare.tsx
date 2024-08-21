@@ -16,17 +16,43 @@ import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { toast } from "sonner";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/icons";
 
 export default function Compare() {
   const router = useRouter();
   const { ids } = router.query;
   const rfqId = parseInt(router.query.rfqId as string);
   const [idArray, setIdArray] = useState<number[]>([]);
-  const [detailedMode, setDetailedMode] = useState(true);
+  const [detailedMode, setDetailedMode] = useState(false);
+  const [selectedQuotes, setSelectedQuotes] = useState<number[]>([]);
+  const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
+    null
+  );
+  const [isCreatingPO, setIsCreatingPO] = useState(false);
+  const purchaseOrderMutation = api.quote.createPurchaseOrder.useMutation();
+
+  const handleAddToOdoo = async () => {
+    try {
+      setIsCreatingPO(true);
+      const odooId = await purchaseOrderMutation.mutateAsync({
+        quoteId: Number(selectedQuotes[0])
+      });
+      setErpPurchaseOrderId(odooId);
+      toast.success("Purchase order created in Odoo.");
+    } catch (error) {
+      console.error("Error in handleCreateQuote:", error);
+      toast.error("Failed to create PO. Please try again.");
+    } finally {
+      setIsCreatingPO(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof ids === "string") {
-      setIdArray(ids.split(",").filter(Boolean).map(Number));
+      const newIdArray = ids.split(",").filter(Boolean).map(Number);
+      setIdArray(newIdArray);
+      setSelectedQuotes(newIdArray);
     }
   }, [ids]);
 
@@ -50,6 +76,14 @@ export default function Compare() {
       toast.success("Comparison finished!");
     }
   }, [isBodyDataLoading]);
+
+  const handleQuoteSelection = (quoteId: number) => {
+    setSelectedQuotes((prev) =>
+      prev.includes(quoteId)
+        ? prev.filter((id) => id !== quoteId)
+        : [...prev, quoteId]
+    );
+  };
 
   const columnCount = (quotesMetaData?.length ?? 0) + 1;
 
@@ -89,13 +123,47 @@ export default function Compare() {
               ]}
             />
           )}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="detailed-mode"
-              checked={detailedMode}
-              onCheckedChange={setDetailedMode}
-            />
-            <Label htmlFor="detailed-mode">Details on Hover</Label>
+          <div className="flex space-x-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="detailed-mode"
+                checked={detailedMode}
+                onCheckedChange={setDetailedMode}
+              />
+              <Label htmlFor="detailed-mode">Details on Hover</Label>
+            </div>
+            {!erpPurchaseOrderId && (
+              <Button
+                variant="soff"
+                className="w-36"
+                onClick={() => handleAddToOdoo()}
+                disabled={isCreatingPO}
+              >
+                {isCreatingPO ? (
+                  <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Icons.odoo className="mr-2 h-4 w-4" />
+                    Add to Odoo
+                  </>
+                )}
+              </Button>
+            )}
+            {!!erpPurchaseOrderId && (
+              <Button
+                className="w-36"
+                variant="outline"
+                onClick={async () =>
+                  window.open(
+                    `${quotesMetaData?.[0]?.supplier?.organization?.erpUrl}/odoo/purchase/${erpPurchaseOrderId}`,
+                    "_blank"
+                  )
+                }
+              >
+                <Icons.odooLogo className="mr-2 h-4 w-4" />
+                View in Odoo
+              </Button>
+            )}
           </div>
         </div>
         {!isMetaDataLoading && (
@@ -112,6 +180,8 @@ export default function Compare() {
                 supplierName={quote.supplier.name}
                 quoteId={quote.id}
                 fileKey={quote.fileKey ?? ""}
+                isSelected={selectedQuotes.includes(quote.id)}
+                onSelect={handleQuoteSelection}
               />
             ))}
           </div>

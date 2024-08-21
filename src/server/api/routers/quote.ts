@@ -246,7 +246,12 @@ export const quoteRouter = createTRPCRouter({
           price: true,
           supplier: {
             select: {
-              name: true
+              name: true,
+              organization: {
+                select: {
+                  erpUrl: true
+                }
+              }
             }
           }
         }

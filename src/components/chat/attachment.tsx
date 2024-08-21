@@ -64,7 +64,7 @@ export function Attachment({
     <Button
       className="w-40"
       onClick={handleCreateQuote}
-      variant="outline"
+      variant="soff"
       disabled={isParsing}
     >
       {isParsing ? (

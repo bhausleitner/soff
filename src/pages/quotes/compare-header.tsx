@@ -16,17 +16,22 @@ import {
   TooltipTrigger,
   TooltipContent
 } from "~/components/ui/tooltip";
+import { Checkbox } from "~/components/ui/checkbox";
 
 interface CompareHeaderProps {
   supplierName: string;
   quoteId: number;
   fileKey: string;
+  isSelected: boolean;
+  onSelect: (quoteId: number) => void;
 }
 
 export default function CompareHeader({
   supplierName,
   quoteId,
-  fileKey
+  fileKey,
+  isSelected,
+  onSelect
 }: CompareHeaderProps) {
   const {
     isOpen,
@@ -39,14 +44,24 @@ export default function CompareHeader({
 
   return (
     <Card className="flex shrink-0 grow basis-0 flex-col items-start gap-1 self-stretch">
-      <CardHeader>
-        <CardTitle>{supplierName}</CardTitle>
-        <CardDescription>Q-{quoteId}</CardDescription>
+      <CardHeader className="w-full">
+        <div className="flex w-full flex-col">
+          <div className="flex items-center space-x-4">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelect(quoteId)}
+              aria-label={`Select quote ${quoteId}`}
+            />
+            <CardTitle>{supplierName}</CardTitle>
+          </div>
+          <div className="ml-8">
+            <CardDescription className="text-sm">Q-{quoteId}</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardFooter>
         <Tooltip>
           <TooltipTrigger asChild>
-            {/* need this div for forward ref error */}
             <div>
               <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
