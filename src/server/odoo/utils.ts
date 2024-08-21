@@ -44,16 +44,18 @@ export function quoteToPurchaseOrder(
   return {
     partner_id: 1, // Replace with the supplier's ID
     // date_order: new Date().toISOString(),
-    order_line: quote?.lineItems.map((lineItem: LineItem) => [
-      0,
-      0,
-      {
-        product_id: lineItem.partId ?? 1, // Replace with the product's ID
-        product_qty: lineItem.quantity ?? 10, // Quantity of the product
-        price_unit: lineItem.price ?? 100, // Unit price of the product
-        name: lineItem.description ?? "Product Description" // Description of the product
-      }
-    ]),
+    order_line: quote?.lineItems
+      .filter((lineItem: LineItem) => lineItem.rfqLineItemId != null)
+      .map((lineItem: LineItem) => [
+        0,
+        0,
+        {
+          product_id: lineItem.partId ?? 1, // Replace with the product's ID
+          product_qty: lineItem.quantity ?? 10, // Quantity of the product
+          price_unit: lineItem.price ?? 100, // Unit price of the product
+          name: lineItem.description ?? "Product Description" // Description of the product
+        }
+      ]),
     currency_id: 1, // Replace with the currency's ID
     company_id: 1 // Replace with the company's ID
   };

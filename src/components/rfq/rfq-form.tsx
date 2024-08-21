@@ -28,6 +28,8 @@ import { type RfqLineItem } from "@prisma/client";
 
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
+import { useUser } from "@clerk/nextjs";
+import { startCase, toLower } from "lodash";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
@@ -54,6 +56,7 @@ export function RFQFormDialog({
   refetchTrigger: () => void;
 }) {
   const router = useRouter();
+  const { user } = useUser();
   const [parts, setParts] = useState<Part[]>([
     { id: 1, description: "", quantity: 1, files: [] }
   ]);
@@ -125,7 +128,7 @@ export function RFQFormDialog({
       })
       .join("\n\n");
 
-    const closingMessage = "\n\nBest regards,\nBerni";
+    const closingMessage = `\n\nBest regards,\n${user?.firstName}`;
 
     setEmailBody(partsList ? defaultMessage + partsList + closingMessage : "");
   };
@@ -347,17 +350,14 @@ export function RFQFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="flex max-h-[calc(100vh-2rem)] min-h-[50vh] flex-col overflow-hidden sm:max-w-[800px]">
+      <DialogContent className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden p-6 sm:max-w-[1300px]">
         <DialogHeader>
           <DialogTitle>Create New RFQ</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-grow flex-col gap-6 overflow-y-auto py-4">
-          <div className="space-y-4">
-            <Label>Parts List</Label>
-            <div
-              className="overflow-y-auto rounded-md border"
-              style={{ maxHeight: "30vh" }}
-            >
+        <div className="flex flex-grow flex-col overflow-y-auto pt-4 md:flex-row">
+          {/* Left Half: Parts List */}
+          <div className="w-full space-y-4 md:w-1/2 md:pr-4">
+            <div className="h-full overflow-y-auto rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -498,25 +498,27 @@ export function RFQFormDialog({
                   </AnimatePresence>
                 </TableBody>
               </Table>
-            </div>
-            <motion.div
-              whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-              transition={{ duration: 0.2 }}
-              className="rounded-md"
-            >
-              <Button
-                variant="ghost"
-                className="w-full rounded-xl py-2 text-blue-500 hover:text-blue-700"
-                onClick={handleAddPart}
+
+              <motion.div
+                whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                transition={{ duration: 0.2 }}
+                className="m-2 rounded-md"
               >
-                <Icons.add className="mr-2 h-4 w-4" />
-                Add New Part
-              </Button>
-            </motion.div>
+                <Button
+                  variant="ghost"
+                  className="w-full rounded-xl py-2 text-blue-500 hover:text-blue-700"
+                  onClick={handleAddPart}
+                >
+                  <Icons.add className="mr-2 h-4 w-4" />
+                  Add New Part
+                </Button>
+              </motion.div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="suppliers">Suppliers</Label>
-            <div className="w-full p-1">
+
+          {/* Right Half: Suppliers and Email Draft */}
+          <div className="flex w-full flex-col space-y-4 md:w-1/2 md:pl-4">
+            <div className="w-full pr-1">
               <MultipleSelector
                 defaultOptions={supplierOptions}
                 placeholder="Select Suppliers..."
@@ -529,35 +531,34 @@ export function RFQFormDialog({
                 hideClearAllButton={true}
               />
             </div>
-          </div>
-          <div className="flex-grow space-y-2">
-            <Label htmlFor="email">Email Draft</Label>
-            <div className="flex h-full min-h-[200px] flex-col overflow-hidden rounded-md border">
-              <Input
-                id="email-subject"
-                value={emailSubject}
-                onChange={(e) => setEmailSubject(e.target.value)}
-                placeholder="Subject"
-                className="rounded-none border-0 border-b focus:ring-0"
-                style={{
-                  fontFamily: "inherit",
-                  fontSize: "0.75rem",
-                  lineHeight: "1rem"
-                }}
-              />
-              <textarea
-                ref={emailBodyRef}
-                id="email-body"
-                value={emailBody}
-                onChange={(e) => setEmailBody(e.target.value)}
-                placeholder="Compose email"
-                className="w-full flex-grow resize-none border-0 p-2 focus:outline-none"
-                style={{
-                  fontFamily: "inherit",
-                  fontSize: "0.75rem",
-                  lineHeight: "1rem"
-                }}
-              />
+            <div className="flex-grow space-y-2">
+              <div className="flex h-full flex-col overflow-hidden rounded-md border">
+                <Input
+                  id="email-subject"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Subject"
+                  className="rounded-none border-0 border-b focus:ring-0"
+                  style={{
+                    fontFamily: "inherit",
+                    fontSize: "0.9rem",
+                    lineHeight: "1rem"
+                  }}
+                />
+                <textarea
+                  ref={emailBodyRef}
+                  id="email-body"
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  placeholder="Compose email"
+                  className="w-full flex-grow resize-none border-0 p-2 focus:outline-none"
+                  style={{
+                    fontFamily: "inherit",
+                    fontSize: "0.9rem",
+                    lineHeight: "1.2rem"
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
