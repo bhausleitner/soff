@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -89,40 +89,54 @@ const PDFParserPage = () => {
     }
   }, [isParsingQuote, isLoadingRfq, isManuallyParsing]);
 
-  const handleCellEdit = (
-    index: number,
-    field: keyof ParsedQuoteData["lineItems"][number],
-    value: string | number
-  ) => {
-    setParsedData((prevData) => {
-      const newLineItems = [...prevData.lineItems];
-      const updatedItem = { ...newLineItems[index] };
+  const handleCellEdit = useCallback(
+    (
+      index: number,
+      field: keyof ParsedQuoteData["lineItems"][number],
+      value: string | number | undefined
+    ) => {
+      setParsedData((prevData) => {
+        const newLineItems = [...prevData.lineItems];
+        const updatedItem = { ...newLineItems[index] };
 
-      if (field === "quantity") {
-        updatedItem.quantity = parseInt(value as string) || 0;
-      } else if (field === "unitPrice") {
-        updatedItem.unitPrice = Number(parseFloat(value as string)) || 0;
-      } else if (field === "description") {
-        updatedItem.description = value as string;
-      } else if (field === "rfqLineItemId") {
-        updatedItem.rfqLineItemId =
-          typeof value === "number" ? value : undefined;
-      }
+        if (field === "quantity") {
+          updatedItem.quantity = parseInt(value as string) || 0;
+        } else if (field === "unitPrice") {
+          updatedItem.unitPrice = Number(parseFloat(value as string)) || 0;
+        } else if (field === "description") {
+          updatedItem.description = value as string;
+        } else if (field === "rfqLineItemId") {
+          updatedItem.rfqLineItemId =
+            value === "unmatched"
+              ? undefined
+              : typeof value === "number"
+                ? value
+                : undefined;
+        }
 
-      newLineItems[index] = updatedItem as ParsedQuoteData["lineItems"][number];
-      return { ...prevData, lineItems: newLineItems };
-    });
-  };
+        newLineItems[index] =
+          updatedItem as ParsedQuoteData["lineItems"][number];
+        return { ...prevData, lineItems: newLineItems };
+      });
+    },
+    []
+  );
 
-  const getAvailableCategories = (currentIndex: number) => {
-    const usedCategories = parsedData.lineItems
-      .filter((_, index) => index !== currentIndex)
-      .map((item) => item.rfqLineItemId)
-      .filter(Boolean);
-    return rfq?.lineItems.filter(
-      (lineItem) => !usedCategories.includes(lineItem.id)
-    );
-  };
+  const getAvailableCategories = useCallback(
+    (currentIndex: number) => {
+      if (!rfq) return [];
+
+      const usedCategories = parsedData.lineItems
+        .filter((_, index) => index !== currentIndex)
+        .map((item) => item.rfqLineItemId)
+        .filter(Boolean);
+
+      return rfq.lineItems.filter(
+        (lineItem) => !usedCategories.includes(lineItem.id)
+      );
+    },
+    [parsedData.lineItems, rfq]
+  );
 
   const truncateDescription = (description: string, maxLength = 20) => {
     if (description.length <= maxLength) return description;
@@ -210,16 +224,21 @@ const PDFParserPage = () => {
             </TableCell>
             <TableCell>
               <Select
-                value={item.rfqLineItemId?.toString()}
+                value={item.rfqLineItemId?.toString() ?? "unmatched"}
                 onValueChange={(value) =>
-                  handleCellEdit(index, "rfqLineItemId", parseInt(value))
+                  handleCellEdit(
+                    index,
+                    "rfqLineItemId",
+                    value === "unmatched" ? undefined : parseInt(value)
+                  )
                 }
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue />
+                  <SelectValue placeholder="Select a line item" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getAvailableCategories(index)?.map((lineItem) => (
+                  <SelectItem value="unmatched">Unmatched</SelectItem>
+                  {getAvailableCategories(index).map((lineItem) => (
                     <SelectItem
                       key={lineItem.id}
                       value={lineItem.id.toString()}

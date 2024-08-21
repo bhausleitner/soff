@@ -70,7 +70,7 @@ export async function syncGmailMessages(
     .map(async (gmailMessage) => {
       const extractedContent =
         htmlToText(gmailMessage.body ?? "", { wordwrap: 130 }).split(
-          "\nOn "
+          /\n(?:On |Am )/
         )[0] ?? "";
 
       const newMessageObject = await ctx.db.message.create({

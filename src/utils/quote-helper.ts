@@ -11,6 +11,16 @@ export interface QuoteComparison {
   }[];
 }
 
+export interface QuotesInput {
+  id: number;
+  lineItems: {
+    rfqLineItemDescription: string;
+    price: number;
+    quantity: number;
+    description: string;
+  }[];
+}
+
 const PROMPT_OUTPUT_FORMAT: QuoteComparison[] = [
   {
     rfqLineItemDescription: "this is the first reconciled lineitem",
@@ -37,7 +47,37 @@ const PROMPT_OUTPUT_FORMAT: QuoteComparison[] = [
   }
 ];
 
-export async function reconcileAndCompareQuotes(
+export function compareQuotes(
+  processedQuotes: QuotesInput[]
+): QuoteComparison[] {
+  const outputMap = new Map<string, QuoteComparison>();
+
+  processedQuotes.forEach((quote) => {
+    quote.lineItems.forEach((item) => {
+      if (item.rfqLineItemDescription) {
+        const outputQuote = {
+          quoteId: quote.id,
+          price: item.price,
+          quantity: item.quantity,
+          originalDescription: item?.description
+        };
+
+        if (outputMap.has(item.rfqLineItemDescription)) {
+          outputMap.get(item.rfqLineItemDescription)!.quotes.push(outputQuote);
+        } else {
+          outputMap.set(item.rfqLineItemDescription, {
+            rfqLineItemDescription: item.rfqLineItemDescription,
+            quotes: [outputQuote]
+          });
+        }
+      }
+    });
+  });
+
+  return Array.from(outputMap.values());
+}
+
+export async function reconcileAndCompareQuotesAI(
   quotes: Pick<Quote, "id">[]
 ): Promise<QuoteComparison[]> {
   const inputPrompt = `I want to compare these quotes. Reconcile the line-items. The output format should be: ${JSON.stringify(PROMPT_OUTPUT_FORMAT)}`;

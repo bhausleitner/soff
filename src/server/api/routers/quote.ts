@@ -8,7 +8,8 @@ import { convertPdfToImage } from "~/server/openai/utils";
 import * as odooUtils from "~/server/odoo/utils";
 import {
   type QuoteComparison,
-  reconcileAndCompareQuotes
+  type QuotesInput,
+  compareQuotes
 } from "~/utils/quote-helper";
 
 export const lineItemSchema = z.object({
@@ -295,10 +296,10 @@ export const quoteRouter = createTRPCRouter({
           rfqLineItemDescription: item?.rfqLineItem?.description,
           rfqLineItem: undefined
         }))
-      }));
+      })) as QuotesInput[];
 
       const newQuoteComparison: QuoteComparison[] =
-        await reconcileAndCompareQuotes(processedQuotes);
+        compareQuotes(processedQuotes);
 
       await ctx.db.quoteComparison.create({
         data: {
