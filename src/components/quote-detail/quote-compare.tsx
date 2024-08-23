@@ -10,11 +10,13 @@ import { useRouter } from "next/router";
 interface CompareQuotesButtonProps {
   checkedQuotes: number[];
   rfqId?: number;
+  variant?: "outline" | "default" | "soff";
 }
 
 export default function CompareQuotesButton({
   checkedQuotes,
-  rfqId
+  rfqId,
+  variant = "soff"
 }: CompareQuotesButtonProps) {
   const router = useRouter();
 
@@ -24,7 +26,7 @@ export default function CompareQuotesButton({
         <span>
           <Button
             disabled={checkedQuotes.length < 2}
-            variant="soff"
+            variant={variant}
             onClick={async () => {
               await router.push(
                 `/quotes/compare?ids=${checkedQuotes.join(",")}${
