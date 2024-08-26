@@ -234,11 +234,7 @@ export function FileUploader(props: FileUploaderProps) {
                     Drag {`'n'`} drop files here, or click to select files
                   </p>
                   <p className="text-sm text-muted-foreground/70">
-                    You can upload
-                    {maxFileCount > 1
-                      ? ` ${maxFileCount === Infinity ? "multiple" : maxFileCount}
-                      files (up to ${formatBytes(maxSize)} each)`
-                      : ` a file with ${formatBytes(maxSize)}`}
+                    You can upload images or PDFs.
                   </p>
                 </div>
               </div>

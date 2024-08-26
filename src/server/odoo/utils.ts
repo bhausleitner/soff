@@ -1,9 +1,28 @@
-import { type LineItem, type Quote } from "@prisma/client";
+import { type Prisma, type LineItem, type Quote } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
 const db = process.env.ODOO_DB;
 const username = process.env.ODOO_USERNAME;
 const password = process.env.ODOO_PASSWORD;
+
+type QuoteWithRelations = Prisma.QuoteGetPayload<{
+  include: {
+    lineItems: {
+      include: {
+        part: true;
+      };
+    };
+    supplier: {
+      select: {
+        organization: {
+          select: {
+            erpUrl: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
 interface PurchaseOrder {
   partner_id: number;
@@ -38,24 +57,20 @@ export function authenticate(odooUrl: string) {
   });
 }
 
-export function quoteToPurchaseOrder(
-  quote: Quote & { lineItems: LineItem[] }
-): PurchaseOrder {
+export function quoteToPurchaseOrder(quote: QuoteWithRelations): PurchaseOrder {
   return {
     partner_id: 1, // Replace with the supplier's ID
     // date_order: new Date().toISOString(),
-    order_line: quote?.lineItems
-      .filter((lineItem: LineItem) => lineItem.rfqLineItemId != null)
-      .map((lineItem: LineItem) => [
-        0,
-        0,
-        {
-          product_id: lineItem.partId ?? 1, // Replace with the product's ID
-          product_qty: lineItem.quantity ?? 10, // Quantity of the product
-          price_unit: lineItem.price ?? 100, // Unit price of the product
-          name: lineItem.description ?? "Product Description" // Description of the product
-        }
-      ]),
+    order_line: quote?.lineItems.map((lineItem: LineItem) => [
+      0,
+      0,
+      {
+        product_id: lineItem.partId ?? 1, // Replace with the product's ID
+        product_qty: lineItem.quantity ?? 10, // Quantity of the product
+        price_unit: lineItem.price ?? 100, // Unit price of the product
+        name: lineItem.description ?? "Product Description" // Description of the product
+      }
+    ]),
     currency_id: 1, // Replace with the currency's ID
     company_id: 1 // Replace with the company's ID
   };

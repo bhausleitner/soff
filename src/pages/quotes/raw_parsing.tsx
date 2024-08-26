@@ -39,7 +39,7 @@ interface ParsedQuoteData {
   }[];
 }
 
-const PDFParserPage = () => {
+const RawPDFParserPage = () => {
   const router = useRouter();
   const { fileKey } = router.query;
   console.log("fileKey");
@@ -55,7 +55,7 @@ const PDFParserPage = () => {
     fileKey: fileKey as string
   });
 
-  const createQuoteMutation = api.quote.createQuote.useMutation();
+  const createQuoteMutation = api.quote.createRawQuote.useMutation();
 
   const [parsedData, setParsedData] = useState<ParsedQuoteData>({
     lineItems: []
@@ -235,24 +235,23 @@ const PDFParserPage = () => {
           </Button>
           <Button
             variant="soff"
-            // onClick={() => {
-            //   void toast.promise(
-            //     createQuoteMutation.mutateAsync({
-            //       supplierId: Number(supplierId),
-            //       chatId: Number(chatId),
-            //       fileKey: String(fileKey),
-            //       parsedData: parsedData
-            //     }),
-            //     {
-            //       loading: "Adding quote...",
-            //       success: () => {
-            //         void router.push(`/rfqs/${String(rfqId)}`);
-            //         return "Quote added successfully!";
-            //       },
-            //       error: "Failed to add quote. Please try again."
-            //     }
-            //   );
-            // }}
+            onClick={() => {
+              void toast.promise(
+                createQuoteMutation.mutateAsync({
+                  supplierId: 1,
+                  fileKey: String(fileKey),
+                  parsedData: parsedData
+                }),
+                {
+                  loading: "Adding quote...",
+                  success: ({ quoteId }) => {
+                    void router.push(`/quotes/${String(quoteId)}`);
+                    return "Quote added successfully!";
+                  },
+                  error: "Failed to add quote. Please try again."
+                }
+              );
+            }}
           >
             Add Quote
             <Icons.quotes className="ml-2 h-4 w-4" />
@@ -303,4 +302,4 @@ const PDFParserPage = () => {
   );
 };
 
-export default PDFParserPage;
+export default RawPDFParserPage;

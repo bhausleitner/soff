@@ -180,19 +180,18 @@ model RfqLineItem {
   @@index([requestForQuoteId])
 }
 
-
 model LineItem {
-  id          Int     @id @default(autoincrement())
-  partId      Int?
-  description String?
-  quantity    Int?
-  price       Float?
-  leadTime    String?
-  quoteId     Int
+  id            Int     @id @default(autoincrement())
+  partId        Int?
+  description   String?
+  quantity      Int?
+  price         Float?
+  leadTime      String?
+  quoteId       Int
   rfqLineItemId Int?
 
-  part  Part? @relation(fields: [partId], references: [id])
-  quote Quote @relation(fields: [quoteId], references: [id])
+  part        Part?        @relation(fields: [partId], references: [id])
+  quote       Quote        @relation(fields: [quoteId], references: [id])
   rfqLineItem RfqLineItem? @relation(fields: [rfqLineItemId], references: [id])
 
   @@index([partId])
