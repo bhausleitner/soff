@@ -165,7 +165,10 @@ const QuotePage = () => {
         </div>
       </div>
       <QuoteInfo
-        quote={quoteData}
+        quotePrice={quoteData.price}
+        quotePaymentTerms={quoteData.paymentTerms ?? ""}
+        quoteCreatedAt={quoteData.createdAt}
+        quoteStatus={quoteData.status}
         supplierName={quoteData.supplierName}
         supplierContactPerson={quoteData.supplierContactPerson}
         supplierEmail={quoteData.supplierEmail}

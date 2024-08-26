@@ -59,6 +59,43 @@ export type Quote = z.infer<typeof quoteSchema>;
 export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const quoteRouter = createTRPCRouter({
+  createRawQuote: publicProcedure
+    .input(
+      z.object({
+        supplierId: z.number(),
+        fileKey: z.string(),
+        parsedData: parsedQuoteSchema
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const newQuote = await ctx.db.quote.create({
+        data: {
+          supplierId: input.supplierId,
+          price: input.parsedData?.lineItems.reduce(
+            (acc: number, item: { unitPrice: number }) => acc + item.unitPrice,
+            0
+          ),
+          status: QuoteStatus.RECEIVED,
+          fileKey: input.fileKey
+        }
+      });
+
+      await Promise.all(
+        input.parsedData.lineItems.map((lineItem) =>
+          ctx.db.lineItem.create({
+            data: {
+              quoteId: newQuote.id,
+              description: lineItem.description,
+              quantity: lineItem.quantity,
+              price: lineItem.unitPrice,
+              rfqLineItemId: lineItem.rfqLineItemId
+            }
+          })
+        )
+      );
+
+      return { quoteId: newQuote.id.toString() };
+    }),
   createQuote: publicProcedure
     .input(
       z.object({
@@ -224,10 +261,11 @@ export const quoteRouter = createTRPCRouter({
 
       return {
         ...quote,
-        supplierName: quote.supplier.name,
-        supplierContactPerson: quote.supplier.contactPerson,
-        supplierEmail: quote.supplier.email,
-        erpUrl: quote.supplier.organization?.erpUrl,
+        supplierName: quote?.supplier?.name,
+        supplierContactPerson: quote?.supplier?.contactPerson,
+        supplierEmail: quote?.supplier?.email,
+        erpUrl:
+          quote?.supplier?.organization?.erpUrl ?? "https://shoesoff.odoo.com",
         quoteHistory: quoteHistory.map((q) => ({
           id: q.id,
           version: q.version,
@@ -423,16 +461,21 @@ export const quoteRouter = createTRPCRouter({
         });
 
         // authenticate with odoo
-        const odooUrl = quote?.supplier.organization?.erpUrl;
+        let odooUrl = quote?.supplier?.organization?.erpUrl;
 
         if (!odooUrl) {
-          throw new Error("No ERP URL found");
+          console.log("No ERP URL found, defaulting to shoesoff");
+          odooUrl = "https://shoesoff.odoo.com";
         }
 
         const odooUid = await odooUtils.authenticate(odooUrl);
 
         if (typeof odooUid !== "number") {
           throw new Error("No ERP user id found");
+        }
+
+        if (!quote) {
+          throw new Error("Quote not found");
         }
 
         // create purchase order object from quote

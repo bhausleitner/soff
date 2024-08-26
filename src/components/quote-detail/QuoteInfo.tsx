@@ -4,14 +4,20 @@ import { type Quote } from "~/server/api/routers/quote";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface QuoteInfoProps {
-  quote: Quote;
-  supplierName: string;
-  supplierContactPerson: string;
-  supplierEmail: string;
+  quotePrice?: number;
+  quotePaymentTerms: string;
+  quoteCreatedAt: Date;
+  quoteStatus?: string;
+  supplierName?: string;
+  supplierContactPerson?: string;
+  supplierEmail?: string;
 }
 
 export function QuoteInfo({
-  quote,
+  quotePrice,
+  quotePaymentTerms,
+  quoteCreatedAt,
+  quoteStatus,
   supplierName,
   supplierContactPerson,
   supplierEmail
@@ -24,11 +30,11 @@ export function QuoteInfo({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${quote.price ? quote.price : "$-"}
+            ${quotePrice ? quotePrice : "$-"}
           </div>
-          {quote.paymentTerms && (
+          {quotePaymentTerms && (
             <p className="text-xs text-muted-foreground">
-              Payment terms: {quote.paymentTerms}
+              Payment terms: {quotePaymentTerms}
             </p>
           )}
         </CardContent>
@@ -37,20 +43,22 @@ export function QuoteInfo({
         title="Quote Details"
         lines={[
           //display date as tay and time without gmt and timezone
-          `Received: ${new Date(quote.createdAt).toLocaleString()}`,
-          `Status: ${quote.status}`,
+          `Received: ${new Date(quoteCreatedAt).toLocaleString()}`,
+          `Status: ${quoteStatus}`,
           // if no payment terms display '-'
-          `Payment terms: ${quote.paymentTerms ? quote.paymentTerms : "-"}`
+          `Payment terms: ${quotePaymentTerms ? quotePaymentTerms : "-"}`
         ]}
       />
-      <InfoCard
-        title="Supplier Information"
-        lines={[
-          `Supplier: ${supplierName}`,
-          `Contact: ${supplierContactPerson}`,
-          `Email: ${supplierEmail}`
-        ]}
-      />
+      {supplierName && (
+        <InfoCard
+          title="Supplier Information"
+          lines={[
+            `Supplier: ${supplierName}`,
+            `Contact: ${supplierContactPerson}`,
+            `Email: ${supplierEmail}`
+          ]}
+        />
+      )}
     </div>
   );
 }

@@ -302,7 +302,11 @@ const PDFParserPage = () => {
                   supplierId: Number(supplierId),
                   chatId: Number(chatId),
                   fileKey: String(fileKey),
-                  parsedData: parsedData
+                  parsedData: {
+                    lineItems: parsedData.lineItems.filter(
+                      (item) => item.rfqLineItemId !== undefined
+                    )
+                  }
                 }),
                 {
                   loading: "Adding quote...",

@@ -83,25 +83,19 @@ export function QuoteUploadDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="soff">
-          Upload files {files.length > 0 && `(${files.length})`}
+          Upload Quotes
           <Icons.upload className="ml-2 h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Upload files</DialogTitle>
-          <DialogDescription>
-            Drag and drop your files here or click to browse.
-          </DialogDescription>
+          <DialogTitle>Upload Quotes</DialogTitle>
         </DialogHeader>
         <FileUploader
-          maxFileCount={8}
-          maxSize={8 * 1024 * 1024}
           onValueChange={setFiles}
           onUpload={handleUpload}
           progresses={uploadProgress}
           accept={{ "application/pdf": [], "image/*": [] }}
-          disabled={uploading}
         />
       </DialogContent>
     </Dialog>
