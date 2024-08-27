@@ -273,6 +273,7 @@ model Message {
   gmailMessageId    String?
   conversationId    String
   fileNames         String[]
+  ccRecipients      CcRecipient[]
 
   @@index([chatId])
   @@index([chatParticipantId])
@@ -293,4 +294,13 @@ model ChatParticipant {
   @@index([chatId])
   @@index([supplierId])
   @@index([userId])
+}
+
+model CcRecipient {
+  id        Int     @id @default(autoincrement())
+  email     String
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId Int
+
+  @@index([messageId])
 }

@@ -333,14 +333,24 @@ export async function sendOutlookAndCreateMessage(
         content: inputChatMessage.content,
         chatParticipantId: inputChatMessage.chatParticipantId,
         conversationId: lastForeignMessage.conversationId ?? "",
-        fileNames: inputChatMessage.fileNames
+        fileNames: inputChatMessage.fileNames,
+        ...(inputChatMessage.ccRecipients &&
+        inputChatMessage.ccRecipients.length > 0
+          ? {
+              ccRecipients: {
+                create: inputChatMessage.ccRecipients.map((recipient) => ({
+                  email: recipient.email
+                }))
+              }
+            }
+          : {})
       }
     });
   } else {
     // new thread
     const { newMessageId, conversationId } = await sendInitialEmail(
       msHomeAccountId,
-      "Message from Soff Chat",
+      inputChatMessage.subject ?? "",
       inputChatMessage.content,
       inputChatMessage.fileNames,
       supplierEmail
@@ -353,7 +363,17 @@ export async function sendOutlookAndCreateMessage(
         chatParticipantId: inputChatMessage.chatParticipantId,
         outlookMessageId: newMessageId,
         conversationId: conversationId,
-        fileNames: inputChatMessage.fileNames
+        fileNames: inputChatMessage.fileNames,
+        ...(inputChatMessage.ccRecipients &&
+        inputChatMessage.ccRecipients.length > 0
+          ? {
+              ccRecipients: {
+                create: inputChatMessage.ccRecipients.map((recipient) => ({
+                  email: recipient.email
+                }))
+              }
+            }
+          : {})
       }
     });
   }

@@ -155,7 +155,8 @@ export async function sendGmailAndCreateMessage(
       identifier: googleGrantId,
       requestBody: {
         to: [{ name: supplierName, email: supplierEmail }],
-        subject: "Message from Soff API",
+        cc: inputChatMessage.ccRecipients,
+        subject: inputChatMessage.subject,
         body: htmlBody,
         replyToMessageId: lastForeignMessage?.gmailMessageId ?? undefined,
         attachments
@@ -174,7 +175,17 @@ export async function sendGmailAndCreateMessage(
         content: inputChatMessage.content,
         chatParticipantId: inputChatMessage.chatParticipantId,
         conversationId: createdDraft.threadId!,
-        fileNames: inputChatMessage.fileNames
+        fileNames: inputChatMessage.fileNames,
+        ...(inputChatMessage.ccRecipients &&
+        inputChatMessage.ccRecipients.length > 0
+          ? {
+              ccRecipients: {
+                create: inputChatMessage.ccRecipients.map((recipient) => ({
+                  email: recipient.email
+                }))
+              }
+            }
+          : {})
       }
     });
   } catch (error) {
