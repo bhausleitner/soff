@@ -32,10 +32,12 @@ import { useUser } from "@clerk/nextjs";
 import EmailMultiSelector, {
   type EmailOption
 } from "~/components/ui/email-multi-select";
+import { Switch } from "../ui/switch";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
 interface Part extends PartialRfqLineItem {
+  quantityTiers: number[];
   files: FileObject[];
 }
 
@@ -60,7 +62,13 @@ export function RFQFormDialog({
   const router = useRouter();
   const { user } = useUser();
   const [parts, setParts] = useState<Part[]>([
-    { id: 1, description: "", quantity: 1, files: [] }
+    {
+      id: 1,
+      description: "",
+      quantityTiers: [1],
+      quantity: 1,
+      files: []
+    }
   ]);
   const [sendingRFQ, setSendingRFQ] = useState<boolean>(false);
   const [selectedSuppliers, setSelectedSuppliers] = useState<Option[]>([]);
@@ -71,6 +79,7 @@ export function RFQFormDialog({
   const sendMessage = api.chat.sendEmail.useMutation();
   const [ccEnabled, setCcEnabled] = useState(false);
   const [ccEmails, setCcEmails] = useState<EmailOption[]>([]);
+  const [enableTieredPrices, setEnableTieredPrices] = useState(false);
 
   // s3 file handling
   const getUploadUrlMutation = api.s3.generateUploadUrl.useMutation();
@@ -119,15 +128,23 @@ export function RFQFormDialog({
       "Hi,\n\nPlease send me a quote for the following parts:\n\n";
 
     const partsList = parts
-      .filter((part) => part.description && part.quantity)
+      .filter((part) => part.description && part.quantityTiers.length > 0)
       .map((part) => {
-        let partDetails = `- Part: ${part.description} - Quantity: ${part.quantity}`;
-        if (part.files.length > 0) {
-          partDetails += "\n   Attachments:";
+        let partDetails = `- Part: ${part.description}\n`;
+
+        if (part.quantityTiers.length === 1) {
+          partDetails += `   Quantity: ${part?.quantityTiers[0]}\n`;
+        } else {
+          partDetails += `   Quantities: ${part?.quantityTiers?.map((tier) => tier).join(" - ")}\n`;
+        }
+
+        if (part.files && part.files.length > 0) {
+          partDetails += "   Attachments:";
           part.files.forEach((fileObj) => {
             partDetails += `\n   - ${fileObj.file.name}`;
           });
         }
+
         return partDetails;
       })
       .join("\n\n");
@@ -141,7 +158,13 @@ export function RFQFormDialog({
     const newId = Math.max(...parts.map((p) => p.id), 0) + 1;
     setParts([
       ...parts,
-      { id: newId, description: "", quantity: 1, files: [] }
+      {
+        id: newId,
+        description: "",
+        quantityTiers: [1],
+        quantity: 1,
+        files: []
+      }
     ]);
   };
 
@@ -161,6 +184,53 @@ export function RFQFormDialog({
       part.id === id ? { ...part, [field]: value } : part
     );
     setParts(newParts);
+  };
+
+  const handleTierChange = (
+    partId: number,
+    tierIndex: number,
+    value: number
+  ) => {
+    setParts((prevParts) =>
+      prevParts.map((part) =>
+        part.id === partId
+          ? {
+              ...part,
+              quantityTiers: part.quantityTiers.map((tier, index) =>
+                index === tierIndex ? value : tier
+              )
+            }
+          : part
+      )
+    );
+  };
+
+  const handleAddTier = (partId: number) => {
+    setParts((prevParts) =>
+      prevParts.map((part) =>
+        part.id === partId
+          ? {
+              ...part,
+              quantityTiers: [...part.quantityTiers, 1]
+            }
+          : part
+      )
+    );
+  };
+
+  const handleDeleteTier = (partId: number, tierIndex: number) => {
+    setParts((prevParts) =>
+      prevParts.map((part) =>
+        part.id === partId
+          ? {
+              ...part,
+              quantityTiers: part.quantityTiers.filter(
+                (_, index) => index !== tierIndex
+              )
+            }
+          : part
+      )
+    );
   };
 
   const handleFileChange = async (
@@ -268,7 +338,7 @@ export function RFQFormDialog({
   const handleSendRFQs = async () => {
     setSendingRFQ(true);
     const validParts = parts.filter(
-      (part) => part.description && part.quantity
+      (part) => part.description && part.quantityTiers.length > 0
     );
     if (validParts.length === 0) {
       alert(
@@ -289,7 +359,7 @@ export function RFQFormDialog({
         ),
         rfqLineItems: validParts.map((part) => ({
           description: part.description!,
-          quantity: part.quantity!,
+          quantity: part.quantityTiers[0]!,
           fileNames: part.files.map((file) => file.fileKey).filter(Boolean)
         }))
       });
@@ -361,7 +431,19 @@ export function RFQFormDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden p-6 sm:max-w-[1300px]">
         <DialogHeader>
-          <DialogTitle>Create New RFQ</DialogTitle>
+          <div className="flex items-center justify-between space-x-2">
+            <DialogTitle>Create New RFQ</DialogTitle>
+
+            <div className="flex items-center space-x-2 pr-6">
+              <Switch
+                checked={enableTieredPrices}
+                onCheckedChange={setEnableTieredPrices}
+              />
+              <Label htmlFor="enable-tiered-prices">
+                Enable Tiered Pricing
+              </Label>
+            </div>
+          </div>
         </DialogHeader>
         <div className="flex flex-grow flex-col overflow-y-auto pt-4 md:flex-row">
           {/* Left Half: Parts List */}
@@ -392,7 +474,7 @@ export function RFQFormDialog({
                           exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <TableCell>
+                          <TableCell className="pt-4 align-top">
                             <Input
                               value={part.description ?? ""}
                               onChange={(e) =>
@@ -406,23 +488,54 @@ export function RFQFormDialog({
                               required
                             />
                           </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              value={part.quantity ?? ""}
-                              onChange={(e) =>
-                                handlePartChange(
-                                  part.id,
-                                  "quantity",
-                                  parseInt(e.target.value, 10)
-                                )
-                              }
-                              placeholder="Enter quantity"
-                              required
-                              min="1"
-                            />
+                          <TableCell className="pt-4 align-top">
+                            <div className="space-y-2">
+                              {part.quantityTiers.map((tier, tierIndex) => (
+                                <div
+                                  key={tierIndex}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <Input
+                                    type="number"
+                                    value={tier}
+                                    onChange={(e) =>
+                                      handleTierChange(
+                                        part.id,
+                                        tierIndex,
+                                        parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                    placeholder="Quantity"
+                                    min="1"
+                                  />
+                                  {enableTieredPrices && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() =>
+                                        handleDeleteTier(part.id, tierIndex)
+                                      }
+                                      className="hover:text-red-600"
+                                    >
+                                      <Icons.trash className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              ))}
+                              {enableTieredPrices && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleAddTier(part.id)}
+                                  className="text-blue-500 hover:text-blue-700"
+                                >
+                                  <Icons.add className="mr-1 h-4 w-4" />
+                                  Add Tier
+                                </Button>
+                              )}
+                            </div>
                           </TableCell>
-                          <TableCell className="w-48">
+                          <TableCell className="w-48 pt-4 align-top">
                             <div className="flex flex-col space-y-2">
                               <div className="flex items-center">
                                 <Input
@@ -483,7 +596,7 @@ export function RFQFormDialog({
                               </AnimatePresence>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="pt-4 align-top">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -495,13 +608,11 @@ export function RFQFormDialog({
                             </Button>
                           </TableCell>
                         </motion.tr>
-                        {index < parts.length - 1 && (
-                          <tr>
-                            <td colSpan={4} className="p-0">
-                              <hr className="border-t border-gray-200" />
-                            </td>
-                          </tr>
-                        )}
+                        <tr>
+                          <td colSpan={4} className="p-0">
+                            <hr className="border-t border-gray-200" />
+                          </td>
+                        </tr>
                       </React.Fragment>
                     ))}
                   </AnimatePresence>
