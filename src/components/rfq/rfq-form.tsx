@@ -29,7 +29,9 @@ import { type RfqLineItem } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
-import { startCase, toLower } from "lodash";
+import EmailMultiSelector, {
+  type EmailOption
+} from "~/components/ui/email-multi-select";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
@@ -67,6 +69,8 @@ export function RFQFormDialog({
   const emailBodyRef = useRef<HTMLTextAreaElement>(null);
   const rfqMutation = api.rfq.createRequestForQuote.useMutation();
   const sendMessage = api.chat.sendEmail.useMutation();
+  const [ccEnabled, setCcEnabled] = useState(false);
+  const [ccEmails, setCcEmails] = useState<EmailOption[]>([]);
 
   // s3 file handling
   const getUploadUrlMutation = api.s3.generateUploadUrl.useMutation();
@@ -283,7 +287,6 @@ export function RFQFormDialog({
         supplierIds: selectedSuppliers.map((supplier) =>
           parseInt(supplier.value)
         ),
-        messageBody: emailBody,
         rfqLineItems: validParts.map((part) => ({
           description: part.description!,
           quantity: part.quantity!,
@@ -308,6 +311,7 @@ export function RFQFormDialog({
             id: 0,
             chatId: chatToSupplierMap[parseInt(supplier.value)]!,
             content: emailBody,
+            subject: emailSubject,
             fileNames: validParts
               .map((part) => part.files.map((file) => file.fileKey))
               .flat()
@@ -315,8 +319,13 @@ export function RFQFormDialog({
             createdAt: new Date(),
             updatedAt: new Date(),
             chatParticipantId:
-              userChatParticipantToSupplierMap[parseInt(supplier.value)]!
+              userChatParticipantToSupplierMap[parseInt(supplier.value)]!,
+            ccRecipients: ccEmails.map((email) => ({
+              email: email.value
+            }))
           };
+
+          // backend for cc recipients :-)
 
           const sendMessagePromise = sendMessage.mutateAsync({
             chatMessage: newChatMessage,
@@ -518,7 +527,13 @@ export function RFQFormDialog({
 
           {/* Right Half: Suppliers and Email Draft */}
           <div className="flex w-full flex-col space-y-4 md:w-1/2 md:pl-4">
-            <div className="w-full pr-1">
+            <div className="flex items-center space-x-2 pr-1">
+              <Label
+                htmlFor="supplier-selector"
+                className="w-8 text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                Bcc
+              </Label>
               <MultipleSelector
                 defaultOptions={supplierOptions}
                 placeholder="Select Suppliers..."
@@ -530,8 +545,36 @@ export function RFQFormDialog({
                 onChange={(value) => setSelectedSuppliers(value)}
                 hideClearAllButton={true}
               />
+              {!ccEnabled && (
+                <Label
+                  onClick={() => setCcEnabled(!ccEnabled)}
+                  className="ml-2 w-8 cursor-pointer text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
+                >
+                  Cc
+                </Label>
+              )}
             </div>
-            <div className="flex-grow space-y-2">
+            {ccEnabled && (
+              <div className="flex items-center space-x-2 pr-1">
+                <Label
+                  onClick={() => setCcEnabled(!ccEnabled)}
+                  htmlFor="cc-input"
+                  className="w-8 cursor-pointer text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
+                >
+                  Cc
+                </Label>
+                <EmailMultiSelector
+                  value={ccEmails}
+                  onChange={(newValue) => setCcEmails(newValue)}
+                  placeholder="Enter email addresses..."
+                  maxSelected={5}
+                  onMaxSelected={(max) =>
+                    alert(`You can only select up to ${max} email addresses.`)
+                  }
+                />
+              </div>
+            )}
+            <div className="flex-grow space-y-2 pr-1">
               <div className="flex h-full flex-col overflow-hidden rounded-md border">
                 <Input
                   id="email-subject"

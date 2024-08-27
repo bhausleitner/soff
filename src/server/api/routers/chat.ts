@@ -20,6 +20,7 @@ const createChatSchema = z.object({
 const chatMessageSchema = z.object({
   id: z.number(),
   chatId: z.number(),
+  subject: z.string().optional(),
   content: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -27,7 +28,14 @@ const chatMessageSchema = z.object({
   outlookMessageId: z.string().nullable().optional(),
   gmailMessageId: z.string().nullable().optional(),
   conversationId: z.string().nullable().optional(),
-  chatParticipantId: z.number()
+  chatParticipantId: z.number(),
+  ccRecipients: z
+    .array(
+      z.object({
+        email: z.string()
+      })
+    )
+    .optional()
 });
 
 export type ChatMessage = z.infer<typeof chatMessageSchema>;

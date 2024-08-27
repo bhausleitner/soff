@@ -119,7 +119,6 @@ export const rfqRouter = createTRPCRouter({
   createRequestForQuote: publicProcedure
     .input(
       z.object({
-        messageBody: z.string(),
         supplierIds: z.array(z.number()),
         rfqLineItems: z.array(
           z.object({
