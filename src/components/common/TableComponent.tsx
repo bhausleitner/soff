@@ -61,7 +61,7 @@ function generateColumns<T extends { id: number }>(
   if (config.expandable) {
     columns.push({
       id: "expander",
-      header: ({ table }) => null,
+      header: ({}) => null,
       cell: ({ row }) => (
         <Button
           variant="ghost"

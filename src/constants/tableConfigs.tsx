@@ -13,10 +13,7 @@ import { type Row } from "@tanstack/react-table";
 import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { type PricingTier } from "@prisma/client";
-import {
-  type QuoteLineItemTableData,
-  type QuoteLineItem
-} from "~/server/api/routers/quote";
+import { type QuoteLineItem } from "~/server/api/routers/quote";
 
 export const quoteTableConfig = {
   link: "/quotes",

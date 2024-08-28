@@ -5,8 +5,6 @@ import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import CompareQuotesButton from "~/components/quote-detail/quote-compare";
-import { Button } from "~/components/ui/button";
-import { Icons } from "~/components/icons";
 import { QuoteUploadDialog } from "~/components/quote-detail/quote-upload";
 
 export default function Quote() {

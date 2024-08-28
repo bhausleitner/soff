@@ -1,4 +1,4 @@
-import { type Prisma, type LineItem, type Quote } from "@prisma/client";
+import { type Prisma, type LineItem } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
 const db = process.env.ODOO_DB;

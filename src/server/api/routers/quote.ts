@@ -63,13 +63,15 @@ export const parsedQuoteSchema = z.object({
       unitPrice: z.number(),
       description: z.string(),
       rfqLineItemId: z.number().optional(),
-      pricingTiers: z.array(
-        z.object({
-          minQuantity: z.number(),
-          maxQuantity: z.number().optional().nullable(),
-          price: z.number()
-        })
-      )
+      pricingTiers: z
+        .array(
+          z.object({
+            minQuantity: z.number(),
+            maxQuantity: z.number().optional().nullable(),
+            price: z.number()
+          })
+        )
+        .default([])
     })
   )
 });

@@ -36,7 +36,6 @@ import {
 } from "~/components/ui/resizable";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
-import { type PricingTier } from "@prisma/client";
 
 import { type ParsedQuoteData } from "~/server/api/routers/quote";
 
