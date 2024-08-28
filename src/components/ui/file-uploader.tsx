@@ -138,7 +138,7 @@ export function FileUploader(props: FileUploaderProps) {
 
       if (rejectedFiles.length > 0) {
         rejectedFiles.forEach(({ file }) => {
-          toast.error(`File ${file.name} was rejected`);
+          toast.error(`File ${file.name} was rejected due to file type`);
         });
       }
 
@@ -234,7 +234,7 @@ export function FileUploader(props: FileUploaderProps) {
                     Drag {`'n'`} drop files here, or click to select files
                   </p>
                   <p className="text-sm text-muted-foreground/70">
-                    You can upload images or PDFs.
+                    You can upload PDFs.
                   </p>
                 </div>
               </div>

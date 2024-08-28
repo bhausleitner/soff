@@ -71,7 +71,7 @@ export function QuoteUploadDialog() {
         setUploadProgress({ ...newUploadProgress });
       }
 
-      await router.push(`/quotes/raw_parsing?fileKey=${uploadedFileKey}`);
+      await router.push(`/quotes/raw-parsing?fileKey=${uploadedFileKey}`);
     } catch (error) {
       toast.error("An error occurred during file upload");
     } finally {
@@ -95,7 +95,7 @@ export function QuoteUploadDialog() {
           onValueChange={setFiles}
           onUpload={handleUpload}
           progresses={uploadProgress}
-          accept={{ "application/pdf": [], "image/*": [] }}
+          accept={{ "application/pdf": [] }}
         />
       </DialogContent>
     </Dialog>

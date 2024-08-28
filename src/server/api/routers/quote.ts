@@ -12,16 +12,6 @@ import {
   compareQuotes
 } from "~/utils/quote-helper";
 
-export const lineItemSchema = z.object({
-  id: z.number(),
-  partId: z.number().nullable(),
-  description: z.string().nullable(),
-  quantity: z.number().nullable(),
-  price: z.number().nullable(),
-  leadTime: z.string().nullable(),
-  quoteId: z.number()
-});
-
 export const quoteSchema = z.object({
   id: z.number(),
   supplierId: z.number(),
@@ -36,7 +26,31 @@ export const quoteSchema = z.object({
 });
 
 export const quoteArraySchema = z.array(quoteSchema);
+
+export const pricingTierSchema = z.object({
+  id: z.number(),
+  minQuantity: z.number(),
+  maxQuantity: z.number().nullable(),
+  price: z.number(),
+  lineItemId: z.number()
+});
+
+export const lineItemSchema = z.object({
+  id: z.number(),
+  partId: z.number().nullable(),
+  quantity: z.number().nullable(),
+  price: z.number().nullable(),
+  quoteId: z.number(),
+  description: z.string().nullable(),
+  leadTime: z.string().nullable(),
+  pricingTiers: z.array(pricingTierSchema)
+});
+
 export const lineItemArraySchema = z.array(lineItemSchema);
+
+export type PricingTier = z.infer<typeof pricingTierSchema>;
+export type QuoteLineItem = z.infer<typeof lineItemSchema>;
+export type QuoteLineItemTableData = z.infer<typeof lineItemArraySchema>;
 
 const quoteIdSchema = z.object({
   quoteId: z.number()
@@ -48,7 +62,14 @@ export const parsedQuoteSchema = z.object({
       quantity: z.number(),
       unitPrice: z.number(),
       description: z.string(),
-      rfqLineItemId: z.number().optional()
+      rfqLineItemId: z.number().optional(),
+      pricingTiers: z.array(
+        z.object({
+          minQuantity: z.number(),
+          maxQuantity: z.number().optional().nullable(),
+          price: z.number()
+        })
+      )
     })
   )
 });
@@ -88,7 +109,14 @@ export const quoteRouter = createTRPCRouter({
               description: lineItem.description,
               quantity: lineItem.quantity,
               price: lineItem.unitPrice,
-              rfqLineItemId: lineItem.rfqLineItemId
+              rfqLineItemId: lineItem.rfqLineItemId,
+              pricingTiers: {
+                create: lineItem.pricingTiers.map((tier) => ({
+                  minQuantity: tier.minQuantity,
+                  maxQuantity: tier.maxQuantity,
+                  price: tier?.price
+                }))
+              }
             }
           })
         )
@@ -144,7 +172,14 @@ export const quoteRouter = createTRPCRouter({
                   description: lineItem.description,
                   quantity: lineItem.quantity,
                   price: lineItem.unitPrice,
-                  rfqLineItemId: lineItem.rfqLineItemId
+                  rfqLineItemId: lineItem.rfqLineItemId,
+                  pricingTiers: {
+                    create: lineItem.pricingTiers.map((tier) => ({
+                      minQuantity: tier.minQuantity,
+                      maxQuantity: tier.maxQuantity,
+                      price: tier.price
+                    }))
+                  }
                 }
               })
             )
@@ -174,7 +209,14 @@ export const quoteRouter = createTRPCRouter({
                   description: lineItem.description,
                   quantity: lineItem.quantity,
                   price: lineItem.unitPrice,
-                  rfqLineItemId: lineItem.rfqLineItemId
+                  rfqLineItemId: lineItem.rfqLineItemId,
+                  pricingTiers: {
+                    create: lineItem.pricingTiers.map((tier) => ({
+                      minQuantity: tier.minQuantity,
+                      maxQuantity: tier.maxQuantity,
+                      price: tier.price
+                    }))
+                  }
                 }
               })
             )
@@ -355,14 +397,15 @@ export const quoteRouter = createTRPCRouter({
     }),
   getLineItemsByQuoteId: publicProcedure
     .input(quoteIdSchema)
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx, input }): Promise<QuoteLineItem[]> => {
       const lineItemData = await ctx.db.lineItem.findMany({
-        where: { quoteId: input.quoteId }
+        where: { quoteId: input.quoteId },
+        include: {
+          pricingTiers: true
+        }
       });
 
-      lineItemArraySchema.parse(lineItemData);
-
-      return lineItemData;
+      return lineItemArraySchema.parse(lineItemData);
     }),
   getOrdersByQuoteId: publicProcedure
     .input(quoteIdSchema)
@@ -401,7 +444,7 @@ export const quoteRouter = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: 'Given the following quote data, parse it into the specified JSON format: {"lineItems": [{"quantity": 10, "unitPrice": 100, "description": "Part 1 Description"}, {"quantity": 5, "unitPrice": 200, "description": "Part 2 Description"}]}'
+                  text: 'Given the following quote data, parse it into the specified JSON format. Include pricing tiers if available: {"lineItems": [{"quantity": 10, "unitPrice": 100, "description": "Part 1 Description", "pricingTiers": [{"minQuantity": 1, "maxQuantity": 50, "price": 100}, {"minQuantity": 51, "maxQuantity": null, "price": 90}]}, {"quantity": 5, "unitPrice": 200, "description": "Part 2 Description"}]}'
                 },
                 {
                   type: "image_url",

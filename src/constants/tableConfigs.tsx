@@ -1,5 +1,41 @@
 import { api } from "~/utils/api";
 
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "~/components/ui/table";
+import { type Row } from "@tanstack/react-table";
+import { Card, CardContent } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
+import { type PricingTier } from "@prisma/client";
+import {
+  type QuoteLineItemTableData,
+  type QuoteLineItem
+} from "~/server/api/routers/quote";
+
+export const quoteTableConfig = {
+  link: "/quotes",
+  maxRowsBeforePagination: 9,
+  placeholder: "Filter quotes...",
+  checkbox: true,
+  columns: [
+    {
+      header: "Quote ID",
+      accessorKey: "id",
+      sortable: true
+    },
+    { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
+    { header: "Part ID", accessorKey: "partId", sortable: true },
+    { header: "Quantity", accessorKey: "quantity", sortable: true },
+    { header: "Price", accessorKey: "price", sortable: true }
+  ]
+};
+
 export const supplierOrderTableConfig = {
   placeholder: "Filter orders...",
   maxRowsBeforePagination: 6,
@@ -44,24 +80,6 @@ export const supplierQuoteTableConfig = {
   ]
 };
 
-export const quoteTableConfig = {
-  link: "/quotes",
-  maxRowsBeforePagination: 9,
-  placeholder: "Filter quotes...",
-  checkbox: true,
-  columns: [
-    {
-      header: "Quote ID",
-      accessorKey: "id",
-      sortable: true
-    },
-    { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
-    { header: "Part ID", accessorKey: "partId", sortable: true },
-    { header: "Quantity", accessorKey: "quantity", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true }
-  ]
-};
-
 export const quoteLineItemTableConfig = {
   placeholder: "Filter line items...",
   maxRowsBeforePagination: 6,
@@ -72,7 +90,55 @@ export const quoteLineItemTableConfig = {
     { header: "Quantity", accessorKey: "quantity", sortable: true },
     { header: "Price", accessorKey: "price", sortable: true },
     { header: "Lead Time", accessorKey: "leadTime", sortable: true }
-  ]
+  ],
+  expandable: true,
+  renderSubComponent: (row: Row<QuoteLineItem>) => {
+    return (
+      <Table>
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b">
+                  <TableHead className="w-1/4 py-2 text-center text-xs font-medium">
+                    Min Quantity
+                  </TableHead>
+                  <TableHead className="w-1/4 py-2 text-center text-xs font-medium">
+                    Max Quantity
+                  </TableHead>
+                  <TableHead className="w-1/4 py-2 text-center text-xs font-medium">
+                    Price [USD]
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {row.original.pricingTiers.map(
+                  (tier: PricingTier, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell className="w-1/4 p-2 text-center">
+                        {tier.minQuantity}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          "w-1/4 p-2 text-center",
+                          tier.maxQuantity === null && "text-xl"
+                        )}
+                      >
+                        {tier.maxQuantity ?? "∞"}
+                      </TableCell>
+                      <TableCell className="w-1/4 p-2 text-center">
+                        {tier.price}
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </Table>
+    );
+  }
 };
 
 export const supplierTableConfig = {

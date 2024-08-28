@@ -190,13 +190,25 @@ model LineItem {
   quoteId       Int
   rfqLineItemId Int?
 
-  part        Part?        @relation(fields: [partId], references: [id])
-  quote       Quote        @relation(fields: [quoteId], references: [id])
-  rfqLineItem RfqLineItem? @relation(fields: [rfqLineItemId], references: [id])
+  part         Part?         @relation(fields: [partId], references: [id])
+  quote        Quote         @relation(fields: [quoteId], references: [id])
+  rfqLineItem  RfqLineItem?  @relation(fields: [rfqLineItemId], references: [id])
+  pricingTiers PricingTier[]
 
   @@index([partId])
   @@index([quoteId])
   @@index([rfqLineItemId])
+}
+
+model PricingTier {
+  id          Int      @id @default(autoincrement())
+  minQuantity Int
+  maxQuantity Int?
+  price       Float
+  lineItemId  Int
+  lineItem    LineItem @relation(fields: [lineItemId], references: [id])
+
+  @@index([lineItemId])
 }
 
 model Order {

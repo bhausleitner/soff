@@ -36,15 +36,9 @@ import {
 } from "~/components/ui/resizable";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
+import { type PricingTier } from "@prisma/client";
 
-interface ParsedQuoteData {
-  lineItems: {
-    quantity: number;
-    unitPrice: number;
-    description: string;
-    rfqLineItemId?: number;
-  }[];
-}
+import { type ParsedQuoteData } from "~/server/api/routers/quote";
 
 const PDFParserPage = () => {
   const router = useRouter();

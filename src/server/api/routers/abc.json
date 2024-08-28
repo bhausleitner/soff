@@ -1,50 +1,15 @@
-[
-  {
-    "id": 50,
-    "lineItems": [
-      {
-        "description": "Jaw sliding part (CNC, 6061 Aluminum, T6 / T651 / T6511, No finish)",
-        "price": 577.94,
-        "quantity": 1,
-        "rfqLineItem": { "id": 39, "description": "Bolt" }
-      }
-    ]
-  },
-  {
-    "id": 52,
-    "lineItems": [
-      {
-        "description": "CNC, 6061 Aluminum (T6 / T651 / T6511), No finish",
-        "price": 540.33,
-        "quantity": 1,
-        "rfqLineItem": { "id": 39, "description": "Bolt" }
-      }
-    ]
-  }
-]
-
-
-[
-  {
-    "id": 50,
-    "lineItems": [
-      {
-        "description": "Jaw sliding part (CNC, 6061 Aluminum, T6 / T651 / T6511, No finish)",
-        "price": 577.94,
-        "quantity": 1,
-        "rfqDescription": "Bolt"
-      }
-    ]
-  },
-  {
-    "id": 52,
-    "lineItems": [
-      {
-        "description": "CNC, 6061 Aluminum (T6 / T651 / T6511), No finish",
-        "price": 540.33,
-        "quantity": 1,
-        "rfqDescription": "Bolt"
-      }
-    ]
-  }
-]
+{
+  "lineItems": [
+    {
+      "quantity": 10,
+      "unitPrice": 100,
+      "description": "Part 1 Description",
+      "pricingTiers": [
+        { "minQuantity": 1, "maxQuantity": 50, "price": 100 },
+        { "minQuantity": 51, "maxQuantity": null, "price": 90 }
+      ]
+    },
+    { "quantity": 5, "unitPrice": 200, "description": "Part 2 Description" }
+  ],
+  "hasPricingTiers": true
+}
