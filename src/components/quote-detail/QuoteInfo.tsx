@@ -1,6 +1,5 @@
 import React from "react";
 import { InfoCard } from "~/components/common/InfoCard";
-import { type Quote } from "~/server/api/routers/quote";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface QuoteInfoProps {

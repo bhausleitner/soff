@@ -8,15 +8,9 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import { Input } from "~/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "~/components/ui/popover";
+
 import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
 import { Skeleton } from "~/components/ui/skeleton";
 import PDFViewer from "~/components/chat/pdf-viewer";
 import { useRouter } from "next/router";
@@ -56,19 +50,6 @@ const RawPDFParserPage = () => {
   const [parsedData, setParsedData] = useState<ParsedQuoteData>({
     lineItems: []
   });
-
-  console.log("parsedData");
-  console.log(parsedData);
-
-  const getDisplayValue = (
-    value: string | number | null | undefined,
-    type: string
-  ) => {
-    if (type === "text") {
-      return truncateDescription(value as string);
-    } else if (value === null || value === undefined) return "∞";
-    return String(value);
-  };
 
   useEffect(() => {
     if (parsedQuoteData) {
@@ -218,11 +199,6 @@ const RawPDFParserPage = () => {
     },
     [sortPricingTiers]
   );
-
-  const truncateDescription = (description: string, maxLength = 30) => {
-    if (description.length <= maxLength) return description;
-    return `${description.substring(0, maxLength)}...`;
-  };
 
   const handleRetryParsing = async () => {
     setIsManuallyParsing(true);

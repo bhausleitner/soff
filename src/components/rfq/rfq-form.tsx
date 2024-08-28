@@ -467,7 +467,7 @@ export function RFQFormDialog({
                 <TableBody>
                   <AnimatePresence>
                     {parts.map((part, index) => (
-                      <React.Fragment key={part.id}>
+                      <React.Fragment key={index}>
                         <motion.tr
                           initial={{ opacity: 0, y: -20 }}
                           animate={{ opacity: 1, y: 0 }}
