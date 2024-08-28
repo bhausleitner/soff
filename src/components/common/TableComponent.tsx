@@ -9,9 +9,9 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable
+  useReactTable,
+  getExpandedRowModel
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -36,6 +36,7 @@ import { cn } from "~/lib/utils";
 import { Badge } from "../ui/badge";
 import { type Status, type QuoteStatus, type RfqStatus } from "@prisma/client";
 import { formatDate } from "~/utils/time";
+import { Icons } from "~/components/icons";
 
 export const statusClassMap: Record<QuoteStatus | Status | RfqStatus, string> =
   {
@@ -56,6 +57,27 @@ function generateColumns<T extends { id: number }>(
   config: TableProps<T>["tableConfig"]
 ) {
   const columns: ColumnDef<T>[] = [];
+
+  if (config.expandable) {
+    columns.push({
+      id: "expander",
+      header: ({ table }) => null,
+      cell: ({ row }) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={() => row.toggleExpanded()}
+        >
+          <Icons.chevronRight
+            className={`h-4 w-4 transition-transform ${
+              row.getIsExpanded() ? "rotate-90" : ""
+            }`}
+          />
+        </Button>
+      )
+    });
+  }
 
   if (config.checkbox) {
     columns.push({
@@ -134,10 +156,13 @@ export function TableComponent<T extends { id: number }>({
   onSelectedRowIdsChange
 }: TableProps<T>) {
   const columns = generateColumns(tableConfig);
+  console.log("columns");
+  console.log(columns);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [expanded, setExpanded] = useState({});
   const router = useRouter();
 
   // if the parent component wants to access the selected row ids -> pass it up
@@ -159,13 +184,16 @@ export function TableComponent<T extends { id: number }>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onExpandedChange: setExpanded,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection
+      rowSelection,
+      expanded
     },
     initialState: {
       pagination: {
@@ -194,7 +222,7 @@ export function TableComponent<T extends { id: number }>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+              Columns <Icons.chevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -241,29 +269,39 @@ export function TableComponent<T extends { id: number }>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(tableConfig.link && "cursor-pointer")}
-                      onClick={async () => {
-                        if (tableConfig.link && cell.column.id !== "select") {
-                          await router.push(
-                            `${tableConfig.link}/${row.original.id}`
-                          );
-                        }
-                      }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(tableConfig.link && "cursor-pointer")}
+                        onClick={async () => {
+                          if (
+                            tableConfig.link &&
+                            cell.column.id !== "select" &&
+                            cell.column.id !== "expander"
+                          ) {
+                            await router.push(
+                              `${tableConfig.link}/${row.original.id}`
+                            );
+                          }
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && (
+                    <TableRow>
+                      <TableCell colSpan={columns.length}>
+                        {tableConfig.renderSubComponent?.(row)}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
