@@ -241,16 +241,22 @@ const RawPDFParserPage = () => {
           {Array.from({ length: skeletonCount }).map((_, index) => (
             <TableRow key={index}>
               <TableCell>
-                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-10 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-10 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-10 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-[180px]" />
+                <Skeleton className="h-10 w-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-10 w-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-10 w-full" />
               </TableCell>
             </TableRow>
           ))}
@@ -266,27 +272,28 @@ const RawPDFParserPage = () => {
               className={cn("group", expandedItems.has(index) && "bg-gray-50")}
             >
               <TableCell>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={() => toggleExpandItem(index)}
-                  >
-                    <Icons.chevronRight
-                      className={`h-4 w-4 transition-transform ${
-                        expandedItems.has(index) ? "rotate-90" : ""
-                      }`}
-                    />
-                  </Button>
-                  <EditableCell
-                    value={item.partId}
-                    onEdit={(value) =>
-                      handleCellEdit(index, "partId", value ?? "")
-                    }
-                    type="text"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => toggleExpandItem(index)}
+                >
+                  <Icons.chevronRight
+                    className={`h-4 w-4 transition-transform ${
+                      expandedItems.has(index) ? "rotate-90" : ""
+                    }`}
                   />
-                </div>
+                </Button>
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.partId}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "partId", value ?? "")
+                  }
+                  type="text"
+                />
+                {/* </div> */}
               </TableCell>
               <TableCell>
                 <EditableCell
@@ -328,7 +335,7 @@ const RawPDFParserPage = () => {
             </TableRow>
             {expandedItems.has(index) && (
               <TableRow className="bg-gray-50">
-                <TableCell colSpan={4} className="p-0">
+                <TableCell colSpan={6} className="p-0">
                   <Card className="m-2 overflow-hidden">
                     <CardContent className="p-0">
                       <Table>
@@ -447,104 +454,110 @@ const RawPDFParserPage = () => {
   };
 
   return (
-    <>
-      <div className="flex flex-row justify-between">
-        <BreadCrumbWrapper
-          items={[
-            {
-              label: "Quotes",
-              href: "/quotes"
-            },
-            {
-              label: `Raw Parsing`,
-              href: `/quotes/raw-parsing`
-            }
-          ]}
-        />
-        <div className="flex flex-row gap-4">
-          <Button
-            className="w-40"
-            variant="outline"
-            onClick={handleRetryParsing}
-            disabled={isManuallyParsing || isParsingQuote}
-          >
-            {isManuallyParsing ? (
-              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                Retry Parsing
-                <Icons.rescan className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
-          <Button
-            variant="soff"
-            onClick={() => {
-              void toast.promise(
-                createQuoteMutation.mutateAsync({
-                  supplierId: 1,
-                  fileKey: String(fileKey),
-                  parsedData: parsedData
-                }),
-                {
-                  loading: "Adding quote...",
-                  success: ({ quoteId }) => {
-                    void router.push(`/quotes/${String(quoteId)}`);
-                    return "Quote added successfully!";
-                  },
-                  error: "Failed to add quote. Please try again."
-                }
-              );
-            }}
-          >
-            Add Quote
-            <Icons.quotes className="ml-2 h-4 w-4" />
-          </Button>
+    <div className="flex h-full flex-col">
+      <div className="mb-4 flex-shrink-0">
+        <div className="flex flex-row justify-between">
+          <BreadCrumbWrapper
+            items={[
+              {
+                label: "Quotes",
+                href: "/quotes"
+              },
+              {
+                label: `Raw Parsing`,
+                href: `/quotes/raw-parsing`
+              }
+            ]}
+          />
+          <div className="flex flex-row gap-4">
+            <Button
+              className="w-40"
+              variant="outline"
+              onClick={handleRetryParsing}
+              disabled={isManuallyParsing || isParsingQuote}
+            >
+              {isManuallyParsing ? (
+                <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Retry Parsing
+                  <Icons.rescan className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+            <Button
+              variant="soff"
+              onClick={() => {
+                void toast.promise(
+                  createQuoteMutation.mutateAsync({
+                    supplierId: 1,
+                    fileKey: String(fileKey),
+                    parsedData: parsedData
+                  }),
+                  {
+                    loading: "Adding quote...",
+                    success: ({ quoteId }) => {
+                      void router.push(`/quotes/${String(quoteId)}`);
+                      return "Quote added successfully!";
+                    },
+                    error: "Failed to add quote. Please try again."
+                  }
+                );
+              }}
+            >
+              Add Quote
+              <Icons.quotes className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="mt-5">
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="min-h-[calc(100vh-10rem)] gap-5"
-        >
+      <div className="flex-grow overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel defaultSize={40} minSize={30}>
-            <Card className="mr-5 h-full w-full">
+            <Card className="mr-5 h-full">
               <CardHeader>
                 <CardTitle>
                   {name}
                   <span className="text-gray-500">.{extension}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="h-[calc(100%-4rem)]">
+              <CardContent className="h-[calc(100%-4rem)] overflow-auto">
                 <PDFViewer fileKey={fileKey as string} isDialog={false} />
               </CardContent>
             </Card>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={60} minSize={30}>
-            <Card className="flex h-full w-full flex-col">
+            <Card className="ml-5 flex h-full flex-col">
               <CardHeader>
                 <CardTitle>Parsed Data</CardTitle>
               </CardHeader>
-              <CardContent className="flex-grow overflow-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Part ID</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Unit Price [USD]</TableHead>
-                      <TableHead className="w-[70px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  {renderTableContent()}
-                </Table>
+              <CardContent className="flex-grow overflow-hidden">
+                <div className="h-full overflow-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead></TableHead>
+                        <TableHead className="text-center">Part ID</TableHead>
+                        <TableHead className="text-center">
+                          Description
+                        </TableHead>
+                        <TableHead className="text-center">Quantity</TableHead>
+                        <TableHead className="text-center">
+                          Unit Price [USD]
+                        </TableHead>
+                        <TableHead className="w-[70px]"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    {renderTableContent()}
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </>
+    </div>
   );
 };
 
