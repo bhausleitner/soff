@@ -38,7 +38,7 @@ export const extractFilenameParts = (path: string): [string, string] => {
   return [filename, extension];
 };
 
-export const truncateDescription = (description: string, maxLength = 30) => {
+export const truncateDescription = (description: string, maxLength = 20) => {
   if (description.length <= maxLength) return description;
   return `${description.substring(0, maxLength)}...`;
 };
