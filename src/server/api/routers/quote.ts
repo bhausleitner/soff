@@ -38,6 +38,7 @@ export const pricingTierSchema = z.object({
 export const lineItemSchema = z.object({
   id: z.number(),
   partId: z.number().nullable(),
+  partIdString: z.string().nullable(),
   quantity: z.number().nullable(),
   price: z.number().nullable(),
   quoteId: z.number(),
@@ -59,6 +60,7 @@ const quoteIdSchema = z.object({
 export const parsedQuoteSchema = z.object({
   lineItems: z.array(
     z.object({
+      partId: z.string(),
       quantity: z.number(),
       unitPrice: z.number(),
       description: z.string(),
@@ -108,6 +110,7 @@ export const quoteRouter = createTRPCRouter({
           ctx.db.lineItem.create({
             data: {
               quoteId: newQuote.id,
+              partIdString: lineItem.partId,
               description: lineItem.description,
               quantity: lineItem.quantity,
               price: lineItem.unitPrice,
@@ -446,7 +449,7 @@ export const quoteRouter = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: 'Given the following quote data, parse it into the specified JSON format. Include pricing tiers if available: {"lineItems": [{"quantity": 10, "unitPrice": 100, "description": "Part 1 Description", "pricingTiers": [{"minQuantity": 1, "maxQuantity": 50, "price": 100}, {"minQuantity": 51, "maxQuantity": null, "price": 90}]}, {"quantity": 5, "unitPrice": 200, "description": "Part 2 Description"}]}'
+                  text: 'Given the following quote data, parse the table into the specified JSON format with the full lineitem description. Include pricing tiers if available: {"lineItems":[{"partId":"A123","quantity":10,"unitPrice":100,"description":"Part 1 Description","pricingTiers":[{"minQuantity":1,"maxQuantity":50,"price":100},{"minQuantity":51,"maxQuantity":null,"price":90}]},{"partId":"B123","quantity":5,"unitPrice":200,"description":"Part 2 Description"}]}'
                 },
                 {
                   type: "image_url",

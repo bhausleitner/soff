@@ -36,6 +36,7 @@ import {
 } from "~/components/ui/resizable";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
+import { truncateDescription } from "~/utils/string-format";
 
 import { type ParsedQuoteData } from "~/server/api/routers/quote";
 
@@ -130,11 +131,6 @@ const PDFParserPage = () => {
     },
     [parsedData.lineItems, rfq]
   );
-
-  const truncateDescription = (description: string, maxLength = 20) => {
-    if (description.length <= maxLength) return description;
-    return `${description.substring(0, maxLength)}...`;
-  };
 
   const handleRetryParsing = async () => {
     setIsManuallyParsing(true);

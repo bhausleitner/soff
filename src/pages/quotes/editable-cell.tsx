@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { Input } from "~/components/ui/input";
 import { Infinity } from "lucide-react";
+import { truncateDescription } from "~/utils/string-format";
 
 interface EditableCellProps {
   value: string | number | null;
@@ -55,7 +56,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       if (val === "∞") return "∞";
       if (type === "number" && typeof val === "number")
         return val.toLocaleString();
-      return val.toString();
+      return truncateDescription(val.toString());
     },
     [type]
   );

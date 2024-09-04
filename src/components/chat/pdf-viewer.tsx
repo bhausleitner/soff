@@ -96,7 +96,7 @@ const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
                 <Page
                   key={`page_${currentPage}`}
                   pageNumber={currentPage}
-                  className="my-2"
+                  className="m-2"
                   scale={scale}
                 />
               )}
@@ -118,7 +118,7 @@ const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
                 <Page
                   key={`page_${index + 1}`}
                   pageNumber={index + 1}
-                  className="my-2"
+                  className="m-2"
                   scale={scale}
                 />
               ))}

@@ -82,7 +82,7 @@ export const quoteLineItemTableConfig = {
   maxRowsBeforePagination: 6,
   checkbox: true,
   columns: [
-    { header: "Part ID", accessorKey: "partId", sortable: true },
+    { header: "Part ID", accessorKey: "partIdString", sortable: true },
     { header: "Description", accessorKey: "description", sortable: true },
     { header: "Quantity", accessorKey: "quantity", sortable: true },
     { header: "Price", accessorKey: "price", sortable: true },
