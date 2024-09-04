@@ -85,8 +85,7 @@ export const quoteLineItemTableConfig = {
     { header: "Part ID", accessorKey: "partIdString", sortable: true },
     { header: "Description", accessorKey: "description", sortable: true },
     { header: "Quantity", accessorKey: "quantity", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true },
-    { header: "Lead Time", accessorKey: "leadTime", sortable: true }
+    { header: "Price", accessorKey: "price", sortable: true }
   ],
   expandable: true,
   renderSubComponent: (row: Row<QuoteLineItem>) => {
