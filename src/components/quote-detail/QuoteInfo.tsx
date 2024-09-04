@@ -29,7 +29,7 @@ export function QuoteInfo({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${quotePrice ? quotePrice : "$-"}
+            ${quotePrice ? quotePrice.toFixed(2) : "$-"}
           </div>
           {quotePaymentTerms && (
             <p className="text-xs text-muted-foreground">

@@ -83,7 +83,7 @@ const RawPDFParserPage = () => {
           updatedItem.quantity = parseInt(value as string) || 0;
         } else if (field === "unitPrice") {
           updatedItem.unitPrice = Number(parseFloat(value as string)) || 0;
-        } else if (field === "description") {
+        } else if (field === "description" ?? field === "partId") {
           updatedItem.description = value as string;
         } else if (field === "rfqLineItemId") {
           updatedItem.rfqLineItemId =
@@ -280,13 +280,22 @@ const RawPDFParserPage = () => {
                     />
                   </Button>
                   <EditableCell
-                    value={item.description}
+                    value={item.partId}
                     onEdit={(value) =>
-                      handleCellEdit(index, "description", value ?? "")
+                      handleCellEdit(index, "partId", value ?? "")
                     }
                     type="text"
                   />
                 </div>
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.description}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "description", value ?? "")
+                  }
+                  type="text"
+                />
               </TableCell>
               <TableCell>
                 <EditableCell
@@ -521,6 +530,7 @@ const RawPDFParserPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Part ID</TableHead>
                       <TableHead>Description</TableHead>
                       <TableHead>Quantity</TableHead>
                       <TableHead>Unit Price [USD]</TableHead>

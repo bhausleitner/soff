@@ -183,6 +183,7 @@ model RfqLineItem {
 model LineItem {
   id            Int     @id @default(autoincrement())
   partId        Int?
+  partIdString  String?
   description   String?
   quantity      Int?
   price         Float?
