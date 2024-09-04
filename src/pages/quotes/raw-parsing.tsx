@@ -35,6 +35,7 @@ const RawPDFParserPage = () => {
   const { fileKey } = router.query;
   const [name, extension] = extractFilenameParts(fileKey as string);
   const [isManuallyParsing, setIsManuallyParsing] = useState(false);
+  const [isCreatingQuote, setIsCreatingQuote] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
 
   const {
@@ -488,6 +489,7 @@ const RawPDFParserPage = () => {
             <Button
               variant="soff"
               onClick={() => {
+                setIsCreatingQuote(true);
                 void toast.promise(
                   createQuoteMutation.mutateAsync({
                     supplierId: 1,
@@ -503,10 +505,17 @@ const RawPDFParserPage = () => {
                     error: "Failed to add quote. Please try again."
                   }
                 );
+                setIsCreatingQuote(false);
               }}
             >
-              Add Quote
-              <Icons.quotes className="ml-2 h-4 w-4" />
+              {isCreatingQuote ? (
+                <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Add Quote
+                  <Icons.quotes className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -516,7 +525,7 @@ const RawPDFParserPage = () => {
           <ResizablePanel defaultSize={40} minSize={30}>
             <Card className="mr-5 h-full">
               <CardHeader>
-                <CardTitle>
+                <CardTitle className="break-words">
                   {name}
                   <span className="text-gray-500">.{extension}</span>
                 </CardTitle>

@@ -550,5 +550,67 @@ export const quoteRouter = createTRPCRouter({
         console.error("Error in createQuoteFromPdf:", error);
         throw new Error(`Error in createQuoteFromPdf: ${String(error)}`);
       }
+    }),
+  askQuestionAboutLineItems: publicProcedure
+    .input(
+      z.object({
+        quoteId: z.number(),
+        question: z.string()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Fetch the line items for the given quote
+      const lineItems = await ctx.db.lineItem.findMany({
+        where: { quoteId: input.quoteId },
+        select: {
+          partIdString: true,
+          description: true,
+          quantity: true,
+          price: true
+        }
+      });
+
+      if (!lineItems.length) {
+        throw new Error("No line items found");
+      }
+
+      // Prepare the prompt for the AI
+      const prompt = `
+        Given the following line items for quote #${input.quoteId}:
+        ${JSON.stringify(lineItems, null, 2)}
+
+        Please answer the following question:
+        ${input.question}
+
+        Provide a accurate answer based on the information given. Don't give markdown formatting.
+      `;
+
+      try {
+        // Call the OpenAI API
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful assistant that answers questions about quote line items."
+            },
+            { role: "user", content: prompt }
+          ],
+          max_tokens: 500
+        });
+
+        // Extract the AI's response
+        const answer = completion.choices[0]?.message?.content;
+
+        if (!answer) {
+          throw new Error("No answer generated");
+        }
+
+        return answer;
+      } catch (error) {
+        console.error("Error calling OpenAI:", error);
+        throw new Error("Failed to generate an answer. Please try again.");
+      }
     })
 });

@@ -18,6 +18,7 @@ import { useFileHandling } from "~/hooks/use-file-handling";
 import { FilePreviewDialog } from "~/components/common/FilePreviewDialog";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { ViewChatButton } from "~/components/chat/view-chat";
+import { QuestionAboutLineItems } from "~/components/quote-detail/questions";
 
 const QuotePage = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const QuotePage = () => {
   const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
     null
   );
+  const [isQuestionPanelOpen, setIsQuestionPanelOpen] = useState(false);
 
   const {
     isOpen,
@@ -106,6 +108,7 @@ const QuotePage = () => {
           />
         )}
         <div className="flex items-center space-x-4">
+          <QuestionAboutLineItems quoteId={quoteId} />
           <QuoteHistory
             currentVersion={quoteData.version}
             quoteHistory={quoteData.quoteHistory}
