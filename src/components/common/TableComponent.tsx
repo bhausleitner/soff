@@ -156,8 +156,6 @@ export function TableComponent<T extends { id: number }>({
   onSelectedRowIdsChange
 }: TableProps<T>) {
   const columns = generateColumns(tableConfig);
-  console.log("columns");
-  console.log(columns);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});

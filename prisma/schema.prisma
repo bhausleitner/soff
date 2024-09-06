@@ -234,6 +234,7 @@ model Organization {
   updatedAt        DateTime          @updatedAt
   emailProvider    EmailProvider?
   erpUrl           String?
+  erpQuoteUrl      String?
   erp              Erp?
   suppliers        Supplier[]
   users            User[]

@@ -156,7 +156,10 @@ const QuotePage = () => {
               variant="outline"
               onClick={async () =>
                 window.open(
-                  `${quoteData.erpUrl}/odoo/purchase/${erpPurchaseOrderId}`,
+                  `${quoteData.erpQuoteUrl?.replace(
+                    "{customId}",
+                    erpPurchaseOrderId.toString()
+                  )}`,
                   "_blank"
                 )
               }

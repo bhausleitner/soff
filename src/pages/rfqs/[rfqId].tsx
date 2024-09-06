@@ -36,10 +36,6 @@ export default function RfqPage() {
     );
   };
 
-  useEffect(() => {
-    console.log(checkedRows);
-  }, [checkedRows]);
-
   const { data: rfqData } = api.rfq.getRfq.useQuery({ rfqId });
 
   return (
