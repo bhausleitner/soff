@@ -1,9 +1,20 @@
-import { type Prisma, type LineItem } from "@prisma/client";
+import { type Prisma, type LineItem, type Erp } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
-const db = process.env.ODOO_DB;
-const username = process.env.ODOO_USERNAME;
-const password = process.env.ODOO_PASSWORD;
+const DB = {
+  soff: "shoesoff",
+  navvis: "prod-navvis"
+};
+
+const USERNAME = {
+  soff: process.env.SOFF_ODOO_USERNAME,
+  navvis: process.env.NAVVIS_ODOO_USERNAME
+};
+
+const PASSWORD = {
+  soff: process.env.SOFF_ODOO_PASSWORD,
+  navvis: process.env.NAVVIS_ODOO_PASSWORD
+};
 
 type QuoteWithRelations = Prisma.QuoteGetPayload<{
   include: {
@@ -38,23 +49,43 @@ interface OrderLine {
   name: string;
 }
 
-export function authenticate(odooUrl: string) {
-  const commonClient = xmlrpc.createClient({
-    url: `${odooUrl}/xmlrpc/2/common`
-  });
-  return new Promise((resolve, reject) => {
-    commonClient.methodCall(
-      "authenticate",
-      [db, username, password, {}],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (err: any, uid: number) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(uid);
-      }
+export async function authenticate(
+  odooUrl: string,
+  orgName: string
+): Promise<number | undefined> {
+  try {
+    // XML-RPC client for common services (authentication)
+    const commonClient = xmlrpc.createSecureClient(
+      `${odooUrl}/xmlrpc/2/common`
     );
-  });
+
+    // Promisify the client call to use async/await
+    const commonCall = (method: string, params: any[]): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        commonClient.methodCall(method, params, (error, value) => {
+          if (error) reject(error);
+          else resolve(value);
+        });
+      });
+    };
+
+    // Get the uid of the authenticated user
+    const uid = await commonCall("authenticate", [
+      DB[orgName as keyof typeof DB],
+      USERNAME[orgName as keyof typeof USERNAME],
+      PASSWORD[orgName as keyof typeof PASSWORD],
+      {}
+    ]);
+
+    if (!uid) {
+      throw new Error("Authentication failed");
+    }
+
+    console.log(`Authenticated successfully. User ID: ${uid}`);
+    return uid as number;
+  } catch (error) {
+    console.error("Authentication error:", error);
+  }
 }
 
 export function quoteToPurchaseOrder(quote: QuoteWithRelations): PurchaseOrder {
@@ -79,15 +110,21 @@ export function quoteToPurchaseOrder(quote: QuoteWithRelations): PurchaseOrder {
 export function createPurchaseOrder(
   odooUrl: string,
   uid: number,
-  purchaseOrderData: any
+  purchaseOrderData: any,
+  orgName: string
 ): Promise<number> {
-  const objectClient = xmlrpc.createClient({
-    url: `${odooUrl}/xmlrpc/2/object`
-  });
+  const objectClient = xmlrpc.createSecureClient(`${odooUrl}/xmlrpc/2/object`);
   return new Promise((resolve, reject) => {
     objectClient.methodCall(
       "execute_kw",
-      [db, uid, password, "purchase.order", "create", [purchaseOrderData]],
+      [
+        DB[orgName as keyof typeof DB],
+        uid,
+        PASSWORD[orgName as keyof typeof PASSWORD],
+        "purchase.order",
+        "create",
+        [purchaseOrderData]
+      ],
       //eslint-disable-next-line @typescript-eslint/no-explicit-any
       (err: any, purchaseOrderId: number) => {
         if (err) {

@@ -100,8 +100,10 @@ export const QuestionAboutLineItems: React.FC<QuestionAboutLineItemsProps> = ({
                     <div
                       key={index}
                       className={`mb-2 rounded-lg p-2 ${
-                        msg.type === "user" ? "ml-auto bg-blue-100" : "bg-white"
-                      } max-w-[80%] ${msg.type === "user" ? "text-right" : "text-left"}`}
+                        msg.type === "user"
+                          ? "ml-auto bg-blue-100"
+                          : "bg-accent"
+                      } max-w-[80%]`}
                     >
                       {msg.content}
                     </div>

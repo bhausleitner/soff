@@ -278,7 +278,8 @@ export const quoteRouter = createTRPCRouter({
               email: true,
               organization: {
                 select: {
-                  erpUrl: true
+                  erpUrl: true,
+                  erpQuoteUrl: true
                 }
               }
             }
@@ -311,8 +312,8 @@ export const quoteRouter = createTRPCRouter({
         supplierName: quote?.supplier?.name,
         supplierContactPerson: quote?.supplier?.contactPerson,
         supplierEmail: quote?.supplier?.email,
-        erpUrl:
-          quote?.supplier?.organization?.erpUrl ?? "https://shoesoff.odoo.com",
+        erpUrl: quote?.supplier?.organization?.erpUrl,
+        erpQuoteUrl: quote?.supplier?.organization?.erpQuoteUrl,
         quoteHistory: quoteHistory.map((q) => ({
           id: q.id,
           version: q.version,
@@ -500,7 +501,8 @@ export const quoteRouter = createTRPCRouter({
               select: {
                 organization: {
                   select: {
-                    erpUrl: true
+                    erpUrl: true,
+                    name: true
                   }
                 }
               }
@@ -509,14 +511,14 @@ export const quoteRouter = createTRPCRouter({
         });
 
         // authenticate with odoo
-        let odooUrl = quote?.supplier?.organization?.erpUrl;
+        const odooUrl = quote?.supplier?.organization?.erpUrl;
+        const orgName = quote?.supplier?.organization?.name?.toLowerCase();
 
-        if (!odooUrl) {
-          console.log("No ERP URL found, defaulting to shoesoff");
-          odooUrl = "https://shoesoff.odoo.com";
+        if (!odooUrl || !orgName) {
+          throw new Error("No ERP url or Org name found");
         }
 
-        const odooUid = await odooUtils.authenticate(odooUrl);
+        const odooUid = await odooUtils.authenticate(odooUrl, orgName);
 
         if (typeof odooUid !== "number") {
           throw new Error("No ERP user id found");
@@ -533,7 +535,8 @@ export const quoteRouter = createTRPCRouter({
         const purchaseOrderId = await odooUtils.createPurchaseOrder(
           odooUrl,
           odooUid,
-          purchaseOrderObject
+          purchaseOrderObject,
+          orgName
         );
 
         // update the quote object with the odoo purchase order id
@@ -582,7 +585,7 @@ export const quoteRouter = createTRPCRouter({
         Please answer the following question:
         ${input.question}
 
-        Provide a accurate answer based on the information given. Don't give markdown formatting.
+        Provide a accurate and crisp answer based on the information given. Don't give markdown formatting.
       `;
 
       try {
