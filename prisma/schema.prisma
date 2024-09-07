@@ -87,6 +87,8 @@ model Supplier {
   organizationId   Int?
   organization     Organization?     @relation(fields: [organizationId], references: [id])
   requestForQuotes RequestForQuote[]
+  utcOffset        Float             @default(0) // New field for UTC offset in hours
+
 
   @@index([name])
   @@index([organizationId])

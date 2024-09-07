@@ -9,11 +9,17 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
+import { startCase, toLower } from "lodash";
 import { type Row } from "@tanstack/react-table";
 import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { type PricingTier } from "@prisma/client";
 import { type QuoteLineItem } from "~/server/api/routers/quote";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import SupplierLocalTime from "~/components/supplier/supplier-local-time";
+import { type SupplierLineItem } from "~/server/api/routers/supplier";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 
 export const quoteTableConfig = {
   link: "/quotes",
@@ -139,14 +145,29 @@ export const quoteLineItemTableConfig = {
 
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
-  maxRowsBeforePagination: 9,
+  maxRowsBeforePagination: 7,
   link: "/suppliers",
   checkbox: true,
   columns: [
     {
-      header: "Name",
-      accessorKey: "name",
-      sortable: true
+      header: "Contact",
+      accessorKey: "contact",
+      sortable: true,
+      cell: (row: Row<SupplierLineItem>) => {
+        return (
+          <div className="flex flex-row items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-sidebar">
+                {startCase(toLower(row.original.name?.[0]))}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-bold">{row.original.name}</p>
+              <p className="text-sm text-gray-500">{row.original.email}</p>
+            </div>
+          </div>
+        );
+      }
     },
     {
       header: "Status",
@@ -154,7 +175,14 @@ export const supplierTableConfig = {
       sortable: false,
       isBadge: true
     },
-    { header: "Email", accessorKey: "email", sortable: true }
+    {
+      header: "Local Time",
+      accessorKey: "localTime",
+      sortable: false,
+      cell: (row: Row<SupplierLineItem>) => {
+        return <SupplierLocalTime utcOffset={row.original.utcOffset ?? 0} />;
+      }
+    }
   ]
 };
 

@@ -3,6 +3,20 @@ import { Status, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { quoteArraySchema } from "~/server/api/routers/quote";
 
+const supplierLineItemSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  status: z.nativeEnum(Status),
+  email: z.string().email(),
+  phone: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+  responseTime: z.number().nullable(),
+  contactPerson: z.string().nullable(),
+  utcOffset: z.number().nullable()
+});
+
+export type SupplierLineItem = z.infer<typeof supplierLineItemSchema>;
+
 export const supplierSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -53,7 +67,8 @@ export const supplierRouter = createTRPCRouter({
                   email: true,
                   status: true,
                   responseTime: true,
-                  contactPerson: true
+                  contactPerson: true,
+                  utcOffset: true
                 }
               }
             }
