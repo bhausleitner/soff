@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import BreadCrumbWrapper from "~/components/common/breadcrumb-wrapper";
 import { api } from "~/utils/api";

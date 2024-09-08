@@ -28,16 +28,9 @@ const QuotePage = () => {
   const [erpPurchaseOrderId, setErpPurchaseOrderId] = useState<number | null>(
     null
   );
-  const [isQuestionPanelOpen, setIsQuestionPanelOpen] = useState(false);
 
-  const {
-    isOpen,
-    setIsOpen,
-    isDownloading,
-    handleDownload,
-    handleClose,
-    handleOpen
-  } = useFileHandling();
+  const { isOpen, setIsOpen, isDownloading, handleDownload, handleOpen } =
+    useFileHandling();
 
   const purchaseOrderMutation = api.quote.createPurchaseOrder.useMutation();
 
@@ -129,7 +122,6 @@ const QuotePage = () => {
               fileKey={quoteData.fileKey}
               isDownloading={isDownloading}
               handleDownload={handleDownload}
-              handleClose={handleClose}
             />
           </Dialog>
 

@@ -163,6 +163,18 @@ export function TableComponent<T extends { id: number }>({
   const [expanded, setExpanded] = useState({});
   const router = useRouter();
 
+  const handleRowClick = async (row: any, cellId: string) => {
+    if (
+      tableConfig.link &&
+      cellId !== "select" &&
+      cellId !== "expander" &&
+      !cellId.includes("actions") // Assuming action cells have 'actions' in their id
+    ) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      await router.push(`${tableConfig.link}/${row?.original?.id}`);
+    }
+  };
+
   // if the parent component wants to access the selected row ids -> pass it up
   useEffect(() => {
     if (onSelectedRowIdsChange) {
@@ -272,16 +284,22 @@ export function TableComponent<T extends { id: number }>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={cn(tableConfig.link && "cursor-pointer")}
-                        onClick={async () => {
-                          if (
-                            tableConfig.link &&
+                        className={cn(
+                          tableConfig.link &&
                             cell.column.id !== "select" &&
-                            cell.column.id !== "expander"
+                            cell.column.id !== "expander" &&
+                            !cell.column.id.includes("actions") &&
+                            "cursor-pointer"
+                        )}
+                        onClick={async (
+                          e: React.MouseEvent<HTMLTableCellElement>
+                        ) => {
+                          const target = e.target as Element;
+                          if (
+                            !target.closest("button") &&
+                            !target.closest('[role="menu"]')
                           ) {
-                            await router.push(
-                              `${tableConfig.link}/${row.original.id}`
-                            );
+                            await handleRowClick(row, cell.column.id);
                           }
                         }}
                       >
