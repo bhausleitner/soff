@@ -1,9 +1,9 @@
 import React from "react";
+import { type Quote } from "@prisma/client";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
 import { type Part } from "~/server/api/routers/part";
 import { type Order } from "~/server/api/routers/supplier";
-import { type Quote } from "~/server/api/routers/quote";
 import {
   supplierOrderTableConfig,
   supplierPartTableConfig,

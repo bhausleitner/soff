@@ -17,17 +17,13 @@ import { useRouter } from "next/router";
 
 export function QuoteUploadDialog() {
   const router = useRouter();
-  const [files, setFiles] = React.useState<File[]>([]);
-  const [uploading, setUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState<
     Record<string, number>
   >({});
-  const [fileKey, setFileKey] = React.useState<string>("");
   const getUploadUrlMutation = api.s3.generateUploadUrl.useMutation();
 
   const uploadToS3 = async (file: File) => {
     const fileKey = `drag-drop/${uuidv4()}/${file.name}`;
-    setFileKey(fileKey);
     try {
       // Get S3 upload URL
       const { uploadUrl } = await getUploadUrlMutation.mutateAsync({
@@ -56,7 +52,6 @@ export function QuoteUploadDialog() {
   };
 
   const handleUpload = async (filesToUpload: File[]) => {
-    setUploading(true);
     const newUploadProgress = { ...uploadProgress };
     let uploadedFileKey = "";
     try {
@@ -73,8 +68,6 @@ export function QuoteUploadDialog() {
       await router.push(`/quotes/raw-parsing?fileKey=${uploadedFileKey}`);
     } catch (error) {
       toast.error("An error occurred during file upload");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -91,7 +84,6 @@ export function QuoteUploadDialog() {
           <DialogTitle>Upload Quotes</DialogTitle>
         </DialogHeader>
         <FileUploader
-          onValueChange={setFiles}
           onUpload={handleUpload}
           progresses={uploadProgress}
           accept={{ "application/pdf": [] }}

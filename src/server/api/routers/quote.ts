@@ -22,7 +22,18 @@ export const quoteSchema = z.object({
   updatedAt: z.date(),
   erpPurchaseOrderId: z.number().optional().nullable(),
   chatId: z.number().optional().nullable(),
-  version: z.number()
+  fileKey: z.string().optional().nullable(),
+  version: z.number(),
+  supplier: z.object({
+    name: z.string(),
+    email: z.string(),
+    organization: z
+      .object({
+        erpUrl: z.string().optional().nullable(),
+        erpQuoteUrl: z.string().optional().nullable()
+      })
+      .nullable()
+  })
 });
 
 export const quoteArraySchema = z.array(quoteSchema);
@@ -252,15 +263,18 @@ export const quoteRouter = createTRPCRouter({
         include: {
           supplier: {
             select: {
-              id: true,
               name: true,
-              organizationId: true
+              email: true,
+              organization: {
+                select: {
+                  erpUrl: true,
+                  erpQuoteUrl: true
+                }
+              }
             }
           }
         }
       });
-
-      quoteArraySchema.parse(quoteData);
 
       return quoteData;
     }),

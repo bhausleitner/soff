@@ -33,14 +33,8 @@ export default function CompareHeader({
   isSelected,
   onSelect
 }: CompareHeaderProps) {
-  const {
-    isOpen,
-    setIsOpen,
-    isDownloading,
-    handleDownload,
-    handleClose,
-    handleOpen
-  } = useFileHandling();
+  const { isOpen, setIsOpen, isDownloading, handleDownload, handleOpen } =
+    useFileHandling();
 
   return (
     <Card className="flex shrink-0 grow basis-0 flex-col items-start gap-1 self-stretch">
@@ -80,7 +74,6 @@ export default function CompareHeader({
                   fileKey={fileKey}
                   isDownloading={isDownloading}
                   handleDownload={handleDownload}
-                  handleClose={handleClose}
                 />
               </Dialog>
             </div>

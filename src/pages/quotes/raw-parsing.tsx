@@ -180,6 +180,7 @@ const RawPDFParserPage = () => {
 
       return { ...prevData, lineItems: newLineItems };
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const deletePricingTier = useCallback(
@@ -198,6 +199,7 @@ const RawPDFParserPage = () => {
         return { ...prevData, lineItems: newLineItems };
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sortPricingTiers]
   );
 

@@ -1,4 +1,4 @@
-import { type Prisma, type LineItem, type Erp } from "@prisma/client";
+import { type Prisma, type LineItem } from "@prisma/client";
 import xmlrpc from "xmlrpc";
 
 const DB = {

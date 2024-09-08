@@ -9,33 +9,119 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import { startCase, toLower } from "lodash";
 import { type Row } from "@tanstack/react-table";
 import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { type PricingTier } from "@prisma/client";
-import { type QuoteLineItem } from "~/server/api/routers/quote";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { type Quote, type QuoteLineItem } from "~/server/api/routers/quote";
 import SupplierLocalTime from "~/components/supplier/supplier-local-time";
 import { type SupplierLineItem } from "~/server/api/routers/supplier";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "~/components/ui/dropdown-menu";
+import { openErpQuoteUrl } from "~/hooks/erpHelper";
+import { SupplierBadge } from "~/components/supplier/supplier-badge";
+import { SupplierCell } from "~/components/supplier/supplier-cell";
+import { type RequestForQuoteLineItem } from "~/server/api/routers/rfq";
 
 export const quoteTableConfig = {
-  link: "/quotes",
-  maxRowsBeforePagination: 9,
+  maxRowsBeforePagination: 7,
   placeholder: "Filter quotes...",
   checkbox: true,
+  link: "/quotes",
   columns: [
     {
-      header: "Quote ID",
+      header: "ID",
       accessorKey: "id",
-      sortable: true
+      sortable: false,
+      cell: (row: Row<Quote>) => {
+        return (
+          <div className="max-w-20">
+            <p>Q{row.original.id}</p>
+          </div>
+        );
+      }
+    },
+    {
+      header: "Supplier",
+      accessorKey: "supplier",
+      sortable: false,
+      cell: (row: Row<Quote>) => {
+        return (
+          <div>
+            <p className="font-bold">{row.original.supplier.name}</p>
+            <p className="text-sm text-gray-500">
+              {row.original.supplier.email}
+            </p>
+          </div>
+        );
+      }
+    },
+
+    {
+      header: "Price",
+      accessorKey: "price",
+      sortable: true,
+      cell: (row: Row<Quote>) => {
+        return <div className="">${row.original.price.toFixed(2)}</div>;
+      }
     },
     { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
-    { header: "Part ID", accessorKey: "partId", sortable: true },
-    { header: "Quantity", accessorKey: "quantity", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true }
+    {
+      header: "Received At",
+      accessorKey: "createdAt",
+      sortable: true,
+      isDate: true
+    },
+    {
+      header: "Actions",
+      accessorKey: "actions",
+      sortable: false,
+
+      cell: (row: Row<Quote>) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <Icons.ellipsis className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                disabled={!row.original.chatId}
+                className={cn(
+                  row.original.chatId ? "cursor-pointer" : "cursor-not-allowed"
+                )}
+                onClick={async () => {
+                  window.open(`/chat/${row.original.chatId}`, "_self");
+                }}
+              >
+                <Icons.messageCircleMore className="mr-2 h-4 w-4" />
+                View Chat
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={!row.original.supplier.organization?.erpQuoteUrl}
+                className="cursor-pointer"
+                onClick={() =>
+                  openErpQuoteUrl(
+                    row.original.supplier.organization?.erpQuoteUrl ?? "",
+                    row.original.id
+                  )
+                }
+              >
+                <Icons.odooLogo className="mr-2 h-4 w-4" />
+                View in Odoo
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      }
+    }
   ]
 };
 
@@ -154,19 +240,7 @@ export const supplierTableConfig = {
       accessorKey: "contact",
       sortable: true,
       cell: (row: Row<SupplierLineItem>) => {
-        return (
-          <div className="flex flex-row items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-sidebar">
-                {startCase(toLower(row.original.name?.[0]))}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-bold">{row.original.name}</p>
-              <p className="text-sm text-gray-500">{row.original.email}</p>
-            </div>
-          </div>
-        );
+        return <SupplierCell supplier={row.original} />;
       }
     },
     {
@@ -192,13 +266,42 @@ export const rfqTableConfig = {
   link: "/rfqs",
   checkbox: true,
   columns: [
-    { header: "RFQ ID", accessorKey: "id", sortable: true },
+    {
+      header: "ID",
+      accessorKey: "id",
+      sortable: false,
+      cell: (row: Row<RequestForQuoteLineItem>) => {
+        return <p>RFQ{row.original.id}</p>;
+      }
+    },
+    {
+      header: "Subject",
+      accessorKey: "subject",
+      sortable: true,
+      cell: (row: Row<RequestForQuoteLineItem>) => {
+        return <p>{row.original.subject ?? "No subject"}</p>;
+      }
+    },
     { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
     {
       header: "Requested At",
       accessorKey: "createdAt",
       sortable: true,
       isDate: true
+    },
+    {
+      header: "Suppliers",
+      accessorKey: "suppliers",
+      sortable: false,
+      cell: (row: Row<RequestForQuoteLineItem>) => {
+        return (
+          <div className="flex flex-row gap-2">
+            {row.original.suppliers.map((supplier) => (
+              <SupplierBadge key={supplier.id} supplier={supplier} />
+            ))}
+          </div>
+        );
+      }
     }
   ]
 };

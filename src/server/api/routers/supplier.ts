@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Status, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { quoteArraySchema } from "~/server/api/routers/quote";
 
 const supplierLineItemSchema = z.object({
   id: z.number(),
@@ -11,7 +10,7 @@ const supplierLineItemSchema = z.object({
   phone: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   responseTime: z.number().nullable(),
-  contactPerson: z.string().nullable(),
+  contactPerson: z.string().nullable().optional(),
   utcOffset: z.number().nullable()
 });
 
@@ -105,8 +104,6 @@ export const supplierRouter = createTRPCRouter({
           supplierId: input.supplierId
         }
       });
-
-      quoteArraySchema.parse(quoteData);
 
       return quoteData;
     }),

@@ -28,14 +28,12 @@ export function useFileHandling() {
   };
 
   const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
 
   return {
     isOpen,
     setIsOpen,
     isDownloading,
     handleDownload,
-    handleOpen,
-    handleClose
+    handleOpen
   };
 }

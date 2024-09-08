@@ -17,7 +17,6 @@ interface FilePreviewDialogProps {
   fileKey: string | null;
   isDownloading: boolean;
   handleDownload: (fileKey: string) => void;
-  handleClose: () => void;
   additionalButtons?: React.ReactNode;
 }
 
@@ -27,7 +26,6 @@ export function FilePreviewDialog({
   fileKey,
   isDownloading,
   handleDownload,
-  handleClose,
   additionalButtons
 }: FilePreviewDialogProps) {
   const fileName = fileKey?.split("/").pop() ?? "File Preview";

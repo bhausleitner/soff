@@ -31,20 +31,17 @@ const EmailMultiSelector = React.forwardRef<
   HTMLInputElement,
   EmailMultiSelectorProps
 >(
-  (
-    {
-      value,
-      onChange,
-      placeholder = "Enter email addresses...",
-      maxSelected = Number.MAX_SAFE_INTEGER,
-      onMaxSelected,
-      disabled,
-      className,
-      badgeClassName,
-      hidePlaceholderWhenSelected
-    }: EmailMultiSelectorProps,
-    ref
-  ) => {
+  ({
+    value,
+    onChange,
+    placeholder = "Enter email addresses...",
+    maxSelected = Number.MAX_SAFE_INTEGER,
+    onMaxSelected,
+    disabled,
+    className,
+    badgeClassName,
+    hidePlaceholderWhenSelected
+  }: EmailMultiSelectorProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [selected, setSelected] = useState<EmailOption[]>(
       Array.isArray(value) ? value : []

@@ -1,6 +1,27 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
+const requestForQuoteLineItemSchema = z.object({
+  id: z.number(),
+  description: z.string(),
+  quantity: z.number(),
+  fileNames: z.array(z.string()),
+  subject: z.string(),
+  createdAt: z.date(),
+  suppliers: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+      contactPerson: z.string()
+    })
+  )
+});
+
+export type RequestForQuoteLineItem = z.infer<
+  typeof requestForQuoteLineItemSchema
+>;
+
 export const rfqRouter = createTRPCRouter({
   getRfqFromChatId: publicProcedure
     .input(
@@ -112,8 +133,19 @@ export const rfqRouter = createTRPCRouter({
       }
 
       const rfqs = await ctx.db.requestForQuote.findMany({
-        where: { organizationId: user.organizationId }
+        where: { organizationId: user.organizationId },
+        include: {
+          suppliers: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              contactPerson: true
+            }
+          }
+        }
       });
+
       return rfqs;
     }),
   createRequestForQuote: publicProcedure
@@ -126,7 +158,8 @@ export const rfqRouter = createTRPCRouter({
             quantity: z.number(),
             fileNames: z.array(z.string())
           })
-        )
+        ),
+        subject: z.string()
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -145,6 +178,7 @@ export const rfqRouter = createTRPCRouter({
           organization: {
             connect: { id: user.organizationId }
           },
+          subject: input.subject,
           suppliers: {
             connect: input.supplierIds.map((id) => ({ id }))
           }

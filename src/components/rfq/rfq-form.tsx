@@ -357,6 +357,7 @@ export function RFQFormDialog({
         supplierIds: selectedSuppliers.map((supplier) =>
           parseInt(supplier.value)
         ),
+        subject: emailSubject,
         rfqLineItems: validParts.map((part) => ({
           description: part.description!,
           quantity: part.quantityTiers[0]!,

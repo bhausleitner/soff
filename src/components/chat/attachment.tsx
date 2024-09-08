@@ -30,14 +30,8 @@ export function Attachment({
   isUserMessage,
   supplierId
 }: AttachmentProps) {
-  const {
-    isOpen,
-    setIsOpen,
-    isDownloading,
-    handleDownload,
-    handleOpen,
-    handleClose
-  } = useFileHandling();
+  const { isOpen, setIsOpen, isDownloading, handleDownload, handleOpen } =
+    useFileHandling();
   const [isParsing, setIsParsing] = useState(false);
   const router = useRouter();
   const rfqId = parseInt(router.query.rfqId as string);
@@ -93,7 +87,6 @@ export function Attachment({
         fileKey={fileKey}
         isDownloading={isDownloading}
         handleDownload={handleDownload}
-        handleClose={handleClose}
         additionalButtons={additionalButtons}
       />
     </Dialog>
