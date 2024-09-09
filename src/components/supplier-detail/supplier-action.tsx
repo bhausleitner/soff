@@ -8,7 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "../ui/dropdown-menu";
-import { type Supplier } from "~/server/api/routers/supplier";
+
+import { type Supplier } from "@prisma/client";
 
 interface SupplierActionProps {
   row: {
@@ -30,7 +31,7 @@ export function SupplierAction({ row }: SupplierActionProps) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem
-          onClick={() => navigator.clipboard.writeText(supplier.email)}
+          onClick={() => navigator.clipboard.writeText(supplier?.email ?? "")}
         >
           Copy supplier Email
         </DropdownMenuItem>

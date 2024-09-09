@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "~/lib/utils";
 import { buttonVariants } from "~/components/ui/button";
 
-import { type Supplier } from "~/server/api/routers/supplier";
+import { type Supplier } from "@prisma/client";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { startCase, toLower } from "lodash";
 import {

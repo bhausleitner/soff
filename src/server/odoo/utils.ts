@@ -1,5 +1,22 @@
 import { type Prisma, type LineItem } from "@prisma/client";
 import xmlrpc from "xmlrpc";
+import { db } from "~/server/db";
+
+type OdooSupplier = {
+  id: number;
+  name: string;
+  email: string | false;
+  phone: string | false;
+  function: string | false;
+  company_id: false;
+  country_id: [number, string] | false;
+  display_name: string;
+  parent_id: [number, string] | false;
+  city: string | false;
+  street: string | false;
+  street2: false;
+  zip: string | false;
+};
 
 const DB = {
   soff: "shoesoff",
@@ -68,7 +85,6 @@ export async function authenticate(
         });
       });
     };
-
     // Get the uid of the authenticated user
     const uid = await commonCall("authenticate", [
       DB[orgName as keyof typeof DB],
@@ -134,4 +150,149 @@ export function createPurchaseOrder(
       }
     );
   });
+}
+
+export function getAllContacts(
+  odooUrl: string,
+  uid: number,
+  orgName: string
+): Promise<any[]> {
+  const objectClient = xmlrpc.createSecureClient(`${odooUrl}/xmlrpc/2/object`);
+  return new Promise((resolve, reject) => {
+    objectClient.methodCall(
+      "execute_kw",
+      [
+        DB[orgName as keyof typeof DB],
+        uid,
+        PASSWORD[orgName as keyof typeof PASSWORD],
+        "res.partner",
+        "search_read",
+        [[]], // Empty domain to get all contacts
+        {
+          fields: [
+            "name",
+            "email",
+            "phone",
+            "function",
+            "country_id",
+            "display_name",
+            "parent_id",
+            "city",
+            "street",
+            "street2",
+            "zip",
+            "country_id"
+          ],
+          limit: 0 // Set to 0 to get all records
+        }
+      ],
+      (err: any, contacts: any[]) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(contacts);
+      }
+    );
+  });
+}
+
+export async function syncSuppliers(
+  odooUrl: string,
+  odooUid: number,
+  orgName: string,
+  orgId: number
+) {
+  const suppliers = await getAllContacts(odooUrl, odooUid, orgName);
+
+  // iterate through suppliers, if parent_id = false -> create new supplier
+  async function createSupplier(supplier: OdooSupplier) {
+    if (supplier.parent_id === false) {
+      // if supplier already exists -> return
+      const supplierExists =
+        (await db.supplier.findFirst({
+          where: {
+            erpId: supplier.id,
+            organizationId: orgId
+          },
+          select: {
+            id: true
+          }
+        })) !== null;
+
+      if (supplierExists) {
+        return;
+      }
+      await db.supplier.create({
+        data: {
+          name: supplier.name ? supplier.name : "",
+          erpId: supplier.id,
+          email: supplier.email ? supplier.email : "",
+          phone: supplier.phone ? supplier.phone : "",
+          function: supplier.function ? supplier.function : "",
+          city: supplier.city ? supplier.city : "",
+          street: supplier.street ? supplier.street : "",
+          street2: supplier.street2 ? (supplier.street2 as string) : "",
+          zip: supplier.zip ? supplier.zip : "",
+          country: supplier.country_id ? supplier.country_id[1] : "",
+          organizationId: orgId
+        }
+      });
+    }
+  }
+
+  // iterate through suppliers again, if parent_id exists -> create contact object and add to suppliers
+  async function createContact(supplier: OdooSupplier) {
+    if (supplier.parent_id !== false) {
+      const contactExists =
+        (await db.supplier.findFirst({
+          where: {
+            erpId: supplier.id,
+            organizationId: orgId
+          }
+        })) !== null;
+
+      if (contactExists) {
+        return;
+      }
+
+      const parentSupplier = await db.supplier.findFirst({
+        where: {
+          erpId: supplier.parent_id[0],
+          organizationId: orgId
+        },
+        select: {
+          id: true,
+          name: true
+        }
+      });
+
+      if (!parentSupplier) {
+        return;
+      }
+
+      await db.supplier.create({
+        data: {
+          name: parentSupplier.name ? parentSupplier.name : "",
+          contactPerson: supplier.name ? supplier.name : "",
+          erpId: supplier.id,
+          email: supplier.email ? supplier.email : "",
+          phone: supplier.phone ? supplier.phone : "",
+          function: supplier.function ? supplier.function : "",
+          city: supplier.city ? supplier.city : "",
+          street: supplier.street ? supplier.street : "",
+          street2: supplier.street2 ? (supplier.street2 as string) : "",
+          zip: supplier.zip ? supplier.zip : "",
+          country: supplier.country_id ? supplier.country_id[1] : "",
+          supplierParentId: parentSupplier.id,
+          organizationId: orgId
+        }
+      });
+    }
+  }
+
+  // Create suppliers first
+  await Promise.all(suppliers.map(createSupplier));
+
+  // Then create contacts
+  await Promise.all(suppliers.map(createContact));
 }

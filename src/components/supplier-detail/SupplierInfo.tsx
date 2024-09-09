@@ -1,6 +1,6 @@
 import React from "react";
 import { InfoCard } from "~/components/common/InfoCard";
-import { type Supplier } from "~/server/api/routers/supplier";
+import { type Supplier } from "@prisma/client";
 import { Badge } from "~/components/ui/badge";
 
 export function SupplierInfo(supplier: Supplier) {
@@ -20,7 +20,7 @@ export function SupplierInfo(supplier: Supplier) {
           `${supplier.contactPerson}`,
           `Email: ${supplier.email}`,
           `Phone: ${supplier.phone}`,
-          `Address: ${supplier.address}`
+          `Street: ${supplier.street}`
         ]}
       />
       <InfoCard
