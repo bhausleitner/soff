@@ -152,6 +152,8 @@ export const supplierRouter = createTRPCRouter({
     }),
 
   syncSuppliers: publicProcedure.mutation(async ({ ctx }) => {
+    // increase timeout to 300 seconds
+    ctx.res.setTimeout(300000);
     const queryData = await ctx.db.user.findFirst({
       where: { clerkUserId: ctx.auth.userId! },
       select: {
