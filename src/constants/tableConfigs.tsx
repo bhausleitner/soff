@@ -45,6 +45,11 @@ export const quoteTableConfig = {
             <p>Q{row.original.id}</p>
           </div>
         );
+      },
+      filterFn: (row: Row<Quote>, columnId: string, filterValue: string) => {
+        return `Q${row.original.id}${row.original.supplier.name}${row.original.supplier.email}`
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
       }
     },
     {
@@ -241,6 +246,15 @@ export const supplierTableConfig = {
       sortable: true,
       cell: (row: Row<SupplierLineItem>) => {
         return <SupplierCell supplier={row.original} />;
+      },
+      filterFn: (
+        row: Row<SupplierLineItem>,
+        columnId: string,
+        filterValue: string
+      ) => {
+        return `${row.original.name}${row.original.email}`
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
       }
     },
     {
@@ -272,6 +286,17 @@ export const rfqTableConfig = {
       sortable: false,
       cell: (row: Row<RequestForQuoteLineItem>) => {
         return <p>RFQ{row.original.id}</p>;
+      },
+      filterFn: (
+        row: Row<RequestForQuoteLineItem>,
+        columnId: string,
+        filterValue: string
+      ) => {
+        return `RFQ${row.original.id}${row.original.subject}${row.original.suppliers
+          .map((supplier) => supplier.name)
+          .join("")}`
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
       }
     },
     {

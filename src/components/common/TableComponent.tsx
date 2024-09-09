@@ -143,7 +143,8 @@ function generateColumns<T extends { id: number }>(
         }
         const cellValue: string = row.getValue(col.accessorKey);
         return <div>{cellValue}</div>;
-      }
+      },
+      filterFn: col.filterFn
     });
   });
 
@@ -215,6 +216,8 @@ export function TableComponent<T extends { id: number }>({
   const firstFilterableColumn = table
     .getAllColumns()
     .find((column) => column.getCanFilter());
+
+  console.log(firstFilterableColumn);
 
   return (
     <div className="flex h-full w-full flex-col">

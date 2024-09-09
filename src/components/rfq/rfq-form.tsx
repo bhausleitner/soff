@@ -33,6 +33,7 @@ import EmailMultiSelector, {
   type EmailOption
 } from "~/components/ui/email-multi-select";
 import { Switch } from "../ui/switch";
+import { getLastValueOfCommaString } from "~/utils/string-format";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
@@ -95,10 +96,12 @@ export function RFQFormDialog({
 
   // Convert supplier data to options for MultipleSelector
   const supplierOptions: Option[] = supplierData
-    ? supplierData.map((supplier) => ({
-        label: supplier.name,
-        value: supplier.id.toString()
-      }))
+    ? supplierData
+        .filter((supplier) => supplier.email)
+        .map((supplier) => ({
+          label: `${supplier.name} (${supplier.email})`,
+          value: `${supplier.name},${supplier.email},${supplier.id})`
+        }))
     : [];
 
   useEffect(() => {
@@ -355,7 +358,7 @@ export function RFQFormDialog({
       // Create RFQ with toast
       const rfqCreationPromise = rfqMutation.mutateAsync({
         supplierIds: selectedSuppliers.map((supplier) =>
-          parseInt(supplier.value)
+          parseInt(getLastValueOfCommaString(supplier.value))
         ),
         subject: emailSubject,
         rfqLineItems: validParts.map((part) => ({
@@ -378,9 +381,13 @@ export function RFQFormDialog({
       // send message to each selected supplier
       await Promise.all(
         selectedSuppliers.map(async (supplier) => {
+          const supplierId = parseInt(
+            getLastValueOfCommaString(supplier.value ?? "")
+          );
+
           const newChatMessage: ChatMessage = {
             id: 0,
-            chatId: chatToSupplierMap[parseInt(supplier.value)]!,
+            chatId: chatToSupplierMap[supplierId]!,
             content: emailBody,
             subject: emailSubject,
             fileNames: validParts
@@ -389,8 +396,7 @@ export function RFQFormDialog({
               .filter(Boolean),
             createdAt: new Date(),
             updatedAt: new Date(),
-            chatParticipantId:
-              userChatParticipantToSupplierMap[parseInt(supplier.value)]!,
+            chatParticipantId: userChatParticipantToSupplierMap[supplierId]!,
             ccRecipients: ccEmails.map((email) => ({
               email: email.value
             }))
