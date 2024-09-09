@@ -9,6 +9,7 @@ export interface ColumnConfig {
   cell?: (row: any) => JSX.Element;
   isBadge?: boolean;
   isDate?: boolean;
+  filterFn?: (row: Row<any>, columnId: string, filterValue: string) => boolean;
 }
 
 export interface TableConfig {

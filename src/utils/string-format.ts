@@ -42,3 +42,14 @@ export const truncateDescription = (description: string, maxLength = 20) => {
   if (description.length <= maxLength) return description;
   return `${description.substring(0, maxLength)}...`;
 };
+
+export const getLastValueOfCommaString = (input: string): string => {
+  if (typeof input !== "string") {
+    throw new TypeError("Input must be a string");
+  }
+
+  const values = input.split(",");
+  const lastValue = values[values.length - 1];
+
+  return lastValue ? lastValue.trim() : "";
+};
