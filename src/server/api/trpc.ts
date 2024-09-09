@@ -10,6 +10,7 @@ import { initTRPC } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { type NextApiResponse } from "next";
 
 import type { AuthObject } from "@clerk/backend/internal";
 
@@ -27,6 +28,7 @@ import { getAuth } from "@clerk/nextjs/server";
 export type TRPCContext = {
   db: typeof db;
   auth: AuthObject;
+  res: NextApiResponse;
 };
 
 export const createTRPCContext = (
@@ -35,7 +37,8 @@ export const createTRPCContext = (
   // return createInnerTRPCContext({});
   return {
     db: db,
-    auth: getAuth(_opts.req)
+    auth: getAuth(_opts.req),
+    res: _opts.res
   };
 };
 
