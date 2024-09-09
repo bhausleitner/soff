@@ -6,26 +6,6 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 const userCreationCache = new Set<string>();
 
 export const userRouter = createTRPCRouter({
-  getOrganization: publicProcedure.query(async ({ ctx }) => {
-    const user = await ctx.db.user.findFirst({
-      where: { clerkUserId: ctx.auth.userId! },
-      select: {
-        organization: {
-          select: {
-            name: true
-          }
-        }
-      }
-    });
-
-    await clerkClient?.users.updateUserMetadata(ctx.auth.userId!, {
-      publicMetadata: {
-        organization: user?.organization?.name ?? "unknown"
-      }
-    });
-
-    return { name: user?.organization?.name ?? "unknown" };
-  }),
   getEmailProvider: publicProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findFirst({
       where: { clerkUserId: ctx.auth.userId! },
@@ -67,18 +47,34 @@ export const userRouter = createTRPCRouter({
           return;
         }
 
-        console.log("Creating new User!");
+        const organization = await ctx.db.organization.findFirst({
+          where: {
+            name: {
+              equals: email.split("@")[1]?.split(".")[0],
+              mode: "insensitive"
+            }
+          },
+          select: {
+            id: true,
+            emailProvider: true,
+            name: true
+          }
+        });
+
         await ctx.db.user.create({
           data: {
             clerkUserId: clerkUserId,
-            email: email
+            email: email,
+            organizationId: organization?.id
           }
         });
 
         // todo move after user creation
         await clerkClient?.users.updateUserMetadata(clerkUserId, {
           publicMetadata: {
-            syncedToDB: true
+            syncedToDB: true,
+            emailProvider: organization?.emailProvider ?? "unknown",
+            organization: organization?.name ?? "unknown"
           }
         });
 

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 const SupplierLocalTime = ({ utcOffset }: { utcOffset: number }) => {
   const [localTime, setLocalTime] = useState("");
   const [dayDifference, setDayDifference] = useState(0);
-  const [isBusinessHours, setIsBusinessHours] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -52,18 +51,10 @@ const SupplierLocalTime = ({ utcOffset }: { utcOffset: number }) => {
         }
 
         setDayDifference(diff);
-
-        // Check if it's business hours
-        const dayOfWeek = supplierTime.getUTCDay();
-        const hours = supplierTime.getUTCHours();
-        const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-        const isWorkHours = hours >= 8 && hours < 17;
-        setIsBusinessHours(isWeekday && isWorkHours);
       } catch (error) {
         console.error("Error formatting time:", error);
         setLocalTime("Invalid Time");
         setDayDifference(0);
-        setIsBusinessHours(false);
       }
     };
 
@@ -97,10 +88,6 @@ const SupplierLocalTime = ({ utcOffset }: { utcOffset: number }) => {
       <div className="flex items-center">
         <span>{localTime}</span>
         {renderDayDifference()}
-        <span
-          className={`ml-2 h-3 w-3 rounded-full ${isBusinessHours ? "bg-green-500" : "bg-red-500"}`}
-          title={isBusinessHours ? "Business Hours" : "Outside Business Hours"}
-        ></span>
       </div>
       <div className="text-xs text-gray-500">{formatOffset(utcOffset)}</div>
     </div>

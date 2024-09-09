@@ -515,6 +515,7 @@ export const quoteRouter = createTRPCRouter({
               select: {
                 organization: {
                   select: {
+                    id: true,
                     erpUrl: true,
                     name: true
                   }

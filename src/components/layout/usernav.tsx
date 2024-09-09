@@ -23,7 +23,7 @@ interface UserNavProps {
 }
 
 export function UserNav({ isCollapsed }: UserNavProps) {
-  const { user, isLoaded: isUserLoaded, isSignedIn } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const router = useRouter();
   const { signOut } = useClerk();
 
@@ -32,14 +32,8 @@ export function UserNav({ isCollapsed }: UserNavProps) {
 
   const googleAuthUrlMutation = api.chat.requestGoogleAuthUrl.useMutation();
 
-  const { data: orgResponse, isLoading: isOrgLoading } =
-    api.user.getOrganization.useQuery(undefined, {
-      enabled: isUserLoaded && isSignedIn && !user.publicMetadata.organization
-    });
-
-  const organization =
-    (user?.publicMetadata.organization as string) || orgResponse?.name;
-  const isLoading = !isUserLoaded || isOrgLoading;
+  const organization = user?.publicMetadata.organization as string;
+  const isLoading = !isUserLoaded;
 
   return (
     <DropdownMenu>
@@ -108,29 +102,33 @@ export function UserNav({ isCollapsed }: UserNavProps) {
                 <Icons.settings className="ml-3 size-5" />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={async () => {
-                const redirectUrl =
-                  await microsoftAuthUrlMutation.mutateAsync();
-                await router.push(redirectUrl);
-              }}
-            >
-              Authenticate Outlook
-              <DropdownMenuShortcut>
-                <Icons.fingerprint className="ml-3 size-5" />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={async () => {
-                const redirectUrl = await googleAuthUrlMutation.mutateAsync();
-                await router.push(redirectUrl);
-              }}
-            >
-              Authenticate Google
-              <DropdownMenuShortcut>
-                <Icons.fingerprint className="ml-3 size-5" />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
+            {user?.publicMetadata.emailProvider === "OUTLOOK" && (
+              <DropdownMenuItem
+                onClick={async () => {
+                  const redirectUrl =
+                    await microsoftAuthUrlMutation.mutateAsync();
+                  await router.push(redirectUrl);
+                }}
+              >
+                Authenticate Outlook
+                <DropdownMenuShortcut>
+                  <Icons.fingerprint className="ml-3 size-5" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            )}
+            {user?.publicMetadata.emailProvider === "GMAIL" && (
+              <DropdownMenuItem
+                onClick={async () => {
+                  const redirectUrl = await googleAuthUrlMutation.mutateAsync();
+                  await router.push(redirectUrl);
+                }}
+              >
+                Authenticate Google
+                <DropdownMenuShortcut>
+                  <Icons.fingerprint className="ml-3 size-5" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>

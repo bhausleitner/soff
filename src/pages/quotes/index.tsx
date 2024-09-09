@@ -1,5 +1,5 @@
 import { GenericTable } from "~/components/common/GenericTable";
-import { type Quote } from "~/server/api/routers/quote";
+import { type Quote } from "@prisma/client";
 import { quoteTableConfig, useGetAllQuotes } from "~/constants/tableConfigs";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";

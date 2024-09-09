@@ -71,11 +71,7 @@ const SupplierPage = () => {
           </Button>
         </div>
       </div>
-      <SupplierInfo
-        {...data}
-        phone={data.phone as string | undefined}
-        address={data.address as string | undefined}
-      />
+      <SupplierInfo {...data} />
       <SupplierTabs supplierId={data.id} />
     </div>
   );

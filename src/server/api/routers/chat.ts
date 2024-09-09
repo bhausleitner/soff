@@ -228,7 +228,7 @@ export const chatRouter = createTRPCRouter({
               ctx,
               input.chatMessage,
               chatParticipant.supplier.email,
-              chatParticipant.supplier.contactPerson
+              chatParticipant.supplier.contactPerson ?? ""
             );
             break;
         }

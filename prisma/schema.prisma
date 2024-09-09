@@ -75,10 +75,10 @@ model Supplier {
   name             String
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
-  contactPerson    String
-  email            String
+  contactPerson    String?
+  function         String?
+  email            String?
   phone            String?           @default("")
-  address          String?           @default("")
   status           Status            @default(ACTIVE)
   responseTime     Int?              @default(48)
   parts            SupplierPart[]
@@ -87,8 +87,16 @@ model Supplier {
   organizationId   Int?
   organization     Organization?     @relation(fields: [organizationId], references: [id])
   requestForQuotes RequestForQuote[]
-  utcOffset        Float             @default(0) // New field for UTC offset in hours
-
+  utcOffset        Float             @default(0) 
+  erpId            Int?
+  street           String?
+  street2          String?
+  city             String?
+  zip              String?
+  country          String?
+  supplierParentId Int?
+  supplierParent   Supplier?         @relation("SupplierToContact", fields: [supplierParentId], references: [id])
+  childrenSupplier Supplier[]        @relation("SupplierToContact")
 
   @@index([name])
   @@index([organizationId])

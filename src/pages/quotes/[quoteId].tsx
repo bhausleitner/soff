@@ -168,8 +168,8 @@ const QuotePage = () => {
         quoteCreatedAt={quoteData.createdAt}
         quoteStatus={quoteData.status}
         supplierName={quoteData.supplierName}
-        supplierContactPerson={quoteData.supplierContactPerson}
-        supplierEmail={quoteData.supplierEmail}
+        supplierContactPerson={quoteData.supplierContactPerson ?? ""}
+        supplierEmail={quoteData.supplierEmail ?? ""}
       />
       <GenericTable<LineItem, { quoteId: number }>
         tableConfig={quoteLineItemTableConfig}
