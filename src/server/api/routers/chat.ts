@@ -71,7 +71,9 @@ export const chatRouter = createTRPCRouter({
 
       // create chat object
       const chatObject = await ctx.db.chat.create({
-        data: {}
+        data: {
+          subject: "Request for Quote"
+        }
       });
 
       // create supplier chat participant
@@ -170,6 +172,7 @@ export const chatRouter = createTRPCRouter({
               user: true
             }
           },
+          subject: true,
           messages: true,
           quotes: {
             where: {

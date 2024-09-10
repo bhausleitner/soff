@@ -22,6 +22,7 @@ import { type EmailProvider } from "@prisma/client";
 interface ChatBottombarProps {
   chatParticipantUserId: number;
   chatId: number;
+  chatSubject: string;
   updateFrontendMessages: (newMessage: ChatMessage) => void;
   emailProvider: EmailProvider;
 }
@@ -34,6 +35,7 @@ interface FileWithHash extends File {
 export default function ChatBottombar({
   updateFrontendMessages,
   chatId,
+  chatSubject,
   chatParticipantUserId,
   emailProvider
 }: ChatBottombarProps) {
@@ -144,7 +146,8 @@ export default function ChatBottombar({
           .filter((file) => file.uploaded)
           .map((file) => `outgoingEmailAttachments/${file.hash}/${file.name}`),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        subject: chatSubject
       };
 
       try {

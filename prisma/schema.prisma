@@ -280,6 +280,7 @@ model Chat {
   quotes            Quote[]
   requestForQuote   RequestForQuote?  @relation(fields: [requestForQuoteId], references: [id])
   requestForQuoteId Int?
+  subject           String?
 
   @@index([requestForQuoteId])
   @@index([createdAt])
