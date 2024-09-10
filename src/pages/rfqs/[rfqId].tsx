@@ -117,8 +117,7 @@ export default function RfqPage() {
                 <TableRow>
                   <TableHead className="w-[50px]">Select</TableHead>
                   <TableHead>Supplier</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Request Status</TableHead>
                   <TableHead>Chat</TableHead>
                   <TableHead>Quote</TableHead>
                 </TableRow>
@@ -145,16 +144,15 @@ export default function RfqPage() {
                       </Tooltip>
                     </TableCell>
                     <TableCell>{supplier.name}</TableCell>
-                    <TableCell>{supplier.contactPerson}</TableCell>
                     <TableCell>
                       <Badge
                         className={cn(
                           statusClassMap[
-                            supplier.status as keyof typeof statusClassMap
+                            supplier.quoteStatus as keyof typeof statusClassMap
                           ]
                         )}
                       >
-                        {supplier.status}
+                        {supplier.quoteStatus}
                       </Badge>
                     </TableCell>
                     <TableCell>

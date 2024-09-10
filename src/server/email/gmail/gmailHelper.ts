@@ -156,7 +156,7 @@ export async function sendGmailAndCreateMessage(
       requestBody: {
         to: [{ name: supplierName, email: supplierEmail }],
         cc: inputChatMessage.ccRecipients,
-        subject: inputChatMessage.subject,
+        subject: "Request for Quote2",
         body: htmlBody,
         replyToMessageId: lastForeignMessage?.gmailMessageId ?? undefined,
         attachments

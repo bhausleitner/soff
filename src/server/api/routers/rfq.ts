@@ -74,7 +74,8 @@ export const rfqRouter = createTRPCRouter({
                   isActive: true
                 },
                 select: {
-                  id: true
+                  id: true,
+                  status: true
                 }
               }
             }
@@ -92,7 +93,8 @@ export const rfqRouter = createTRPCRouter({
           chat.chatParticipants[0]?.supplierId,
           {
             chatId: chat.id,
-            quoteId: chat.quotes[0]?.id ?? null
+            quoteId: chat.quotes[0]?.id ?? null,
+            quoteStatus: chat.quotes[0]?.status ?? "WAITING"
           }
         ])
       );
@@ -102,12 +104,14 @@ export const rfqRouter = createTRPCRouter({
         (supplier) => {
           const info = supplierInfoMap.get(supplier.id) ?? {
             chatId: null,
-            quoteId: null
+            quoteId: null,
+            quoteStatus: "WAITING"
           };
           return {
             ...supplier,
             chatId: info.chatId,
-            quoteId: info.quoteId
+            quoteId: info.quoteId,
+            quoteStatus: info.quoteStatus
           };
         }
       );
@@ -209,7 +213,8 @@ export const rfqRouter = createTRPCRouter({
           // create chat object
           const chatObject = await ctx.db.chat.create({
             data: {
-              requestForQuoteId: newRfqObject.id
+              requestForQuoteId: newRfqObject.id,
+              subject: input.subject
             }
           });
 

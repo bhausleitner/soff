@@ -77,6 +77,7 @@ export default function ChatSheetContent({ chatId }: { chatId: number }) {
             </div>
             <ChatBottombar
               chatId={chatId}
+              chatSubject={data?.newChat?.subject ?? ""}
               chatParticipantUserId={chatParticipantUserId}
               updateFrontendMessages={updateFrontendMessages}
               emailProvider={emailProvider}

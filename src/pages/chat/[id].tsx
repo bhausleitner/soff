@@ -109,6 +109,7 @@ export default function Exchange() {
             </div>
             <ChatBottombar
               chatId={chatId}
+              chatSubject={data?.newChat?.subject ?? ""}
               chatParticipantUserId={chatParticipantUserId}
               updateFrontendMessages={updateFrontendMessages}
               emailProvider={emailProvider}
