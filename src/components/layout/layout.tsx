@@ -106,8 +106,8 @@ export const PageLayout = (props: PropsWithChildren) => {
           <UserNav isCollapsed={isCollapsed} />
         </div>
       </aside>
-      <main className="flex h-full flex-1 flex-col overflow-hidden bg-sidebar p-4 pl-0 font-sans antialiased">
-        <div className="drop-shadow-s flex h-full flex-1 flex-col rounded-xl bg-white drop-shadow-md">
+      <main className="flex h-full flex-1 flex-col overflow-hidden bg-sidebar p-4 font-sans antialiased">
+        <div className="flex h-full flex-1 flex-col rounded-xl bg-white drop-shadow-xl">
           <div className="flex-1 overflow-auto p-4">{props.children}</div>
         </div>
       </main>
