@@ -18,7 +18,7 @@ export default function Quote() {
 
   return (
     <div>
-      <div className="flex items-center justify-between pb-4">
+      <div className="flex items-center justify-between">
         <BreadCrumbWrapper items={[{ label: "Quotes", href: "/quotes" }]} />
         <div className="flex items-center gap-4">
           <CompareQuotesButton

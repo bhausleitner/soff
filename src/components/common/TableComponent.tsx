@@ -40,17 +40,28 @@ import { Icons } from "~/components/icons";
 
 export const statusClassMap: Record<QuoteStatus | Status | RfqStatus, string> =
   {
-    ACTIVE: "bg-green-500",
-    INACTIVE: "bg-gray-500",
-    ONBOARDING: "bg-yellow-500",
-    REQUESTED: "bg-yellow-500",
-    WAITING: "bg-yellow-500",
-    RECEIVED: "bg-teal-400",
-    CONFIRMED: "bg-green-500",
-    REJECTED: "bg-red-500",
-    REVIEW: "bg-gray-500",
-    CLOSED: "bg-gray-500",
-    AWARDED: "bg-green-500"
+    ACTIVE:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-68 border-green-200",
+    INACTIVE:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
+    ONBOARDING:
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
+    REQUESTED:
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
+    WAITING:
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
+    RECEIVED:
+      "bg-teal-100 text-teal-500 hover:bg-teal-200 bg-opacity-80 border-teal-200",
+    CONFIRMED:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80 border-green-200",
+    REJECTED:
+      "bg-red-100 text-red-500 hover:bg-red-200 bg-opacity-80 border-red-200",
+    REVIEW:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
+    CLOSED:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
+    AWARDED:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80 border-green-200"
   };
 
 function generateColumns<T extends { id: number }>(
@@ -127,6 +138,11 @@ function generateColumns<T extends { id: number }>(
           return col.cell(row);
         }
         if (col.isBadge) {
+          const color =
+            statusClassMap[accessorKey as keyof typeof statusClassMap];
+
+          console.log("color");
+          console.log(color);
           return (
             <Badge
               className={cn(
