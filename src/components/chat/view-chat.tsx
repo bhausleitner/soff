@@ -14,9 +14,11 @@ import { useRouter } from "next/router";
 
 export function ViewChatButton({
   chatId,
+  subject,
   rfqId
 }: {
   chatId: number;
+  subject: string;
   rfqId?: number;
 }) {
   const router = useRouter();
@@ -31,7 +33,7 @@ export function ViewChatButton({
       <SheetContent side="right" className="!w-[70vw] !max-w-[95vw]">
         <SheetHeader className="flex flex-row gap-4">
           <div>
-            <SheetTitle>Chat</SheetTitle>
+            <SheetTitle>{subject}</SheetTitle>
             <SheetDescription>Chat #{chatId}</SheetDescription>
           </div>
           <Button

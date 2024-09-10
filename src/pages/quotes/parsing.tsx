@@ -83,6 +83,28 @@ const PDFParserPage = () => {
     }
   }, [isParsingQuote, isLoadingRfq, isManuallyParsing]);
 
+  const handleAutoMatch = useCallback(() => {
+    if (!rfq) return;
+
+    setParsedData((prevData) => {
+      const newLineItems = prevData.lineItems.map((item) => {
+        const matchedRfqItem = rfq.lineItems.find((rfqItem) =>
+          item.description
+            .toLowerCase()
+            .includes(rfqItem?.description?.toLowerCase() ?? "")
+        );
+
+        return {
+          ...item,
+          rfqLineItemId: matchedRfqItem ? matchedRfqItem.id : undefined
+        };
+      });
+      return { ...prevData, lineItems: newLineItems };
+    });
+
+    toast.success("Auto-matching completed!");
+  }, [rfq]);
+
   const handleCellEdit = useCallback(
     (
       index: number,
@@ -282,6 +304,15 @@ const PDFParserPage = () => {
                 <Icons.rescan className="ml-2 h-4 w-4" />
               </>
             )}
+          </Button>
+          <Button
+            className="w-40"
+            variant="outline"
+            onClick={handleAutoMatch}
+            disabled={isParsingQuote || isLoadingRfq}
+          >
+            Auto-Match
+            <Icons.sparkles className="ml-2 h-4 w-4" />
           </Button>
           <Button
             variant="soff"

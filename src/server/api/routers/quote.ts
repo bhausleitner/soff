@@ -285,6 +285,11 @@ export const quoteRouter = createTRPCRouter({
       const quote = await ctx.db.quote.findUnique({
         where: { id: input.quoteId },
         include: {
+          chat: {
+            select: {
+              subject: true
+            }
+          },
           supplier: {
             select: {
               name: true,
@@ -323,6 +328,7 @@ export const quoteRouter = createTRPCRouter({
 
       return {
         ...quote,
+        subject: quote?.chat?.subject,
         supplierName: quote?.supplier?.name,
         supplierContactPerson: quote?.supplier?.contactPerson,
         supplierEmail: quote?.supplier?.email,
