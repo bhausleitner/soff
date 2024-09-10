@@ -107,7 +107,11 @@ const QuotePage = () => {
             quoteHistory={quoteData.quoteHistory}
           />
           {quoteData.chatId && (
-            <ViewChatButton chatId={quoteData.chatId} rfqId={rfqId} />
+            <ViewChatButton
+              chatId={quoteData.chatId}
+              rfqId={rfqId}
+              subject={quoteData.subject ?? "Chat"}
+            />
           )}
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>

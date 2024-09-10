@@ -119,7 +119,9 @@ export const rfqRouter = createTRPCRouter({
       return {
         rfqLineItems: rfqDetails.lineItems,
         suppliers: suppliersWithChatAndQuoteIds,
-        status: rfqDetails.status
+        status: rfqDetails.status,
+        subject: rfqDetails.subject,
+        createdAt: rfqDetails.createdAt
       };
     }),
   getAllRequestsForQuotes: publicProcedure
