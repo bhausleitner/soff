@@ -9,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue
 } from "~/components/ui/select";
+import { cn } from "~/lib/utils";
+import { statusClassMap } from "../common/TableComponent";
 
 interface QuoteHistoryProps {
   currentVersion: number;
@@ -56,7 +58,7 @@ export function QuoteHistory({
                 >
                   <span>Version {item.version}</span>
                   {item.isActive && (
-                    <Badge className="ml-2 bg-green-500 hover:bg-green-500">
+                    <Badge className={cn(statusClassMap.ACTIVE, "ml-2")}>
                       Active
                     </Badge>
                   )}

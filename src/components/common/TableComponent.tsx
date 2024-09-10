@@ -40,19 +40,28 @@ import { Icons } from "~/components/icons";
 
 export const statusClassMap: Record<QuoteStatus | Status | RfqStatus, string> =
   {
-    ACTIVE: "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80",
-    INACTIVE: "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80",
+    ACTIVE:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-68 border-green-200",
+    INACTIVE:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
     ONBOARDING:
-      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80",
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
     REQUESTED:
-      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80",
-    WAITING: "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80",
-    RECEIVED: "bg-teal-100 text-teal-500 hover:bg-teal-200 bg-opacity-80",
-    CONFIRMED: "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80",
-    REJECTED: "bg-red-100 text-red-500 hover:bg-red-200 bg-opacity-80",
-    REVIEW: "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80",
-    CLOSED: "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80",
-    AWARDED: "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80"
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
+    WAITING:
+      "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 bg-opacity-80 border-yellow-200",
+    RECEIVED:
+      "bg-teal-100 text-teal-500 hover:bg-teal-200 bg-opacity-80 border-teal-200",
+    CONFIRMED:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80 border-green-200",
+    REJECTED:
+      "bg-red-100 text-red-500 hover:bg-red-200 bg-opacity-80 border-red-200",
+    REVIEW:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
+    CLOSED:
+      "bg-gray-100 text-gray-500 hover:bg-gray-200 bg-opacity-80 border-gray-200",
+    AWARDED:
+      "bg-green-100 text-green-500 hover:bg-green-200 bg-opacity-80 border-green-200"
   };
 
 function generateColumns<T extends { id: number }>(
