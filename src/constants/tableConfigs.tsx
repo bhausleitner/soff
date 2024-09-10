@@ -236,7 +236,7 @@ export const quoteLineItemTableConfig = {
 
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
-  maxRowsBeforePagination: 7,
+  maxRowsBeforePagination: 6,
   link: "/suppliers",
   checkbox: true,
   columns: [
