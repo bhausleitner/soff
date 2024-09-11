@@ -53,3 +53,11 @@ export const getLastValueOfCommaString = (input: string): string => {
 
   return lastValue ? lastValue.trim() : "";
 };
+
+export function personalizeMessage(template: string, contactPerson: string) {
+  const firstName = contactPerson ? contactPerson.split(" ")[0] : "";
+  return template
+    .replace("{{first_name}}", firstName!)
+    .replace(/\s+,/, ",")
+    .replace(/^\s*\n/, "\n"); // Remove empty first line if it occurs
+}

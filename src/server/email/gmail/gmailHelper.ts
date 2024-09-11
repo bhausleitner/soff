@@ -7,7 +7,7 @@ import { htmlToText } from "html-to-text";
 import { type ChatMessage } from "~/server/api/routers/chat";
 import { type CreateAttachmentRequest } from "nylas";
 import { getFileFromS3, uploadFileToS3 } from "~/server/s3/utils";
-import { convertToHtml } from "~/utils/string-format";
+import { convertToHtml, personalizeMessage } from "~/utils/string-format";
 
 export const GOOGLE_APP_REDIRECT_ROUTE = "/api/googleCallback";
 
@@ -147,8 +147,13 @@ export async function sendGmailAndCreateMessage(
   ]);
 
   try {
+    const emailContent = personalizeMessage(
+      inputChatMessage.content,
+      supplierName
+    );
+
     const htmlBody = `<div style="font-family: Arial, sans-serif; font-size: 14px;">
-      ${convertToHtml(inputChatMessage.content)}
+      ${convertToHtml(emailContent)}
     </div>`;
 
     const { data: createdDraft } = await nylas.drafts.create({
@@ -156,7 +161,7 @@ export async function sendGmailAndCreateMessage(
       requestBody: {
         to: [{ name: supplierName, email: supplierEmail }],
         cc: inputChatMessage.ccRecipients,
-        subject: "Request for Quote2",
+        subject: inputChatMessage.subject,
         body: htmlBody,
         replyToMessageId: lastForeignMessage?.gmailMessageId ?? undefined,
         attachments
@@ -172,7 +177,7 @@ export async function sendGmailAndCreateMessage(
       data: {
         chatId: inputChatMessage.chatId,
         gmailMessageId: sentMessage.id,
-        content: inputChatMessage.content,
+        content: emailContent,
         chatParticipantId: inputChatMessage.chatParticipantId,
         conversationId: createdDraft.threadId!,
         fileNames: inputChatMessage.fileNames,
