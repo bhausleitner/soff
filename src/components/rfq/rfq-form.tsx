@@ -128,7 +128,7 @@ export function RFQFormDialog({
 
   const updateEmailBody = () => {
     const defaultMessage =
-      "Hi,\n\nPlease send me a quote for the following parts:\n\n";
+      "Hi {{first_name}},\n\nPlease send me a quote for the following parts:\n\n";
 
     const partsList = parts
       .filter((part) => part.description && part.quantityTiers.length > 0)
