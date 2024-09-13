@@ -14,7 +14,7 @@ type OdooSupplier = {
   parent_id: [number, string] | false;
   city: string | false;
   street: string | false;
-  street2: false;
+  street2: string | false;
   zip: string | false;
 };
 
@@ -156,7 +156,7 @@ export function getAllContacts(
   odooUrl: string,
   uid: number,
   orgName: string
-): Promise<any[]> {
+): Promise<OdooSupplier[]> {
   const objectClient = xmlrpc.createSecureClient(`${odooUrl}/xmlrpc/2/object`);
   return new Promise((resolve, reject) => {
     objectClient.methodCall(
@@ -196,6 +196,10 @@ export function getAllContacts(
   });
 }
 
+// import fs from "fs";
+
+// syncSuppliers("https://soff.odoo.com", 2, "soff", 2);
+
 export async function syncSuppliers(
   odooUrl: string,
   odooUid: number,
@@ -204,58 +208,43 @@ export async function syncSuppliers(
 ) {
   const suppliers = await getAllContacts(odooUrl, odooUid, orgName);
 
-  // iterate through suppliers, if parent_id = false -> create new supplier
-  async function createSupplier(supplier: OdooSupplier) {
-    if (supplier.parent_id === false) {
-      // if supplier already exists -> return
-      const supplierExists =
-        (await db.supplier.findFirst({
-          where: {
-            erpId: supplier.id,
-            organizationId: orgId
-          },
-          select: {
-            id: true
-          }
-        })) !== null;
+  // iterate through suppliers, if parent_id = false
+  // check if supplier already exists in db, if not -> create new supplier
 
-      if (supplierExists) {
-        return;
-      }
+  for (const supplier of suppliers) {
+    // if parent supplier already exists -> return
+    const supplierExists =
+      (await db.supplier.findFirst({
+        where: {
+          erpId: supplier.id,
+          organizationId: orgId
+        }
+      })) !== null;
+
+    if (supplierExists) {
+      return;
+    }
+
+    if (supplier.parent_id === false) {
+      // this is a parent supplier
       await db.supplier.create({
         data: {
-          name: supplier.name ? supplier.name : "",
+          name: supplier.name ? supplier.name.trim() : "",
           erpId: supplier.id,
-          email: supplier.email ? supplier.email : "",
-          phone: supplier.phone ? supplier.phone : "",
-          function: supplier.function ? supplier.function : "",
-          city: supplier.city ? supplier.city : "",
-          street: supplier.street ? supplier.street : "",
-          street2: supplier.street2 ? (supplier.street2 as string) : "",
-          zip: supplier.zip ? supplier.zip : "",
+          email: supplier.email ? supplier.email.trim() : "",
+          phone: supplier.phone ? supplier.phone.trim() : "",
+          function: supplier.function ? supplier.function.trim() : "",
+          city: supplier.city ? supplier.city.trim() : "",
+          street: supplier.street ? supplier.street.trim() : "",
+          street2: supplier.street2 ? supplier.street2.trim() : "",
+          zip: supplier.zip ? supplier.zip.trim() : "",
           country: supplier.country_id ? supplier.country_id[1] : "",
           organizationId: orgId
         }
       });
-    }
-  }
-
-  // iterate through suppliers again, if parent_id exists -> create contact object and add to suppliers
-  async function createContact(supplier: OdooSupplier) {
-    if (supplier.parent_id !== false) {
-      const contactExists =
-        (await db.supplier.findFirst({
-          where: {
-            erpId: supplier.id,
-            organizationId: orgId
-          }
-        })) !== null;
-
-      if (contactExists) {
-        return;
-      }
-
-      const parentSupplier = await db.supplier.findFirst({
+    } else {
+      // this is a child supplier
+      let parentSupplier = await db.supplier.findFirst({
         where: {
           erpId: supplier.parent_id[0],
           organizationId: orgId
@@ -266,13 +255,67 @@ export async function syncSuppliers(
         }
       });
 
+      // if parent supplier does not exist -> create it
       if (!parentSupplier) {
-        return;
+        const rawParentSupplier = suppliers.find((supplier: OdooSupplier) => {
+          if (
+            Array.isArray(supplier.parent_id) &&
+            supplier.id === supplier.parent_id[0]
+          ) {
+            return supplier;
+          }
+        });
+
+        if (rawParentSupplier) {
+          const rawParentSupplierExists =
+            (await db.supplier.findFirst({
+              where: {
+                erpId: rawParentSupplier.id,
+                organizationId: orgId
+              }
+            })) !== null;
+
+          if (rawParentSupplierExists) {
+            return;
+          }
+
+          parentSupplier = await db.supplier.create({
+            data: {
+              name: rawParentSupplier?.name
+                ? rawParentSupplier.name.trim()
+                : "",
+              erpId: rawParentSupplier.id,
+              email: rawParentSupplier.email
+                ? rawParentSupplier.email.trim()
+                : "",
+              phone: rawParentSupplier.phone
+                ? rawParentSupplier.phone.trim()
+                : "",
+              function: rawParentSupplier.function
+                ? rawParentSupplier.function.trim()
+                : "",
+              city: rawParentSupplier.city ? rawParentSupplier.city.trim() : "",
+              street: rawParentSupplier.street
+                ? rawParentSupplier.street.trim()
+                : "",
+              street2: rawParentSupplier.street2
+                ? rawParentSupplier.street2.trim()
+                : "",
+              zip: rawParentSupplier.zip ? rawParentSupplier.zip.trim() : "",
+              country: rawParentSupplier.country_id
+                ? rawParentSupplier.country_id[1]
+                : "",
+              organizationId: orgId
+            }
+          });
+        }
       }
 
       await db.supplier.create({
         data: {
-          name: parentSupplier.name ? parentSupplier.name : "",
+          name:
+            // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+            parentSupplier && parentSupplier.name ? parentSupplier.name : "",
           contactPerson: supplier.name ? supplier.name : "",
           erpId: supplier.id,
           email: supplier.email ? supplier.email : "",
@@ -280,19 +323,13 @@ export async function syncSuppliers(
           function: supplier.function ? supplier.function : "",
           city: supplier.city ? supplier.city : "",
           street: supplier.street ? supplier.street : "",
-          street2: supplier.street2 ? (supplier.street2 as string) : "",
+          street2: supplier.street2 ? supplier.street2 : "",
           zip: supplier.zip ? supplier.zip : "",
           country: supplier.country_id ? supplier.country_id[1] : "",
-          supplierParentId: parentSupplier.id,
+          supplierParentId: parentSupplier ? parentSupplier.id : null,
           organizationId: orgId
         }
       });
     }
   }
-
-  // Create suppliers first
-  await Promise.all(suppliers.map(createSupplier));
-
-  // Then create contacts
-  await Promise.all(suppliers.map(createContact));
 }
