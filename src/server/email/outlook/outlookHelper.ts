@@ -34,7 +34,11 @@ const MICROSOFT_APP_SCOPES = [
 ];
 
 export const getNonHashBaseUrl = () =>
-  process.env.VERCEL_URL ? "https://app.soff.ai" : "http://localhost:3000";
+  process.env.VERCEL_URL
+    ? "https://app.soff.ai"
+    : process.env.PORTER_URL
+      ? "http://platform.soff.ai"
+      : "http://localhost:3000";
 
 export async function initMicrosoftAuthUrl(): Promise<string> {
   const urlParameters: AuthorizationUrlRequest = {
