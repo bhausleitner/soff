@@ -14,7 +14,6 @@ import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { type PricingTier } from "@prisma/client";
 import { type Quote, type QuoteLineItem } from "~/server/api/routers/quote";
-import SupplierLocalTime from "~/components/supplier/supplier-local-time";
 import { type SupplierLineItem } from "~/server/api/routers/supplier";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
@@ -28,6 +27,8 @@ import { openErpQuoteUrl } from "~/hooks/erpHelper";
 import { SupplierBadge } from "~/components/supplier/supplier-badge";
 import { SupplierCell } from "~/components/supplier/supplier-cell";
 import { type RequestForQuoteLineItem } from "~/server/api/routers/rfq";
+import countryFlagEmoji from "~/utils/emoji-country";
+import { get } from "lodash";
 
 export const quoteTableConfig = {
   maxRowsBeforePagination: 7,
@@ -264,11 +265,20 @@ export const supplierTableConfig = {
       isBadge: true
     },
     {
-      header: "Local Time",
-      accessorKey: "localTime",
-      sortable: false,
+      header: "Country",
+      accessorKey: "country",
+      sortable: true,
       cell: (row: Row<SupplierLineItem>) => {
-        return <SupplierLocalTime utcOffset={row.original.utcOffset ?? 0} />;
+        const country = row.original.country
+          ? row.original.country
+          : "Undefined";
+        const emoji = get(countryFlagEmoji, country, "🏳️");
+
+        return (
+          <p>
+            {country} {emoji}
+          </p>
+        );
       }
     }
   ]

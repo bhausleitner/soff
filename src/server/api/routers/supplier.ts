@@ -11,7 +11,8 @@ const supplierLineItemSchema = z.object({
   phone: z.string().nullable().optional(),
   responseTime: z.number().nullable(),
   contactPerson: z.string().nullable().optional(),
-  utcOffset: z.number().nullable()
+  utcOffset: z.number().nullable(),
+  country: z.string().nullable()
 });
 
 export type SupplierLineItem = z.infer<typeof supplierLineItemSchema>;
@@ -65,7 +66,8 @@ export const supplierRouter = createTRPCRouter({
                   status: true,
                   responseTime: true,
                   contactPerson: true,
-                  utcOffset: true
+                  utcOffset: true,
+                  country: true
                 }
               }
             }
