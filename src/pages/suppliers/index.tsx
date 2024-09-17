@@ -30,8 +30,7 @@ export default function Supplier() {
     const syncSuppliersPromise = syncSuppliersMutation.mutateAsync();
 
     toast.promise(syncSuppliersPromise, {
-      loading: "Syncing Suppliers from ERP...",
-      success: "Successfully synced!",
+      success: "Triggered sync of suppliers. Can take up to 3 minutes.",
       error: "Failed syncing Suppliers."
     });
 
