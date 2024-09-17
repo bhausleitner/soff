@@ -9,12 +9,7 @@ export default createNextApiHandler({
   router: appRouter,
   createContext: createTRPCContext,
   onError: ({ path, error }) => {
-    // Log error to console in development
-    if (env.NODE_ENV === "development") {
-      console.error(
-        `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
-      );
-    }
+    console.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
 
     // Log error to Sentry in all environments
     Sentry.withScope((scope: Sentry.Scope) => {
