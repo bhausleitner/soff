@@ -188,6 +188,6 @@ export const supplierRouter = createTRPCRouter({
       throw new Error("Odoo authentication failed");
     }
 
-    await odooUtils.syncSuppliers(erpUrl, odooUid, orgName, orgId);
+    odooUtils.syncSuppliers(erpUrl, odooUid, orgName, orgId);
   })
 });
