@@ -1,4 +1,5 @@
 "use client";
+
 import { useUser, useClerk } from "@clerk/nextjs";
 import { startCase, toLower } from "lodash";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -24,8 +25,8 @@ interface UserNavProps {
 
 export function UserNav({ isCollapsed }: UserNavProps) {
   const { user, isLoaded: isUserLoaded } = useUser();
+  const { signOut, openUserProfile } = useClerk();
   const router = useRouter();
-  const { signOut } = useClerk();
 
   const microsoftAuthUrlMutation =
     api.chat.requestMicrosoftAuthUrl.useMutation();
@@ -88,16 +89,8 @@ export function UserNav({ isCollapsed }: UserNavProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={async () => {
-                await router.push(
-                  window.location.host === "localhost:3000"
-                    ? "https://lucky-crow-92.accounts.dev/user"
-                    : "https://accounts.soff.ai/user"
-                );
-              }}
-            >
-              Settings
+            <DropdownMenuItem onClick={() => openUserProfile()}>
+              Settings Dialog
               <DropdownMenuShortcut>
                 <Icons.settings className="ml-3 size-5" />
               </DropdownMenuShortcut>
