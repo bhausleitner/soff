@@ -105,7 +105,7 @@ export function UserNav({ isCollapsed }: UserNavProps) {
                 })
               }
             >
-              Settings Dialog
+              Settings
               <DropdownMenuShortcut>
                 <Icons.settings className="ml-3 size-5" />
               </DropdownMenuShortcut>
