@@ -47,6 +47,8 @@ const EmailMultiSelector = React.forwardRef<
       Array.isArray(value) ? value : []
     );
     const [inputValue, setInputValue] = useState("");
+    const [isInputInvalid, setIsInputInvalid] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => {
       if (Array.isArray(value)) {
@@ -63,26 +65,37 @@ const EmailMultiSelector = React.forwardRef<
       [onChange, selected]
     );
 
+    const addEmailOption = useCallback(() => {
+      if (inputValue.trim() === "") {
+        setIsInputInvalid(false);
+        return;
+      }
+
+      if (isValidEmail(inputValue)) {
+        if (selected.length >= maxSelected) {
+          onMaxSelected?.(selected.length);
+          toast.error(
+            `You can only select up to ${maxSelected} email addresses.`
+          );
+          return;
+        }
+        const newOption = { value: inputValue, label: inputValue };
+        const newOptions = [...selected, newOption];
+        setSelected(newOptions);
+        onChange?.(newOptions);
+        setInputValue("");
+        setIsInputInvalid(false);
+      } else {
+        setIsInputInvalid(true);
+        toast.error("Please enter a valid email address.");
+      }
+    }, [inputValue, selected, maxSelected, onMaxSelected, onChange]);
+
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && inputValue) {
           e.preventDefault();
-          if (isValidEmail(inputValue)) {
-            if (selected.length >= maxSelected) {
-              onMaxSelected?.(selected.length);
-              toast.error(
-                `You can only select up to ${maxSelected} email addresses.`
-              );
-              return;
-            }
-            const newOption = { value: inputValue, label: inputValue };
-            const newOptions = [...selected, newOption];
-            setSelected(newOptions);
-            onChange?.(newOptions);
-            setInputValue("");
-          } else {
-            toast.error("Please enter a valid email address.");
-          }
+          addEmailOption();
         } else if (
           (e.key === "Backspace" || e.key === "Delete") &&
           inputValue === "" &&
@@ -94,21 +107,36 @@ const EmailMultiSelector = React.forwardRef<
           }
         }
       },
-      [
-        inputValue,
-        selected,
-        maxSelected,
-        onMaxSelected,
-        onChange,
-        handleUnselect
-      ]
+      [inputValue, selected, handleUnselect, addEmailOption]
+    );
+
+    const handleBlur = useCallback(() => {
+      setIsFocused(false);
+      addEmailOption();
+    }, [addEmailOption]);
+
+    const handleFocus = useCallback(() => {
+      setIsFocused(true);
+      setIsInputInvalid(false);
+    }, []);
+
+    const handleInputChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        if (isFocused) {
+          setIsInputInvalid(false);
+        }
+      },
+      [isFocused]
     );
 
     return (
       <div className={cn("w-full", className)}>
         <div
           className={cn(
-            "flex min-h-10 w-full flex-wrap gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-soff-foreground focus-within:ring-offset-2",
+            "flex min-h-10 w-full flex-wrap gap-2 rounded-md border bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-soff-foreground focus-within:ring-offset-2",
+            isInputInvalid && !isFocused ? "border-red-500" : "border-input",
             disabled && "cursor-not-allowed opacity-50"
           )}
           onClick={() => {
@@ -148,10 +176,10 @@ const EmailMultiSelector = React.forwardRef<
             type="text"
             disabled={disabled}
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-            }}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
             placeholder={
               hidePlaceholderWhenSelected && selected.length !== 0
                 ? ""
