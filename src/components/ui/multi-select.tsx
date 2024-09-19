@@ -620,7 +620,6 @@ const MultipleSelector = React.forwardRef<
                                   onMaxSelected?.(selected.length);
                                   return;
                                 }
-                                console.log(option.value);
                                 if (isValidEmail(option.value)) {
                                   setInputValue("");
                                   const newOptions = [...selected, option];
