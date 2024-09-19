@@ -141,8 +141,6 @@ function generateColumns<T extends { id: number }>(
           const color =
             statusClassMap[accessorKey as keyof typeof statusClassMap];
 
-          console.log("color");
-          console.log(color);
           return (
             <Badge
               className={cn(
@@ -232,8 +230,6 @@ export function TableComponent<T extends { id: number }>({
   const firstFilterableColumn = table
     .getAllColumns()
     .find((column) => column.getCanFilter());
-
-  console.log(firstFilterableColumn);
 
   return (
     <div className="flex h-full w-full flex-col">
