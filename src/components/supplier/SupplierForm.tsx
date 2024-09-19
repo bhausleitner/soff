@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 
 export interface SupplierFormData {
-  companyName: string;
+  supplierName: string;
   contactName: string;
   contactRole: string;
   email: string;
@@ -16,7 +16,7 @@ interface SupplierFormProps {
 
 export function SupplierForm({ onSubmit }: SupplierFormProps) {
   const [formData, setFormData] = useState<SupplierFormData>({
-    companyName: "",
+    supplierName: "",
     contactName: "",
     contactRole: "",
     email: ""
@@ -49,9 +49,9 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
-        name="companyName"
+        name="supplierName"
         placeholder="Company Name"
-        value={formData.companyName}
+        value={formData.supplierName}
         onChange={handleChange}
         required
       />

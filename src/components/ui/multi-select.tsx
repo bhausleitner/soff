@@ -4,6 +4,8 @@ import { Command as CommandPrimitive, useCommandState } from "cmdk";
 import { X } from "lucide-react";
 import * as React from "react";
 import { forwardRef, useEffect } from "react";
+import { toast } from "sonner";
+import { isValidEmail } from "~/utils/string-format";
 
 import { Badge } from "~/components/ui/badge";
 import {
@@ -380,22 +382,24 @@ const MultipleSelector = React.forwardRef<
               onMaxSelected?.(selected.length);
               return;
             }
-            setInputValue("");
-            const newOptions = [...selected, { value, label: value }];
-            setSelected(newOptions);
-            onChange?.(newOptions);
+            if (isValidEmail(value)) {
+              setInputValue("");
+              const newOptions = [...selected, { value, label: value }];
+              setSelected(newOptions);
+              onChange?.(newOptions);
+            } else {
+              toast.error("Please enter a valid email address.");
+            }
           }}
         >
-          {`Create "${inputValue}"`}
+          {`Add "${inputValue}"`}
         </CommandItem>
       );
 
-      // For normal creatable
       if (!onSearch && inputValue.length > 0) {
         return Item;
       }
 
-      // For async search creatable. avoid showing creatable item before loading at first.
       if (onSearch && debouncedSearchTerm.length > 0 && !isLoading) {
         return Item;
       }
@@ -616,10 +620,17 @@ const MultipleSelector = React.forwardRef<
                                   onMaxSelected?.(selected.length);
                                   return;
                                 }
-                                setInputValue("");
-                                const newOptions = [...selected, option];
-                                setSelected(newOptions);
-                                onChange?.(newOptions);
+                                console.log(option.value);
+                                if (isValidEmail(option.value)) {
+                                  setInputValue("");
+                                  const newOptions = [...selected, option];
+                                  setSelected(newOptions);
+                                  onChange?.(newOptions);
+                                } else {
+                                  toast.error(
+                                    "Please enter a valid email address."
+                                  );
+                                }
                               }}
                               className={cn(
                                 "cursor-pointer",

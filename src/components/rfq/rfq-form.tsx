@@ -94,13 +94,16 @@ export function RFQFormDialog({
   // Fetch Email Provider
   const { data: emailProvider } = api.user.getEmailProvider.useQuery();
 
+  // Create Supplier
+  const createSupplierMutation = api.supplier.createSupplier.useMutation();
+
   // Convert supplier data to options for MultipleSelector
   const supplierOptions: Option[] = supplierData
     ? supplierData
         .filter((supplier) => supplier.email)
         .map((supplier) => ({
           label: `${supplier.name} (${supplier.email})`,
-          value: `${supplier.name},${supplier.email},${supplier.id})`
+          value: `${supplier.name},${supplier.email},${supplier.id}`
         }))
     : [];
 
@@ -336,6 +339,45 @@ export function RFQFormDialog({
 
   const getCurrentDateTime = () => {
     return new Date().toLocaleString();
+  };
+
+  const handleSupplierChange = async (value: Option[]) => {
+    const newSuppliers = value.filter(
+      (supplier) => !selectedSuppliers.find((s) => s.value === supplier.value)
+    );
+
+    for (const newSupplier of newSuppliers) {
+      if (!newSupplier.value.includes(",")) {
+        // This is a newly created supplier
+        try {
+          const createdSupplier = await createSupplierMutation.mutateAsync({
+            email: newSupplier.value
+          });
+
+          // Update the newly created supplier with the correct format
+          const updatedSupplier: Option = {
+            label: `${createdSupplier.name} (${createdSupplier.email})`,
+            value: `${createdSupplier.name},${createdSupplier.email},${createdSupplier.id}`
+          };
+
+          // Replace the temporary supplier with the updated one
+          value = value.map((s) =>
+            s.value === newSupplier.value ? updatedSupplier : s
+          );
+
+          toast.success(`Added new Supplier: ${createdSupplier.email}`);
+        } catch (error) {
+          console.error("Error creating supplier:", error);
+          toast.error(
+            `Failed to create supplier ${newSupplier.value}. Please try again.`
+          );
+          // Remove the failed supplier from the list
+          value = value.filter((s) => s.value !== newSupplier.value);
+        }
+      }
+    }
+
+    setSelectedSuppliers(value);
   };
 
   const handleSendRFQs = async () => {
@@ -660,8 +702,9 @@ export function RFQFormDialog({
                     No more suppliers found... :)
                   </p>
                 }
-                onChange={(value) => setSelectedSuppliers(value)}
+                onChange={handleSupplierChange}
                 hideClearAllButton={true}
+                creatable={true}
               />
               {!ccEnabled && (
                 <Label
