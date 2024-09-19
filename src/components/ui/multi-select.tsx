@@ -216,6 +216,14 @@ const MultipleSelector = React.forwardRef<
     const [inputValue, setInputValue] = React.useState("");
     const debouncedSearchTerm = useDebounce(inputValue, delay ?? 500);
 
+    const commandListRef = React.useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (open && commandListRef.current) {
+        commandListRef.current.scrollTop = 0;
+      }
+    }, [open, inputValue, options]);
+
     React.useImperativeHandle(
       ref,
       () => ({
@@ -421,13 +429,20 @@ const MultipleSelector = React.forwardRef<
         return commandProps.filter;
       }
 
-      if (creatable) {
-        return (value: string, search: string) => {
-          return value.toLowerCase().includes(search.toLowerCase()) ? 1 : -1;
-        };
-      }
-      // Using default filter in `cmdk`. We don't have to provide it.
-      return undefined;
+      return (value: string, search: string) => {
+        // Exact substring match (case-insensitive)
+        if (value.toLowerCase().includes(search.toLowerCase())) {
+          return 1;
+        }
+
+        // If creatable is true, we might want to allow creating new items
+        // that don't match existing ones. This depends on your use case.
+        if (creatable) {
+          return 0; // Neutral score, allowing item creation but not showing as a match
+        }
+
+        return -1; // No match
+      };
     }, [creatable, commandProps?.filter]);
 
     return (
@@ -558,6 +573,7 @@ const MultipleSelector = React.forwardRef<
         <div className="relative">
           {open && (
             <CommandList
+              ref={commandListRef}
               className="absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
               onMouseLeave={() => {
                 setOnScrollbar(false);
