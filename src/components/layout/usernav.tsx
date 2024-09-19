@@ -89,7 +89,22 @@ export function UserNav({ isCollapsed }: UserNavProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => openUserProfile()}>
+            <DropdownMenuItem
+              onClick={() =>
+                openUserProfile({
+                  appearance: {
+                    elements: {
+                      active: "bg-green-500 hover:bg-red-400",
+                      formButtonPrimary:
+                        "bg-soff-foreground text-white hover:bg-blue/90",
+                      navbarButton: "text-soff-foreground bg-accent",
+                      profileSectionPrimaryButton:
+                        "text-soff-foreground bg-accent"
+                    }
+                  }
+                })
+              }
+            >
               Settings Dialog
               <DropdownMenuShortcut>
                 <Icons.settings className="ml-3 size-5" />
