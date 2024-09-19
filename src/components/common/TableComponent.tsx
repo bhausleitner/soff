@@ -138,9 +138,6 @@ function generateColumns<T extends { id: number }>(
           return col.cell(row);
         }
         if (col.isBadge) {
-          const color =
-            statusClassMap[accessorKey as keyof typeof statusClassMap];
-
           return (
             <Badge
               className={cn(

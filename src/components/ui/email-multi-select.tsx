@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { cn } from "~/lib/utils";
 import { toast } from "sonner";
+import { isValidEmail } from "~/utils/string-format";
 
 export interface EmailOption {
   value: string;
@@ -21,11 +22,6 @@ interface EmailMultiSelectorProps {
   badgeClassName?: string;
   hidePlaceholderWhenSelected?: boolean;
 }
-
-const isValidEmail = (email: string) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
 
 const EmailMultiSelector = React.forwardRef<
   HTMLInputElement,
@@ -147,7 +143,7 @@ const EmailMultiSelector = React.forwardRef<
           {selected.map((option) => (
             <Badge
               key={option.value}
-              variant="secondary"
+              variant="outline"
               className={cn(
                 "bg-blue-50 text-gray-800 hover:bg-blue-200",
                 "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",

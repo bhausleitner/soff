@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Status, OrderStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import * as odooUtils from "~/server/odoo/utils";
+import { emailToName } from "~/utils/string-format";
 
 const supplierLineItemSchema = z.object({
   id: z.number(),
@@ -125,11 +126,11 @@ export const supplierRouter = createTRPCRouter({
   createSupplier: publicProcedure
     .input(
       z.object({
-        companyName: z.string(),
-        contactName: z.string(),
-        contactRole: z.string(),
+        supplierName: z.string().optional(),
+        contactName: z.string().optional(),
+        contactRole: z.string().optional(),
         email: z.string().email(),
-        status: z.nativeEnum(Status)
+        status: z.nativeEnum(Status).optional()
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -141,16 +142,26 @@ export const supplierRouter = createTRPCRouter({
       if (!user?.organizationId) {
         throw new Error("User or organization not found");
       }
+      let autoName = "";
+      if (!input.supplierName) {
+        autoName = emailToName(input.email);
+      }
 
-      await ctx.db.supplier.create({
+      const newSupplier = await ctx.db.supplier.create({
         data: {
-          name: input.companyName,
+          name: input.supplierName ?? autoName,
           contactPerson: input.contactName,
           email: input.email,
           status: input.status,
           organization: { connect: { id: user.organizationId } }
         }
       });
+
+      return {
+        id: newSupplier.id,
+        name: newSupplier.name,
+        email: newSupplier.email
+      };
     }),
 
   syncSuppliers: publicProcedure.mutation(async ({ ctx }) => {
