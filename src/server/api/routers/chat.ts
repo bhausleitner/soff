@@ -223,7 +223,8 @@ export const chatRouter = createTRPCRouter({
             await sendOutlookAndCreateMessage(
               ctx,
               input.chatMessage,
-              chatParticipant.supplier.email
+              chatParticipant.supplier.email,
+              chatParticipant.supplier.contactPerson ?? ""
             );
             break;
           case EmailProvider.GMAIL:

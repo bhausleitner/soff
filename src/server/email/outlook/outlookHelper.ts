@@ -10,6 +10,7 @@ import { getFileFromS3, uploadFileToS3 } from "~/server/s3/utils"; // Assuming y
 import { type TRPCContext } from "~/server/api/trpc";
 import { get, map } from "lodash";
 import { type ChatMessage } from "~/server/api/routers/chat";
+import { personalizeMessage } from "~/utils/string-format";
 
 export interface Attachment {
   id?: string;
@@ -289,7 +290,8 @@ export async function syncOutlookMessages(
 export async function sendOutlookAndCreateMessage(
   ctx: TRPCContext,
   inputChatMessage: ChatMessage,
-  supplierEmail: string
+  supplierEmail: string,
+  supplierName: string
 ) {
   // use lodash to get the msHomeAccountid
   const msHomeAccountId = get(
@@ -300,6 +302,12 @@ export async function sendOutlookAndCreateMessage(
   if (!msHomeAccountId) {
     throw Error("Microsoft Account not authorized");
   }
+
+  // create emailContent
+  const emailContent = personalizeMessage(
+    inputChatMessage.content,
+    supplierName
+  );
 
   // get last messageId that is not from current user
   const lastForeignMessage = await ctx.db.message.findFirst({
@@ -320,7 +328,7 @@ export async function sendOutlookAndCreateMessage(
     // existing thread
     await replyEmailAsync(
       msHomeAccountId,
-      inputChatMessage.content,
+      emailContent,
       inputChatMessage.fileNames,
       supplierEmail,
       lastForeignMessage.outlookMessageId
@@ -330,7 +338,7 @@ export async function sendOutlookAndCreateMessage(
     await ctx.db.message.create({
       data: {
         chatId: inputChatMessage.chatId,
-        content: inputChatMessage.content,
+        content: emailContent,
         chatParticipantId: inputChatMessage.chatParticipantId,
         conversationId: lastForeignMessage.conversationId ?? "",
         fileNames: inputChatMessage.fileNames,
@@ -351,7 +359,7 @@ export async function sendOutlookAndCreateMessage(
     const { newMessageId, conversationId } = await sendInitialEmail(
       msHomeAccountId,
       inputChatMessage.subject ?? "",
-      inputChatMessage.content,
+      emailContent,
       inputChatMessage.fileNames,
       supplierEmail
     );
@@ -359,7 +367,7 @@ export async function sendOutlookAndCreateMessage(
     await ctx.db.message.create({
       data: {
         chatId: inputChatMessage.chatId,
-        content: inputChatMessage.content,
+        content: emailContent,
         chatParticipantId: inputChatMessage.chatParticipantId,
         outlookMessageId: newMessageId,
         conversationId: conversationId,
