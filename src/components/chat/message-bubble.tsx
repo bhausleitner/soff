@@ -21,12 +21,12 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-md p-3",
+        "flex max-w-[100%] flex-col rounded-md p-3",
         isUserMessage ? "bg-blue-100" : "bg-accent"
       )}
     >
-      <span>{chatMessage.content}</span>
-      <div className="mt-2 flex gap-2">
+      <span className="break-words">{chatMessage.content}</span>
+      <div className="mt-2 flex flex-wrap gap-2">
         {chatMessage.fileNames.map((fileName, index) => {
           return (
             <div key={index} className="mb-2">

@@ -30,11 +30,9 @@ export function ChatList({
         inline: "nearest"
       };
 
-      // Use a timeout to ensure the scroll happens after the animation
       setTimeout(() => {
         lastMessage.scrollIntoView(scrollOptions);
 
-        // Prevent scrolling of parent elements
         const scrollTop = container.scrollTop;
         const scrollHeight = container.scrollHeight;
         const clientHeight = container.clientHeight;
@@ -50,8 +48,11 @@ export function ChatList({
   const sortedMessages = orderBy(chatMessages, ["createdAt"], ["asc"]);
 
   return (
-    <div className="h-full overflow-y-auto" ref={messagesContainerRef}>
-      <div className="min-h-full">
+    <div
+      className={"h-full overflow-y-auto overflow-x-hidden"}
+      ref={messagesContainerRef}
+    >
+      <div className="min-h-full w-full px-4">
         <AnimatePresence>
           {map(sortedMessages, (chatMessage, index) => {
             const isLastMessage = index === chatMessages.length - 1;
@@ -76,7 +77,7 @@ export function ChatList({
                   originY: 0.5
                 }}
                 className={cn(
-                  "flex flex-col gap-2 whitespace-pre-wrap p-4",
+                  "flex flex-col gap-2 whitespace-pre-wrap py-2", // Changed p-4 to py-2
                   chatMessage.chatParticipantId === chatParticipantUserId
                     ? "items-end"
                     : "items-start"
