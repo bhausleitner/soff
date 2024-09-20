@@ -68,7 +68,7 @@ export default function ChatSheetContent({ chatId }: { chatId: number }) {
             className="flex flex-col"
           >
             <ChatTopbar supplier={supplier} />
-            <div className="flex-grow overflow-hidden">
+            <div className="flex-grow overflow-hidden px-4">
               <ChatList
                 supplierId={supplier.id}
                 chatMessages={chatMessages}
