@@ -463,8 +463,8 @@ export function RFQFormDialog({
       );
 
       refetchTrigger();
-      setOpen(false);
       await router.push(`/rfqs/${rfqId}`);
+      setOpen(false);
     } catch (error) {
       console.error("Error in RFQ process:", error);
       toast.error("An error occurred in the RFQ process. Please try again.", {
