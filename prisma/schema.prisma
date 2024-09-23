@@ -246,6 +246,7 @@ model Organization {
   emailProvider    EmailProvider?
   erpUrl           String?
   erpQuoteUrl      String?
+  erpContactUrl    String?
   erp              Erp?
   suppliers        Supplier[]
   users            User[]

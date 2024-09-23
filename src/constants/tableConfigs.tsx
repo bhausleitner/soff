@@ -14,7 +14,10 @@ import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { type PricingTier } from "@prisma/client";
 import { type Quote, type QuoteLineItem } from "~/server/api/routers/quote";
-import { type SupplierLineItem } from "~/server/api/routers/supplier";
+import {
+  type ContactLineItem,
+  type SupplierLineItem
+} from "~/server/api/routers/supplier";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import {
@@ -29,6 +32,8 @@ import { SupplierCell } from "~/components/supplier/supplier-cell";
 import { type RequestForQuoteLineItem } from "~/server/api/routers/rfq";
 import countryFlagEmoji from "~/utils/emoji-country";
 import { get } from "lodash";
+import { ContactCell } from "~/components/supplier/contact-cell";
+import { ContactDropdown } from "~/components/supplier/contact-dropdown";
 
 export const quoteTableConfig = {
   maxRowsBeforePagination: 7,
@@ -235,6 +240,57 @@ export const quoteLineItemTableConfig = {
   }
 };
 
+export const supplierContactTableConfig = {
+  placeholder: "Filter contacts...",
+  maxRowsBeforePagination: 3,
+  checkbox: true,
+  columns: [
+    {
+      header: "Contact",
+      accessorKey: "contact",
+      sortable: true,
+      cell: (row: Row<ContactLineItem>) => {
+        return <ContactCell supplier={row.original} />;
+      },
+      filterFn: (
+        row: Row<ContactLineItem>,
+        columnId: string,
+        filterValue: string
+      ) => {
+        return `${row.original.contactPerson}${row.original.email}`
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
+      }
+    },
+    { header: "Status", accessorKey: "status", sortable: true, isBadge: true },
+    {
+      header: "Function",
+      accessorKey: "function",
+      sortable: true,
+      cell: (row: Row<ContactLineItem>) => {
+        const functionValue = row.original.function;
+        return (
+          <p>
+            {functionValue === "" ||
+            functionValue === undefined ||
+            functionValue === null
+              ? "Undefined"
+              : functionValue}
+          </p>
+        );
+      }
+    },
+    {
+      header: "Actions",
+      accessorKey: "actions",
+      sortable: false,
+      cell: (row: Row<ContactLineItem>) => {
+        return <ContactDropdown row={row} />;
+      }
+    }
+  ]
+};
+
 export const supplierTableConfig = {
   placeholder: "Filter supplier...",
   maxRowsBeforePagination: 6,
@@ -356,6 +412,9 @@ export const useGetAllQuotes = (args: { clerkUserId: string }) =>
 
 export const useGetAllSuppliers = (args: { clerkUserId: string }) =>
   api.supplier.getAllSuppliers.useQuery(args);
+
+export const useGetSupplierContacts = (args: { supplierId: number }) =>
+  api.supplier.getSupplierContacts.useQuery(args);
 
 export const useGetLineItemsByQuoteQuery = (args: { quoteId: number }) =>
   api.quote.getLineItemsByQuoteId.useQuery(args);
