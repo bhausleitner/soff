@@ -3,14 +3,19 @@ import { type Quote } from "@prisma/client";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { GenericTable } from "~/components/common/GenericTable";
 import { type Part } from "~/server/api/routers/part";
-import { type Order } from "~/server/api/routers/supplier";
+import {
+  type Order,
+  type ContactLineItem
+} from "~/server/api/routers/supplier";
 import {
   supplierOrderTableConfig,
   supplierPartTableConfig,
   supplierQuoteTableConfig,
   useGetPartsBySupplierQuery,
   useGetQuotesBySupplierQuery,
-  useGetOrdersBySupplierQuery
+  useGetOrdersBySupplierQuery,
+  useGetSupplierContacts,
+  supplierContactTableConfig
 } from "~/constants/tableConfigs";
 
 interface SupplierTabsProps {
@@ -20,12 +25,20 @@ interface SupplierTabsProps {
 export function SupplierTabs({ supplierId }: SupplierTabsProps) {
   return (
     <>
-      <Tabs defaultValue="parts">
+      <Tabs defaultValue="contacts">
         <TabsList>
+          <TabsTrigger value="contacts">Contacts</TabsTrigger>
           <TabsTrigger value="parts">Parts</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
         </TabsList>
+        <TabsContent value="contacts" className="space-y-4">
+          <GenericTable<ContactLineItem, { supplierId: number }>
+            tableConfig={supplierContactTableConfig}
+            useQueryHook={useGetSupplierContacts}
+            queryArgs={{ supplierId }}
+          />
+        </TabsContent>
         <TabsContent value="parts" className="space-y-4">
           <GenericTable<Part, { supplierId: number }>
             tableConfig={supplierPartTableConfig}

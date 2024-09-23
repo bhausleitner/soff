@@ -16,7 +16,22 @@ const supplierLineItemSchema = z.object({
   country: z.string().nullable()
 });
 
+export const contactLineItemSchema = z.object({
+  function: z.string().nullable(),
+  id: z.number(),
+  email: z.string().nullable(),
+  status: z.nativeEnum(Status),
+  contactPerson: z.string().nullable(),
+  organization: z
+    .object({
+      erpContactUrl: z.string().nullable()
+    })
+    .nullable(),
+  erpId: z.number().nullable()
+});
+
 export type SupplierLineItem = z.infer<typeof supplierLineItemSchema>;
+export type ContactLineItem = z.infer<typeof contactLineItemSchema>;
 
 export const supplierSchema = z.object({
   id: z.number(),
@@ -44,6 +59,30 @@ export const orderArraySchema = z.array(orderSchema);
 export type Order = z.infer<typeof orderSchema>;
 
 export const supplierRouter = createTRPCRouter({
+  getSupplierContacts: publicProcedure
+    .input(z.object({ supplierId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const contacts = await ctx.db.supplier.findMany({
+        where: {
+          supplierParentId: input.supplierId
+        },
+        select: {
+          id: true,
+          email: true,
+          status: true,
+          contactPerson: true,
+          erpId: true,
+          function: true,
+          organization: {
+            select: {
+              erpContactUrl: true
+            }
+          }
+        }
+      });
+
+      return contacts;
+    }),
   getAllSuppliers: publicProcedure
     .input(
       z.object({
@@ -60,6 +99,9 @@ export const supplierRouter = createTRPCRouter({
           organization: {
             select: {
               suppliers: {
+                where: {
+                  supplierParentId: null
+                },
                 select: {
                   id: true,
                   name: true,

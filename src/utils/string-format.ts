@@ -1,3 +1,5 @@
+import { split, first } from "lodash";
+
 export function formatCurrency(amount: number): string {
   // Convert the number to a fixed 2 decimal places string
   const fixedAmount = amount.toFixed(2);
@@ -89,4 +91,11 @@ export function emailToName(email: string): string {
     .join(" ");
 
   return name;
+}
+
+export function getInitials(contactPerson: string): string {
+  return split(contactPerson, " ")
+    .map((name) => first(name) ?? "")
+    .join("")
+    .toUpperCase();
 }
