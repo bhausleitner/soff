@@ -12,7 +12,7 @@ import { LogoEdgy } from "./LogoEdgy";
 export const PageLayout = (props: PropsWithChildren) => {
   const { user } = useUser();
   const upsertUser = api.user.upsertUser.useMutation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
