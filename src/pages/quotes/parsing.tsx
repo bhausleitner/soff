@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+
 import {
   Table,
   TableBody,
@@ -105,6 +107,30 @@ const PDFParserPage = () => {
     toast.success("Auto-matching completed!");
   }, [rfq]);
 
+  const handleAddLineItem = useCallback(() => {
+    setParsedData((prevData) => {
+      const newLineItem = {
+        partId: `PART_${prevData.lineItems.length + 1}`,
+        quantity: 0,
+        unitPrice: 0,
+        description: "",
+        pricingTiers: []
+      };
+
+      return {
+        ...prevData,
+        lineItems: [...prevData.lineItems, newLineItem]
+      };
+    });
+  }, []);
+
+  const deleteLineItem = (index: number) => {
+    setParsedData((prevData) => {
+      const newLineItems = prevData.lineItems.filter((_, i) => i !== index);
+      return { ...prevData, lineItems: newLineItems };
+    });
+  };
+
   const handleCellEdit = useCallback(
     (
       index: number,
@@ -182,6 +208,9 @@ const PDFParserPage = () => {
               <TableCell>
                 <Skeleton className="h-6 w-[180px]" />
               </TableCell>
+              <TableCell>
+                <Skeleton className="h-6 w-8" />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -199,7 +228,11 @@ const PDFParserPage = () => {
                     variant="ghost"
                     className="h-auto cursor-text p-1 hover:bg-blue-100"
                   >
-                    {truncateDescription(item.description)}
+                    {truncateDescription(item.description) || (
+                      <span className="opacity-50">
+                        Click to add description
+                      </span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
@@ -260,6 +293,16 @@ const PDFParserPage = () => {
                 </SelectContent>
               </Select>
             </TableCell>
+            <TableCell className="pl-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="p-0 hover:text-red-600"
+                onClick={() => deleteLineItem(index)}
+              >
+                <Icons.trash className="h-4 w-4" />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -278,10 +321,6 @@ const PDFParserPage = () => {
             {
               label: `RFQ #${String(rfqId) ?? ""}`,
               href: `/rfqs/${String(rfqId) ?? ""}`
-            },
-            {
-              label: `Chat #${String(chatId) ?? ""}`,
-              href: `/chat/${String(chatId) ?? ""}`
             },
             {
               label: "Quote Parsing",
@@ -349,7 +388,7 @@ const PDFParserPage = () => {
           direction="horizontal"
           className="min-h-[calc(100vh-10rem)] gap-5"
         >
-          <ResizablePanel defaultSize={40} minSize={30}>
+          <ResizablePanel defaultSize={35} minSize={30}>
             <Card className="mr-5 h-full w-full">
               <CardHeader>
                 <CardTitle>
@@ -363,7 +402,7 @@ const PDFParserPage = () => {
             </Card>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={60} minSize={30}>
+          <ResizablePanel defaultSize={75} minSize={30}>
             <Card className="flex h-full w-full flex-col">
               <CardHeader>
                 <CardTitle>Parsed Data</CardTitle>
@@ -376,10 +415,27 @@ const PDFParserPage = () => {
                       <TableHead>Quantity</TableHead>
                       <TableHead>Unit Price [USD]</TableHead>
                       <TableHead>RFQ Lineitem</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   {renderTableContent()}
                 </Table>
+                {!isParsingQuote && (
+                  <motion.div
+                    whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}
+                    transition={{ duration: 0.2 }}
+                    className="m-2 rounded-md"
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full rounded-xl py-2 text-blue-500 hover:text-blue-700"
+                      onClick={handleAddLineItem}
+                    >
+                      <Icons.add className="mr-2 h-4 w-4" />
+                      Add Line Item
+                    </Button>
+                  </motion.div>
+                )}
               </CardContent>
             </Card>
           </ResizablePanel>
