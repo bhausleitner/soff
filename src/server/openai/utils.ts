@@ -14,7 +14,10 @@ const arrayBufferToUint8Array = (buffer: ArrayBuffer): Uint8Array => {
 export const convertPdfToImage = async (pdfData: ArrayBuffer) => {
   const uint8ArrayData = arrayBufferToUint8Array(pdfData);
 
-  const loadingTask = pdfjs.getDocument({ data: uint8ArrayData });
+  const loadingTask = pdfjs.getDocument({
+    data: uint8ArrayData,
+    standardFontDataUrl: "node_modules/pdfjs-dist/standard_fonts/"
+  });
 
   const pdfDocument = await loadingTask.promise;
   const page = await pdfDocument.getPage(1); // Get the first page
