@@ -7,6 +7,11 @@ enum Status {
   ONBOARDING
 }
 
+enum Currency {
+  USD
+  EUR
+}
+
 enum Erp {
   ODOO
   NETSUITE
@@ -146,6 +151,7 @@ model Quote {
   version            Int         @default(1)
   isActive           Boolean     @default(true)
   fileKey            String?
+  currency           Currency    @default(USD)
 
   @@index([status])
   @@index([supplierId])

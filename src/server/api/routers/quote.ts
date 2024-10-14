@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { QuoteStatus } from "@prisma/client";
+import { Currency, QuoteStatus } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { orderArraySchema } from "~/server/api/routers/supplier";
 import openai from "~/server/openai/config";
@@ -86,7 +86,8 @@ export const parsedQuoteSchema = z.object({
         )
         .default([])
     })
-  )
+  ),
+  currency: z.nativeEnum(Currency)
 });
 
 export type ParsedQuoteData = z.infer<typeof parsedQuoteSchema>;
@@ -176,7 +177,8 @@ export const quoteRouter = createTRPCRouter({
               ),
               status: QuoteStatus.RECEIVED,
               erpPurchaseOrderId: existingQuote.erpPurchaseOrderId,
-              fileKey: input.fileKey
+              fileKey: input.fileKey,
+              currency: input.parsedData.currency
             }
           });
 
@@ -470,7 +472,7 @@ export const quoteRouter = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: 'Given the following quote data, parse the table into the specified JSON format with the full lineitem description. Include pricing tiers if available: {"lineItems":[{"partId":"A123","quantity":10,"unitPrice":100,"description":"Part 1 Description","pricingTiers":[{"minQuantity":1,"maxQuantity":50,"price":100},{"minQuantity":51,"maxQuantity":null,"price":90}]},{"partId":"B123","quantity":5,"unitPrice":200,"description":"Part 2 Description"}]}'
+                  text: 'Given the following quote data, parse the table into the specified JSON format with the full lineitem description. Include pricing tiers if available, also get the currency which is either USD or EUR: {"lineItems":[{"partId":"A123","quantity":10,"unitPrice":100,"description":"Part 1 Description","pricingTiers":[{"minQuantity":1,"maxQuantity":50,"price":100},{"minQuantity":51,"maxQuantity":null,"price":90}]},{"partId":"B123","quantity":5,"unitPrice":200,"description":"Part 2 Description"}],"currency":"USD"}'
                 },
                 {
                   type: "image_url",
@@ -492,6 +494,11 @@ export const quoteRouter = createTRPCRouter({
         }
 
         const parsedData = JSON.parse(match[1]) as ParsedQuoteData;
+
+        // check if currency is USD or EUR, if not default to USD
+        if (!Object.values(Currency).includes(parsedData.currency)) {
+          parsedData.currency = Currency.USD;
+        }
 
         return parsedData;
       } catch (error) {

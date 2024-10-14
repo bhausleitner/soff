@@ -23,9 +23,16 @@ const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { data } = api.s3.getSignedUrl.useQuery({
-    fileKey: fileKey
-  });
+  const { data } = api.s3.getSignedUrl.useQuery(
+    {
+      fileKey: fileKey
+    },
+    {
+      enabled: !!fileKey,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false
+    }
+  );
 
   useEffect(() => {
     if (data?.signedUrl) {

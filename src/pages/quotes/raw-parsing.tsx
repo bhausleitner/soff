@@ -49,7 +49,8 @@ const RawPDFParserPage = () => {
   const createQuoteMutation = api.quote.createRawQuote.useMutation();
 
   const [parsedData, setParsedData] = useState<ParsedQuoteData>({
-    lineItems: []
+    lineItems: [],
+    currency: "USD"
   });
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const RawPDFParserPage = () => {
           updatedItem.quantity = parseInt(value as string) || 0;
         } else if (field === "unitPrice") {
           updatedItem.unitPrice = Number(parseFloat(value as string)) || 0;
-        } else if (field === "description" ?? field === "partId") {
+        } else if (field === "description") {
           updatedItem.description = value as string;
         } else if (field === "rfqLineItemId") {
           updatedItem.rfqLineItemId =
@@ -93,6 +94,8 @@ const RawPDFParserPage = () => {
               : typeof value === "number"
                 ? value
                 : undefined;
+        } else if (field === "partId") {
+          updatedItem.partId = value as string;
         }
 
         newLineItems[index] =
@@ -296,7 +299,6 @@ const RawPDFParserPage = () => {
                   }
                   type="text"
                 />
-                {/* </div> */}
               </TableCell>
               <TableCell>
                 <EditableCell

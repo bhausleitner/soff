@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-
+import { Currency } from "@prisma/client";
 import {
   Table,
   TableBody,
@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow
 } from "~/components/ui/table";
-import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,13 +17,7 @@ import {
   SelectValue
 } from "~/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "~/components/ui/popover";
 import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
 import { Skeleton } from "~/components/ui/skeleton";
 import PDFViewer from "~/components/chat/pdf-viewer";
 import { useRouter } from "next/router";
@@ -38,34 +31,62 @@ import {
 } from "~/components/ui/resizable";
 import { Icons } from "~/components/icons";
 import { toast } from "sonner";
-import { truncateDescription } from "~/utils/string-format";
 
 import { type ParsedQuoteData } from "~/server/api/routers/quote";
+import EditableCell from "./editable-cell";
+import PriceHeader from "./price-header";
 
 const PDFParserPage = () => {
   const router = useRouter();
   const { fileKey, supplierId, chatId, rfqId } = router.query;
   const [name, extension] = extractFilenameParts(fileKey as string);
   const [isManuallyParsing, setIsManuallyParsing] = useState(false);
+  const [parsedData, setParsedData] = useState<ParsedQuoteData>({
+    lineItems: [],
+    currency: Currency.USD
+  });
+
+  const createQuoteMutation = api.quote.createQuote.useMutation();
+
+  const handleCurrencyChange = (newCurrency: Currency) => {
+    setParsedData((prevData) => ({ ...prevData, currency: newCurrency }));
+  };
 
   const {
     data: parsedQuoteData,
     isLoading: isParsingQuote,
     refetch: refetchParsing
-  } = api.quote.parseQuoteDatafromPdf.useQuery({
-    fileKey: fileKey as string
-  });
+  } = api.quote.parseQuoteDatafromPdf.useQuery(
+    {
+      fileKey: fileKey as string
+    },
+    {
+      enabled: !!fileKey,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false
+    }
+  );
+
+  const handleRetryParsing = async () => {
+    setIsManuallyParsing(true);
+    try {
+      await refetchParsing();
+    } finally {
+      setIsManuallyParsing(false);
+    }
+  };
 
   const { data: rfq, isLoading: isLoadingRfq } =
-    api.rfq.getRfqFromChatId.useQuery({
-      chatId: Number(chatId)
-    });
-
-  const createQuoteMutation = api.quote.createQuote.useMutation();
-
-  const [parsedData, setParsedData] = useState<ParsedQuoteData>({
-    lineItems: []
-  });
+    api.rfq.getRfqFromChatId.useQuery(
+      {
+        chatId: Number(chatId)
+      },
+      {
+        enabled: !!chatId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false
+      }
+    );
 
   useEffect(() => {
     if (parsedQuoteData) {
@@ -110,7 +131,7 @@ const PDFParserPage = () => {
   const handleAddLineItem = useCallback(() => {
     setParsedData((prevData) => {
       const newLineItem = {
-        partId: `PART_${prevData.lineItems.length + 1}`,
+        partId: "",
         quantity: 0,
         unitPrice: 0,
         description: "",
@@ -154,6 +175,8 @@ const PDFParserPage = () => {
               : typeof value === "number"
                 ? value
                 : undefined;
+        } else if (field === "partId") {
+          updatedItem.partId = value as string;
         }
 
         newLineItems[index] =
@@ -180,15 +203,6 @@ const PDFParserPage = () => {
     [parsedData.lineItems, rfq]
   );
 
-  const handleRetryParsing = async () => {
-    setIsManuallyParsing(true);
-    try {
-      await refetchParsing();
-    } finally {
-      setIsManuallyParsing(false);
-    }
-  };
-
   const renderTableContent = () => {
     if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
       const skeletonCount = rfq?.lineItems?.length ?? 3;
@@ -196,6 +210,10 @@ const PDFParserPage = () => {
         <TableBody>
           {Array.from({ length: skeletonCount }).map((_, index) => (
             <TableRow key={index}>
+              <TableCell></TableCell>
+              <TableCell>
+                <Skeleton className="h-6 w-full" />
+              </TableCell>
               <TableCell>
                 <Skeleton className="h-6 w-full" />
               </TableCell>
@@ -222,48 +240,42 @@ const PDFParserPage = () => {
         {parsedData.lineItems.map((item, index) => (
           <TableRow key={index}>
             <TableCell>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="h-auto cursor-text p-1 hover:bg-blue-100"
-                  >
-                    {truncateDescription(item.description) || (
-                      <span className="opacity-50">
-                        Click to add description
-                      </span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <Textarea
-                    value={item.description}
-                    onChange={(e) =>
-                      handleCellEdit(index, "description", e.target.value)
-                    }
-                    className="min-h-[100px]"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Icons.chevronRight className="h-4 w-4" />
+              </Button>
             </TableCell>
             <TableCell>
-              <Input
-                className="w-20"
-                type="number"
-                value={item.quantity}
-                onChange={(e) =>
-                  handleCellEdit(index, "quantity", e.target.value)
-                }
+              <EditableCell
+                value={item.partId}
+                onEdit={(value) => handleCellEdit(index, "partId", value ?? "")}
+                type="text"
               />
             </TableCell>
             <TableCell>
-              <Input
-                className="w-24"
-                type="number"
-                value={item.unitPrice}
-                onChange={(e) =>
-                  handleCellEdit(index, "unitPrice", e.target.value)
+              <EditableCell
+                value={item.description}
+                onEdit={(value) =>
+                  handleCellEdit(index, "description", value ?? "")
                 }
+                type="text"
+              />
+            </TableCell>
+            <TableCell>
+              <EditableCell
+                value={item.quantity}
+                onEdit={(value) =>
+                  handleCellEdit(index, "quantity", value ?? "")
+                }
+                type="number"
+              />
+            </TableCell>
+            <TableCell>
+              <EditableCell
+                value={item.unitPrice}
+                onEdit={(value) =>
+                  handleCellEdit(index, "unitPrice", value ?? "")
+                }
+                type={parsedData.currency}
               />
             </TableCell>
             <TableCell>
@@ -364,7 +376,8 @@ const PDFParserPage = () => {
                   parsedData: {
                     lineItems: parsedData.lineItems.filter(
                       (item) => item.rfqLineItemId !== undefined
-                    )
+                    ),
+                    currency: parsedData.currency
                   }
                 }),
                 {
@@ -411,13 +424,21 @@ const PDFParserPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Unit Price [USD]</TableHead>
-                      <TableHead>RFQ Lineitem</TableHead>
+                      <TableHead></TableHead>
+                      <TableHead className="text-center">Part ID</TableHead>
+                      <TableHead className="text-center">Description</TableHead>
+                      <TableHead className="text-center">Quantity</TableHead>
+                      <PriceHeader
+                        currency={parsedData.currency}
+                        onCurrencyChange={handleCurrencyChange}
+                      />
+                      <TableHead className="text-center">
+                        RFQ Lineitem
+                      </TableHead>
                       <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
+
                   {renderTableContent()}
                 </Table>
                 {!isParsingQuote && (
