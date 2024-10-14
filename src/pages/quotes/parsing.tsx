@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Currency } from "@prisma/client";
 import {
   Table,
@@ -35,12 +35,22 @@ import { toast } from "sonner";
 import { type ParsedQuoteData } from "~/server/api/routers/quote";
 import EditableCell from "./editable-cell";
 import PriceHeader from "./price-header";
+import PricingTiers from "./pricing-tiers";
+import { cn } from "~/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "~/components/ui/tooltip";
+
+type PricingTier = ParsedQuoteData["lineItems"][number]["pricingTiers"][number];
 
 const PDFParserPage = () => {
   const router = useRouter();
   const { fileKey, supplierId, chatId, rfqId } = router.query;
   const [name, extension] = extractFilenameParts(fileKey as string);
   const [isManuallyParsing, setIsManuallyParsing] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [parsedData, setParsedData] = useState<ParsedQuoteData>({
     lineItems: [],
     currency: Currency.USD
@@ -74,6 +84,18 @@ const PDFParserPage = () => {
     } finally {
       setIsManuallyParsing(false);
     }
+  };
+
+  const toggleExpandItem = (index: number) => {
+    setExpandedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   };
 
   const { data: rfq, isLoading: isLoadingRfq } =
@@ -187,6 +209,106 @@ const PDFParserPage = () => {
     []
   );
 
+  const sortPricingTiers = useCallback((tiers: PricingTier[]) => {
+    return [...tiers].sort(
+      (a, b) => (a?.minQuantity ?? 0) - (b?.minQuantity ?? 0)
+    );
+  }, []);
+
+  const handlePricingTierEdit = useCallback(
+    (
+      lineItemIndex: number,
+      tierIndex: number,
+      field: string,
+      value: string | number
+    ) => {
+      setParsedData((prevData) => {
+        const newLineItems = [...prevData.lineItems];
+        const updatedItem = { ...newLineItems[lineItemIndex] };
+        const updatedTiers = [...(updatedItem.pricingTiers ?? [])];
+
+        const updatedTier = { ...updatedTiers[tierIndex] };
+        if (field === "minQuantity" || field === "maxQuantity") {
+          updatedTier[field] = parseInt(value as string) ?? undefined;
+        } else if (field === "price") {
+          updatedTier[field] = Number(parseFloat(value as string)) ?? 0;
+        }
+
+        updatedTiers[tierIndex] = updatedTier as {
+          price: number;
+          minQuantity: number;
+          maxQuantity?: number;
+        };
+        updatedItem.pricingTiers = updatedTiers;
+        newLineItems[lineItemIndex] =
+          updatedItem as ParsedQuoteData["lineItems"][number];
+
+        return { ...prevData, lineItems: newLineItems };
+      });
+    },
+    []
+  );
+
+  const handlePricingTierBlur = useCallback(
+    (lineItemIndex: number) => {
+      setParsedData((prevData) => {
+        const newLineItems = [...prevData.lineItems];
+        const updatedItem = { ...newLineItems[lineItemIndex] };
+        const updatedTiers = [...(updatedItem.pricingTiers ?? [])];
+
+        updatedItem.pricingTiers = sortPricingTiers(updatedTiers); // Apply sorting only on blur
+        newLineItems[lineItemIndex] =
+          updatedItem as ParsedQuoteData["lineItems"][number];
+
+        return { ...prevData, lineItems: newLineItems };
+      });
+    },
+    [sortPricingTiers]
+  );
+
+  const deletePricingTier = useCallback(
+    (lineItemIndex: number, tierIndex: number) => {
+      setParsedData((prevData) => {
+        const newLineItems = [...prevData.lineItems];
+        const updatedItem = { ...newLineItems[lineItemIndex] };
+        const updatedTiers = (updatedItem.pricingTiers ?? []).filter(
+          (_, index) => index !== tierIndex
+        );
+
+        updatedItem.pricingTiers = updatedTiers;
+        newLineItems[lineItemIndex] =
+          updatedItem as ParsedQuoteData["lineItems"][number];
+
+        return { ...prevData, lineItems: newLineItems };
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sortPricingTiers]
+  );
+
+  const addPricingTier = useCallback((lineItemIndex: number) => {
+    setParsedData((prevData) => {
+      const newLineItems = [...prevData.lineItems];
+      const updatedItem = { ...newLineItems[lineItemIndex] };
+      const updatedTiers = [...(updatedItem.pricingTiers ?? [])];
+
+      // Find the maximum minQuantity from existing tiers
+      const maxMinQuantity = updatedTiers.reduce(
+        (max, tier) => Math.max(max, tier?.minQuantity ?? 0),
+        -1
+      );
+
+      // Add new tier with minQuantity set to maxMinQuantity + 1
+      updatedTiers.push({ minQuantity: maxMinQuantity + 1, price: 0 });
+      updatedItem.pricingTiers = sortPricingTiers(updatedTiers);
+      newLineItems[lineItemIndex] =
+        updatedItem as ParsedQuoteData["lineItems"][number];
+
+      return { ...prevData, lineItems: newLineItems };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getAvailableCategories = useCallback(
     (currentIndex: number) => {
       if (!rfq) return [];
@@ -238,84 +360,140 @@ const PDFParserPage = () => {
     return (
       <TableBody>
         {parsedData.lineItems.map((item, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <Icons.chevronRight className="h-4 w-4" />
-              </Button>
-            </TableCell>
-            <TableCell>
-              <EditableCell
-                value={item.partId}
-                onEdit={(value) => handleCellEdit(index, "partId", value ?? "")}
-                type="text"
-              />
-            </TableCell>
-            <TableCell>
-              <EditableCell
-                value={item.description}
-                onEdit={(value) =>
-                  handleCellEdit(index, "description", value ?? "")
-                }
-                type="text"
-              />
-            </TableCell>
-            <TableCell>
-              <EditableCell
-                value={item.quantity}
-                onEdit={(value) =>
-                  handleCellEdit(index, "quantity", value ?? "")
-                }
-                type="number"
-              />
-            </TableCell>
-            <TableCell>
-              <EditableCell
-                value={item.unitPrice}
-                onEdit={(value) =>
-                  handleCellEdit(index, "unitPrice", value ?? "")
-                }
-                type={parsedData.currency}
-              />
-            </TableCell>
-            <TableCell>
-              <Select
-                value={item.rfqLineItemId?.toString() ?? "unmatched"}
-                onValueChange={(value) =>
-                  handleCellEdit(
-                    index,
-                    "rfqLineItemId",
-                    value === "unmatched" ? undefined : parseInt(value)
-                  )
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a line item" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unmatched">Unmatched</SelectItem>
-                  {getAvailableCategories(index).map((lineItem) => (
-                    <SelectItem
-                      key={lineItem.id}
-                      value={lineItem.id.toString()}
-                    >
-                      {lineItem.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </TableCell>
-            <TableCell className="pl-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="p-0 hover:text-red-600"
-                onClick={() => deleteLineItem(index)}
-              >
-                <Icons.trash className="h-4 w-4" />
-              </Button>
-            </TableCell>
-          </TableRow>
+          <>
+            <TableRow
+              className={cn("group", expandedItems.has(index) && "bg-gray-50")}
+            >
+              <TableCell>
+                {item.pricingTiers && item.pricingTiers.length > 0 ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => toggleExpandItem(index)}
+                      >
+                        <Icons.chevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            expandedItems.has(index) ? "rotate-90" : ""
+                          }`}
+                        />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Show Pricing Tiers</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => addPricingTier(index)}
+                      >
+                        <Icons.add className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Add Pricing Tiers</TooltipContent>
+                  </Tooltip>
+                )}
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.partId}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "partId", value ?? "")
+                  }
+                  type="text"
+                />
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.description}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "description", value ?? "")
+                  }
+                  type="text"
+                />
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.quantity}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "quantity", value ?? "")
+                  }
+                  type="number"
+                />
+              </TableCell>
+              <TableCell>
+                <EditableCell
+                  value={item.unitPrice}
+                  onEdit={(value) =>
+                    handleCellEdit(index, "unitPrice", value ?? "")
+                  }
+                  type={parsedData.currency}
+                />
+              </TableCell>
+              <TableCell>
+                <Select
+                  value={item.rfqLineItemId?.toString() ?? "unmatched"}
+                  onValueChange={(value) =>
+                    handleCellEdit(
+                      index,
+                      "rfqLineItemId",
+                      value === "unmatched" ? undefined : parseInt(value)
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a line item" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unmatched">Unmatched</SelectItem>
+                    {getAvailableCategories(index).map((lineItem) => (
+                      <SelectItem
+                        key={lineItem.id}
+                        value={lineItem.id.toString()}
+                      >
+                        {lineItem.description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="pl-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="p-0 hover:text-red-600"
+                  onClick={() => deleteLineItem(index)}
+                >
+                  <Icons.trash className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+            {expandedItems.has(index) &&
+              item.pricingTiers &&
+              item.pricingTiers.length > 0 && (
+                <TableRow className="bg-gray-50">
+                  <TableCell colSpan={7} className="p-0">
+                    <PricingTiers
+                      pricingTiers={item.pricingTiers ?? []}
+                      currency={parsedData.currency}
+                      onPricingTierEdit={(tierIndex, field, value) =>
+                        handlePricingTierEdit(index, tierIndex, field, value)
+                      }
+                      onPricingTierBlur={() => handlePricingTierBlur(index)}
+                      onDeletePricingTier={(tierIndex) =>
+                        deletePricingTier(index, tierIndex)
+                      }
+                      onAddPricingTier={() => addPricingTier(index)}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+          </>
         ))}
       </TableBody>
     );
