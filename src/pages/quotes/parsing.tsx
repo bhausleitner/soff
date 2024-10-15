@@ -73,6 +73,7 @@ const PDFParserPage = () => {
     });
 
   const handleCurrencyChange = (newCurrency: Currency) => {
+    toast.info(`Changed currency to ${newCurrency}!`);
     setParsedData((prevData) => ({ ...prevData, currency: newCurrency }));
   };
 
@@ -644,7 +645,7 @@ const PDFParserPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="h-[calc(100%-4rem)]">
-                <PDFViewer fileKey={fileKey as string} isDialog={false} />
+                <PDFViewer fileKey={fileKey as string} />
               </CardContent>
             </Card>
           </ResizablePanel>
