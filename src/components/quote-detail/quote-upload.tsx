@@ -65,7 +65,7 @@ export function QuoteUploadDialog() {
         setUploadProgress({ ...newUploadProgress });
       }
 
-      await router.push(`/quotes/raw-parsing?fileKey=${uploadedFileKey}`);
+      await router.push(`/quotes/parsing?fileKey=${uploadedFileKey}`);
     } catch (error) {
       toast.error("An error occurred during file upload");
     }

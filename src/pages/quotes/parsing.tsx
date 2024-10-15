@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Currency } from "@prisma/client";
 import {
   Table,
@@ -42,10 +42,15 @@ import {
   TooltipContent,
   TooltipTrigger
 } from "~/components/ui/tooltip";
+import { useUser } from "@clerk/nextjs";
+import AddQuote from "./add-quote";
+import SupplierSelectionDialog from "./supplier-select-dialog";
 
 type PricingTier = ParsedQuoteData["lineItems"][number]["pricingTiers"][number];
 
 const PDFParserPage = () => {
+  const user = useUser();
+  const clerkUserId = user.user?.id;
   const router = useRouter();
   const { fileKey, supplierId, chatId, rfqId } = router.query;
   const [name, extension] = extractFilenameParts(fileKey as string);
@@ -55,8 +60,20 @@ const PDFParserPage = () => {
     lineItems: [],
     currency: Currency.USD
   });
+  const [isSupplierDialogOpen, setIsSupplierDialogOpen] = useState(false);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
+    null
+  );
+
+  console.log("supplierId", supplierId);
+  console.log("selectedSupplierId", selectedSupplierId);
 
   const createQuoteMutation = api.quote.createQuote.useMutation();
+
+  const { data: suppliers, isLoading: isLoadingSuppliers } =
+    api.supplier.getAllSuppliers.useQuery({
+      clerkUserId: clerkUserId!
+    });
 
   const handleCurrencyChange = (newCurrency: Currency) => {
     setParsedData((prevData) => ({ ...prevData, currency: newCurrency }));
@@ -325,6 +342,50 @@ const PDFParserPage = () => {
     [parsedData.lineItems, rfq]
   );
 
+  const handleAddQuote = () => {
+    console.log("supplierId", supplierId);
+    console.log("selectedSupplierId", selectedSupplierId);
+    if (!supplierId ?? !selectedSupplierId) {
+      setIsSupplierDialogOpen(true);
+    } else {
+      void createQuote();
+    }
+  };
+
+  const createQuote = () => {
+    const finalSupplierId = Number(supplierId) || selectedSupplierId;
+    if (!finalSupplierId) {
+      toast.error("Please select a supplier before adding the quote.");
+      return;
+    }
+
+    void toast.promise(
+      createQuoteMutation.mutateAsync({
+        supplierId: finalSupplierId,
+        chatId: chatId ? Number(chatId) : undefined,
+        fileKey: String(fileKey),
+        parsedData: {
+          lineItems: parsedData.lineItems.filter(
+            (item) => item.rfqLineItemId !== undefined
+          ),
+          currency: parsedData.currency
+        }
+      }),
+      {
+        loading: "Adding quote...",
+        success: ({ quoteId }) => {
+          if (rfqId) {
+            void router.push(`/rfqs/${String(rfqId)}`);
+          } else {
+            void router.push(`/quotes/${String(quoteId)}`);
+          }
+          return "Quote added successfully!";
+        },
+        error: "Failed to add quote. Please try again."
+      }
+    );
+  };
+
   const renderTableContent = () => {
     if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
       const skeletonCount = rfq?.lineItems?.length ?? 3;
@@ -334,22 +395,24 @@ const PDFParserPage = () => {
             <TableRow key={index}>
               <TableCell></TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-8 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-8 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-8 w-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-8 w-full" />
               </TableCell>
+              {rfqId && (
+                <TableCell>
+                  <Skeleton className="h-8 w-full" />
+                </TableCell>
+              )}
               <TableCell>
-                <Skeleton className="h-6 w-[180px]" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-6 w-8" />
+                <Skeleton className="h-8 w-8" />
               </TableCell>
             </TableRow>
           ))}
@@ -406,6 +469,7 @@ const PDFParserPage = () => {
                     handleCellEdit(index, "partId", value ?? "")
                   }
                   type="text"
+                  maxLength={5}
                 />
               </TableCell>
               <TableCell>
@@ -435,33 +499,35 @@ const PDFParserPage = () => {
                   type={parsedData.currency}
                 />
               </TableCell>
-              <TableCell>
-                <Select
-                  value={item.rfqLineItemId?.toString() ?? "unmatched"}
-                  onValueChange={(value) =>
-                    handleCellEdit(
-                      index,
-                      "rfqLineItemId",
-                      value === "unmatched" ? undefined : parseInt(value)
-                    )
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a line item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unmatched">Unmatched</SelectItem>
-                    {getAvailableCategories(index).map((lineItem) => (
-                      <SelectItem
-                        key={lineItem.id}
-                        value={lineItem.id.toString()}
-                      >
-                        {lineItem.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
+              {rfqId && (
+                <TableCell>
+                  <Select
+                    value={item.rfqLineItemId?.toString() ?? "unmatched"}
+                    onValueChange={(value) =>
+                      handleCellEdit(
+                        index,
+                        "rfqLineItemId",
+                        value === "unmatched" ? undefined : parseInt(value)
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Select a line item" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unmatched">Unmatched</SelectItem>
+                      {getAvailableCategories(index).map((lineItem) => (
+                        <SelectItem
+                          key={lineItem.id}
+                          value={lineItem.id.toString()}
+                        >
+                          {lineItem.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+              )}
               <TableCell className="pl-0">
                 <Button
                   variant="ghost"
@@ -502,22 +568,38 @@ const PDFParserPage = () => {
   return (
     <>
       <div className="flex flex-row justify-between">
-        <BreadCrumbWrapper
-          items={[
-            {
-              label: "RFQs",
-              href: "/rfqs"
-            },
-            {
-              label: `RFQ #${String(rfqId) ?? ""}`,
-              href: `/rfqs/${String(rfqId) ?? ""}`
-            },
-            {
-              label: "Quote Parsing",
-              href: `/quotes/parsing`
-            }
-          ]}
-        />
+        {rfqId && (
+          <BreadCrumbWrapper
+            items={[
+              {
+                label: "RFQs",
+                href: "/rfqs"
+              },
+              {
+                label: `RFQ #${String(rfqId) ?? ""}`,
+                href: `/rfqs/${String(rfqId) ?? ""}`
+              },
+              {
+                label: "Quote Parsing",
+                href: `/quotes/parsing`
+              }
+            ]}
+          />
+        )}
+        {!rfqId && (
+          <BreadCrumbWrapper
+            items={[
+              {
+                label: "Quotes",
+                href: "/quotes"
+              },
+              {
+                label: `Raw Parsing`,
+                href: `/quotes/raw-parsing`
+              }
+            ]}
+          />
+        )}
         <div className="flex flex-row gap-4">
           <Button
             className="w-40"
@@ -534,44 +616,21 @@ const PDFParserPage = () => {
               </>
             )}
           </Button>
-          <Button
-            className="w-40"
-            variant="outline"
-            onClick={handleAutoMatch}
-            disabled={isParsingQuote || isLoadingRfq}
-          >
-            Auto-Match
-            <Icons.sparkles className="ml-2 h-4 w-4" />
-          </Button>
-          <Button
-            variant="soff"
-            onClick={() => {
-              void toast.promise(
-                createQuoteMutation.mutateAsync({
-                  supplierId: Number(supplierId),
-                  chatId: Number(chatId),
-                  fileKey: String(fileKey),
-                  parsedData: {
-                    lineItems: parsedData.lineItems.filter(
-                      (item) => item.rfqLineItemId !== undefined
-                    ),
-                    currency: parsedData.currency
-                  }
-                }),
-                {
-                  loading: "Adding quote...",
-                  success: () => {
-                    void router.push(`/rfqs/${String(rfqId)}`);
-                    return "Quote added successfully!";
-                  },
-                  error: "Failed to add quote. Please try again."
-                }
-              );
-            }}
-          >
-            Add Quote
-            <Icons.quotes className="ml-2 h-4 w-4" />
-          </Button>
+          {rfqId && (
+            <Button
+              className="w-40"
+              variant="outline"
+              onClick={handleAutoMatch}
+              disabled={isParsingQuote || isLoadingRfq}
+            >
+              Auto-Match
+              <Icons.sparkles className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+          <AddQuote
+            onClick={handleAddQuote}
+            disabled={isManuallyParsing || isParsingQuote || isLoadingRfq}
+          />
         </div>
       </div>
       <div className="mt-5">
@@ -610,9 +669,11 @@ const PDFParserPage = () => {
                         currency={parsedData.currency}
                         onCurrencyChange={handleCurrencyChange}
                       />
-                      <TableHead className="text-center">
-                        RFQ Lineitem
-                      </TableHead>
+                      {rfqId && (
+                        <TableHead className="text-center">
+                          RFQ Lineitem
+                        </TableHead>
+                      )}
                       <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -640,6 +701,18 @@ const PDFParserPage = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+      <SupplierSelectionDialog
+        isOpen={isSupplierDialogOpen}
+        onClose={() => setIsSupplierDialogOpen(false)}
+        suppliers={suppliers}
+        isLoadingSuppliers={isLoadingSuppliers}
+        selectedSupplierId={selectedSupplierId}
+        setSelectedSupplierId={setSelectedSupplierId}
+        onAddQuote={() => {
+          setIsSupplierDialogOpen(false);
+          handleAddQuote();
+        }}
+      />
     </>
   );
 };

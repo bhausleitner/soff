@@ -145,7 +145,7 @@ export const quoteRouter = createTRPCRouter({
     .input(
       z.object({
         supplierId: z.number(),
-        chatId: z.number(),
+        chatId: z.number().optional(),
         fileKey: z.string(),
         parsedData: parsedQuoteSchema
       })
@@ -203,7 +203,7 @@ export const quoteRouter = createTRPCRouter({
             )
           );
 
-          return newQuote.id.toString();
+          return { quoteId: newQuote.id.toString() };
         } else {
           const newQuote = await ctx.db.quote.create({
             data: {

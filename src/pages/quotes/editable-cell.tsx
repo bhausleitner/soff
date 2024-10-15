@@ -15,13 +15,15 @@ interface EditableCellProps {
   onEdit: (value: string | number | null) => void;
   type?: "text" | "number" | "USD" | "EUR";
   isMaxQuantity?: boolean;
+  maxLength?: number;
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
   value,
   onEdit,
   type = "text",
-  isMaxQuantity = false
+  isMaxQuantity = false,
+  maxLength = 20
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [localValue, setLocalValue] = useState<string | number | null>(value);
@@ -113,9 +115,9 @@ const EditableCell: React.FC<EditableCellProps> = ({
             maximumFractionDigits: 2
           })
           .replace("€", "€");
-      return truncateDescription(val.toString());
+      return truncateDescription(val.toString(), maxLength);
     },
-    [type]
+    [type, maxLength]
   );
 
   const handleInfinityClick = useCallback(() => {
