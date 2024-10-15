@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import CompareHeader from "./compare-header";
+import CompareHeader from "~/components/compare/compare-header";
 import { api } from "~/utils/api";
 import {
   Popover,

@@ -33,9 +33,9 @@ import { Icons } from "~/components/icons";
 import { toast } from "sonner";
 
 import { type ParsedQuoteData } from "~/server/api/routers/quote";
-import EditableCell from "./editable-cell";
-import PriceHeader from "./price-header";
-import PricingTiers from "./pricing-tiers";
+import EditableCell from "~/components/parsing/editable-cell";
+import PriceHeader from "~/components/parsing/price-header";
+import PricingTiers from "~/components/parsing/pricing-tiers";
 import { cn } from "~/lib/utils";
 import {
   Tooltip,
@@ -43,8 +43,8 @@ import {
   TooltipTrigger
 } from "~/components/ui/tooltip";
 import { useUser } from "@clerk/nextjs";
-import AddQuote from "./add-quote";
-import SupplierSelectionDialog from "./supplier-select-dialog";
+import AddQuote from "~/components/parsing/add-quote";
+import SupplierSelectionDialog from "~/components/parsing/supplier-select-dialog";
 
 type PricingTier = ParsedQuoteData["lineItems"][number]["pricingTiers"][number];
 
@@ -64,9 +64,6 @@ const PDFParserPage = () => {
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
     null
   );
-
-  console.log("supplierId", supplierId);
-  console.log("selectedSupplierId", selectedSupplierId);
 
   const createQuoteMutation = api.quote.createQuote.useMutation();
 
@@ -343,12 +340,10 @@ const PDFParserPage = () => {
   );
 
   const handleAddQuote = () => {
-    console.log("supplierId", supplierId);
-    console.log("selectedSupplierId", selectedSupplierId);
-    if (!supplierId ?? !selectedSupplierId) {
-      setIsSupplierDialogOpen(true);
-    } else {
+    if (supplierId ?? selectedSupplierId) {
       void createQuote();
+    } else {
+      setIsSupplierDialogOpen(true);
     }
   };
 
@@ -373,11 +368,11 @@ const PDFParserPage = () => {
       }),
       {
         loading: "Adding quote...",
-        success: ({ quoteId }) => {
+        success: async ({ quoteId }) => {
           if (rfqId) {
-            void router.push(`/rfqs/${String(rfqId)}`);
+            await router.push(`/rfqs/${String(rfqId)}`);
           } else {
-            void router.push(`/quotes/${String(quoteId)}`);
+            await router.push(`/quotes/${String(quoteId)}`);
           }
           return "Quote added successfully!";
         },
