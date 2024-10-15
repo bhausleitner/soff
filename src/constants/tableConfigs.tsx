@@ -156,18 +156,6 @@ export const supplierOrderTableConfig = {
   ]
 };
 
-export const supplierPartTableConfig = {
-  placeholder: "Filter part...",
-  maxRowsBeforePagination: 6,
-  checkbox: true,
-  columns: [
-    { header: "Part Number", accessorKey: "partNumber", sortable: true },
-    { header: "Part Name", accessorKey: "partName", sortable: true },
-    { header: "Price", accessorKey: "price", sortable: true },
-    { header: "CAD File", accessorKey: "cadFile", sortable: false }
-  ]
-};
-
 export const supplierQuoteTableConfig = {
   link: "/quotes",
   maxRowsBeforePagination: 6,
@@ -397,8 +385,6 @@ export const rfqTableConfig = {
   ]
 };
 
-export const useGetPartsBySupplierQuery = (args: { supplierId: number }) =>
-  api.part.getPartsBySupplierId.useQuery(args);
 export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
   api.supplier.getQuotesBySupplierId.useQuery(args);
 export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>

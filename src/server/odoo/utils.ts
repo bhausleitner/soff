@@ -196,10 +196,6 @@ export function getAllContacts(
   });
 }
 
-// import fs from "fs";
-
-// syncSuppliers("https://soff.odoo.com", 2, "soff", 2);
-
 export async function syncSuppliers(
   odooUrl: string,
   odooUid: number,

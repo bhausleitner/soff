@@ -14,7 +14,6 @@ const PDFViewer = ({ fileKey }: { fileKey: string }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState<number>(1.0);
   const [autoScale, setAutoScale] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
@@ -37,7 +36,6 @@ const PDFViewer = ({ fileKey }: { fileKey: string }) => {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
-    setCurrentPage(1);
   };
 
   const onPageLoadSuccess = ({

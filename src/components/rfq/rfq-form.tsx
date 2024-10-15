@@ -37,7 +37,7 @@ import { getLastValueOfCommaString } from "~/utils/string-format";
 
 type PartialRfqLineItem = Omit<RfqLineItem, "fileNames" | "requestForQuoteId">;
 
-interface Part extends PartialRfqLineItem {
+interface RfqPart extends PartialRfqLineItem {
   quantityTiers: number[];
   files: FileObject[];
 }
@@ -62,7 +62,7 @@ export function RFQFormDialog({
 }) {
   const router = useRouter();
   const { user } = useUser();
-  const [parts, setParts] = useState<Part[]>([
+  const [parts, setParts] = useState<RfqPart[]>([
     {
       id: 1,
       description: "",
@@ -183,7 +183,7 @@ export function RFQFormDialog({
 
   const handlePartChange = (
     id: number,
-    field: keyof Part,
+    field: keyof RfqPart,
     value: string | number
   ) => {
     const newParts = parts.map((part) =>
@@ -502,10 +502,10 @@ export function RFQFormDialog({
                 <TableHeader>
                   <TableRow>
                     <TableHead className="sticky top-0 bg-white">
-                      Part Description*
+                      Part Description
                     </TableHead>
                     <TableHead className="sticky top-0 w-28 bg-white">
-                      Quantity*
+                      Quantity
                     </TableHead>
                     <TableHead className="sticky top-0 w-48 bg-white">
                       Files
