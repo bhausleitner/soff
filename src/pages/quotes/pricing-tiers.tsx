@@ -42,8 +42,8 @@ const PricingTiers: React.FC<PricingTiersProps> = ({
     <Card className="m-2 overflow-hidden">
       <CardContent className="p-0">
         <Table>
-          <TableHeader>
-            <TableRow className="border-b">
+          <TableHeader className="border-b">
+            <TableRow>
               <TableHead className="w-1/4 py-2 text-center text-xs font-medium">
                 Min Quantity
               </TableHead>
@@ -53,6 +53,7 @@ const PricingTiers: React.FC<PricingTiersProps> = ({
               <TableHead className="w-1/4 py-2 text-center text-xs font-medium">
                 Unit Price
               </TableHead>
+              <TableHead className="w-1/4 py-2 text-center text-xs font-medium"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

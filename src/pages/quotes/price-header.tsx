@@ -28,7 +28,7 @@ const PriceHeader: React.FC<PriceHeaderProps> = ({
         <SelectTrigger className="ml-2 w-[70px]">
           <SelectValue placeholder="Select currency" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="w-[70px]">
           <SelectItem value={Currency.USD}>$</SelectItem>
           <SelectItem value={Currency.EUR}>€</SelectItem>
         </SelectContent>
