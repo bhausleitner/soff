@@ -45,6 +45,7 @@ const SupplierSelectionDialog: React.FC<SupplierSelectionDialogProps> = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const selectedSupplier = suppliers?.find((s) => s.id === selectedSupplierId);
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const SupplierSelectionDialog: React.FC<SupplierSelectionDialogProps> = ({
         </DialogHeader>
         <div className="py-4" ref={dropdownRef}>
           <Button
+            ref={buttonRef}
             variant="outline"
             className="w-full justify-between"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -79,8 +81,15 @@ const SupplierSelectionDialog: React.FC<SupplierSelectionDialogProps> = ({
             <Icons.chevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
           </Button>
           {isDropdownOpen && (
-            <div className="absolute z-50 mt-2 w-[calc(100%-2rem)] rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95">
-              <Command>
+            <div
+              className="absolute z-50 mt-2 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95"
+              style={{
+                width: buttonRef.current
+                  ? buttonRef.current.offsetWidth
+                  : "auto"
+              }}
+            >
+              <Command className="w-full">
                 <CommandInput placeholder="Search suppliers..." />
                 <CommandList>
                   <CommandEmpty>No suppliers found.</CommandEmpty>

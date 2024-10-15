@@ -354,15 +354,17 @@ const PDFParserPage = () => {
       return;
     }
 
+    const finalLineItems = rfqId
+      ? parsedData.lineItems.filter((item) => item.rfqLineItemId !== undefined)
+      : parsedData.lineItems;
+
     void toast.promise(
       createQuoteMutation.mutateAsync({
         supplierId: finalSupplierId,
         chatId: chatId ? Number(chatId) : undefined,
         fileKey: String(fileKey),
         parsedData: {
-          lineItems: parsedData.lineItems.filter(
-            (item) => item.rfqLineItemId !== undefined
-          ),
+          lineItems: finalLineItems,
           currency: parsedData.currency
         }
       }),
