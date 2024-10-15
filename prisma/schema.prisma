@@ -86,7 +86,6 @@ model Supplier {
   phone            String?           @default("")
   status           Status            @default(ACTIVE)
   responseTime     Int?              @default(48)
-  parts            SupplierPart[]
   quotes           Quote[]
   chatParticipants ChatParticipant[]
   organizationId   Int?
@@ -115,23 +114,11 @@ model Part {
   partNumber       String?
   partName         String
   cadFile          String?
-  suppliers        SupplierPart[]
   lineItems        LineItem[]
   requestForQuotes RequestForQuote[]
 
   @@index([partName])
   @@index([partNumber])
-}
-
-model SupplierPart {
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  supplierId Int
-  part       Part     @relation(fields: [partId], references: [id])
-  partId     Int
-
-  @@id([supplierId, partId])
-  @@index([supplierId])
-  @@index([partId])
 }
 
 model Quote {
