@@ -6,22 +6,17 @@ import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
-import { Separator } from "~/components/ui/separator";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-interface PDFViewerProps {
-  fileKey: string;
-  isDialog?: boolean;
-}
-
-const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
+const PDFViewer = ({ fileKey }: { fileKey: string }) => {
   const [url, setUrl] = useState<string>();
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState<number>(1.0);
   const [autoScale, setAutoScale] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   const { data } = api.s3.getSignedUrl.useQuery(
     {
@@ -55,9 +50,10 @@ const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
     if (autoScale && containerRef.current) {
       const containerWidth = containerRef.current.clientWidth;
       const containerHeight = containerRef.current.clientHeight;
-      const widthScale = containerWidth / originalWidth;
-      const heightScale = containerHeight / originalHeight;
-      setScale(Math.min(widthScale, heightScale));
+      const padding = 40; // 20px padding on each side
+      const widthScale = (containerWidth - padding) / originalWidth;
+      const heightScale = (containerHeight - padding) / originalHeight;
+      setScale(Math.min(widthScale, heightScale, 1.0)); // Limit max scale to 1.0
     }
   };
 
@@ -77,97 +73,64 @@ const PDFViewer = ({ fileKey, isDialog = true }: PDFViewerProps) => {
     });
   };
 
-  const goToPreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-  };
-
-  const goToNextPage = () => {
-    if (numPages !== null) {
-      setCurrentPage((prevPage) => Math.min(prevPage + 1, numPages));
-    }
-  };
-
   if (!url) {
     return <Spinner />;
   }
 
+  const documentContainer = (
+    <div
+      ref={containerRef}
+      className="group relative flex flex-col items-center overflow-auto"
+      style={{ height: "65vh", maxWidth: "100%" }}
+    >
+      <Document
+        file={url}
+        onLoadSuccess={onDocumentLoadSuccess}
+        loading={<Spinner />}
+      >
+        {numPages !== null &&
+          Array.from(new Array(numPages), (el, index) => (
+            <Page
+              key={`page_${index + 1}`}
+              pageNumber={index + 1}
+              className="m-2"
+              scale={scale}
+              onLoadSuccess={onPageLoadSuccess}
+            />
+          ))}
+      </Document>
+    </div>
+  );
+
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="mb-2 flex items-center justify-center gap-2">
-        <Button
-          variant="secondary"
-          onClick={goToPreviousPage}
-          disabled={currentPage === 1}
+      <div
+        className="relative w-full rounded-lg bg-gray-200"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        {documentContainer}
+        <div
+          className={`absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 transform gap-2 transition-opacity duration-300 ${
+            isHovering ? "opacity-100" : "opacity-0"
+          }`}
         >
-          <Icons.chevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm">
-          Page {currentPage} / {numPages ?? 0}
-        </span>
-        <Button
-          variant="secondary"
-          onClick={goToNextPage}
-          disabled={currentPage === numPages}
-        >
-          <Icons.chevronRight className="h-4 w-4" />
-        </Button>
-        <Separator orientation="vertical" />
-        <Button variant="secondary" onClick={zoomIn}>
-          <Icons.zoomIn className="h-4 w-4" />
-        </Button>
-        <Button variant="secondary" onClick={zoomOut}>
-          <Icons.zoomOut className="h-4 w-4" />
-        </Button>
+          <Button
+            variant="outline"
+            onClick={zoomIn}
+            className="bg-white bg-opacity-50 backdrop-blur-sm backdrop-filter transition-all"
+          >
+            <Icons.zoomIn className="h-4 w-4 text-black" />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={zoomOut}
+            className="bg-white bg-opacity-50 backdrop-blur-sm backdrop-filter transition-all"
+          >
+            <Icons.zoomOut className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-      {isDialog ? (
-        <div className="w-[50vw] rounded-lg bg-gray-200">
-          <div
-            ref={containerRef}
-            className="flex flex-col items-center overflow-auto"
-            style={{ height: "60vh", maxWidth: "100%" }}
-          >
-            <Document
-              file={url}
-              onLoadSuccess={onDocumentLoadSuccess}
-              loading={<Spinner />}
-            >
-              {numPages !== null && (
-                <Page
-                  key={`page_${currentPage}`}
-                  pageNumber={currentPage}
-                  className="m-2"
-                  scale={scale}
-                  onLoadSuccess={onPageLoadSuccess}
-                />
-              )}
-            </Document>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full rounded-lg bg-gray-200">
-          <div
-            ref={containerRef}
-            className="flex flex-col items-center overflow-auto"
-            style={{ height: "65vh", maxWidth: "100%" }}
-          >
-            <Document
-              file={url}
-              onLoadSuccess={onDocumentLoadSuccess}
-              loading={<Spinner />}
-            >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page
-                  key={`page_${index + 1}`}
-                  pageNumber={index + 1}
-                  className="m-2"
-                  scale={scale}
-                  onLoadSuccess={onPageLoadSuccess}
-                />
-              ))}
-            </Document>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
