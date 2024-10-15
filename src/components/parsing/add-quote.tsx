@@ -9,12 +9,7 @@ export default function AddQuote({
   disabled?: boolean;
 }) {
   return (
-    <Button
-      variant="soff"
-      onClick={onClick}
-      disabled={disabled}
-      className="antialiased"
-    >
+    <Button variant="soff" onClick={onClick} disabled={disabled}>
       Add Quote
       <Icons.quotes className="ml-2 h-4 w-4" />
     </Button>
