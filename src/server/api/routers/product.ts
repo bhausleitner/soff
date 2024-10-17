@@ -26,6 +26,40 @@ export const productRouter = createTRPCRouter({
 
       return user?.organization?.erpProducts ?? [];
     }),
+  searchErpProducts: publicProcedure
+    .input(
+      z.object({
+        query: z.string()
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const user = await ctx.db.user.findFirst({
+        where: {
+          clerkUserId: ctx.auth.userId!
+        },
+        select: {
+          organizationId: true
+        }
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const erpProducts = await ctx.db.erpProduct.findMany({
+        where: {
+          organizationId: user.organizationId,
+          OR: [
+            { productName: { contains: input.query, mode: "insensitive" } },
+            { productCode: { contains: input.query, mode: "insensitive" } }
+          ]
+        },
+        take: 20,
+        orderBy: [{ productName: "asc" }]
+      });
+
+      return erpProducts;
+    }),
   syncErpProducts: publicProcedure.mutation(async ({ ctx }) => {
     const queryData = await ctx.db.user.findFirst({
       where: { clerkUserId: ctx.auth.userId! },
