@@ -65,7 +65,7 @@ export default function Supplier() {
               ) : (
                 <>
                   Sync Suppliers
-                  <Icons.sync className="ml-2 h-5 w-5" />
+                  <Icons.sync className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>

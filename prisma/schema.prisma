@@ -110,12 +110,13 @@ model Supplier {
 }
 
 model ErpProduct {
-  id          Int     @id @default(autoincrement())
-  productId   Int
-  productName String
-  productCode String?
-  organizationId   Int?
-  organization     Organization?     @relation(fields: [organizationId], references: [id])
+  id             Int           @id @default(autoincrement())
+  productId      Int
+  productName    String
+  productCode    String?
+  organizationId Int?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  updatedAt      DateTime      @updatedAt
 
   @@index([productId])
   @@index([productName])
@@ -243,7 +244,7 @@ model Organization {
   users            User[]
   requestForQuotes RequestForQuote[]
   erpProducts      ErpProduct[]
-  
+
   @@index([name])
   @@index([emailProvider])
   @@index([erp])

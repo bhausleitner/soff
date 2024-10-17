@@ -95,8 +95,14 @@ export const PageLayout = (props: PropsWithChildren) => {
               {
                 title: "RFQs",
                 href: "/rfqs",
-                icon: Icons.package,
+                icon: Icons.rfq,
                 subpages: ["rfqs"]
+              },
+              {
+                title: "Products",
+                href: "/products",
+                icon: Icons.product,
+                subpages: ["products"]
               }
             ]}
           />

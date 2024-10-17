@@ -12,7 +12,7 @@ import {
 import { type Row } from "@tanstack/react-table";
 import { Card, CardContent } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
-import { type PricingTier } from "@prisma/client";
+import { type ErpProduct, type PricingTier } from "@prisma/client";
 import { type Quote, type QuoteLineItem } from "~/server/api/routers/quote";
 import {
   type ContactLineItem,
@@ -34,6 +34,7 @@ import countryFlagEmoji from "~/utils/emoji-country";
 import { get } from "lodash";
 import { ContactCell } from "~/components/supplier/contact-cell";
 import { ContactDropdown } from "~/components/supplier/contact-dropdown";
+import { Badge } from "~/components/ui/badge";
 
 export const quoteTableConfig = {
   maxRowsBeforePagination: 7,
@@ -385,6 +386,46 @@ export const rfqTableConfig = {
   ]
 };
 
+export const erpProductTableConfig = {
+  placeholder: "Filter products...",
+  maxRowsBeforePagination: 9,
+  checkbox: true,
+  columns: [
+    {
+      header: "Description",
+      accessorKey: "productName",
+      sortable: true,
+      filterFn: (
+        row: Row<ErpProduct>,
+        columnId: string,
+        filterValue: string
+      ) => {
+        return `${row.original.productName}${row.original.productCode}`
+          .toLowerCase()
+          .includes(filterValue.toLowerCase());
+      }
+    },
+    {
+      header: "Product Code",
+      accessorKey: "productCode",
+      sortable: true,
+      cell: (row: Row<ErpProduct>) => {
+        return (
+          <Badge variant="secondary">
+            {row.original.productCode === "" ? "N/A" : row.original.productCode}
+          </Badge>
+        );
+      }
+    },
+    {
+      header: "Last Updated At",
+      accessorKey: "updatedAt",
+      sortable: true,
+      isDate: true
+    }
+  ]
+};
+
 export const useGetQuotesBySupplierQuery = (args: { supplierId: number }) =>
   api.supplier.getQuotesBySupplierId.useQuery(args);
 export const useGetOrdersBySupplierQuery = (args: { supplierId: number }) =>
@@ -407,3 +448,6 @@ export const useGetLineItemsByQuoteQuery = (args: { quoteId: number }) =>
 
 export const useGetAllRequestsForQuotes = (args: { clerkUserId: string }) =>
   api.rfq.getAllRequestsForQuotes.useQuery(args);
+
+export const useGetAllErpProducts = (args: { clerkUserId: string }) =>
+  api.product.getAllErpProducts.useQuery(args);

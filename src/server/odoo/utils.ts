@@ -363,10 +363,6 @@ export function getAllProducts(
   });
 }
 
-// write to a local json file
-
-// import fs from "fs";
-
 export async function syncProducts(
   odooUrl: string,
   odooUid: number,
@@ -389,8 +385,8 @@ export async function syncProducts(
         await db.erpProduct.update({
           where: { id: existingProduct.id },
           data: {
-            productName: product.name,
-            productCode: product.default_code,
+            productName: String(product.name || ""),
+            productCode: String(product.default_code || ""),
             organizationId: orgId
           }
         });
@@ -414,55 +410,3 @@ export async function syncProducts(
     console.log(`Progress: ${index + 1}/${products.length}`);
   }
 }
-
-// async function main() {
-//   const odooUrl = "https://odoo.navvis.com";
-//   const orgName = "navvis";
-//   const orgId = 2;
-
-//   const odooUid = await authenticate(odooUrl, orgName);
-
-//   if (!odooUid) {
-//     throw new Error("Authentication failed");
-//   }
-
-//   const products = await getAllProducts(odooUrl, odooUid, orgName);
-
-//   for (const [index, product] of products.entries()) {
-//     const existingProduct = await db.erpProduct.findFirst({
-//       where: { productId: product.id }
-//     });
-
-//     if (existingProduct) {
-//       // Check if the product name or code has changed
-//       if (
-//         existingProduct.productName !== product.name ||
-//         existingProduct.productCode !== product.default_code
-//       ) {
-//         await db.erpProduct.update({
-//           where: { id: existingProduct.id },
-//           data: {
-//             productName: product.name,
-//             productCode: product.default_code
-//           }
-//         });
-//         console.log(`Updated product: ${product.id}`);
-//       } else {
-//         console.log(`No changes for product: ${product.id}`);
-//       }
-//     } else {
-//       await db.erpProduct.create({
-//         data: {
-//           productId: Number(product.id),
-//           productName: String(product.name || ""),
-//           productCode: String(product.default_code || "")
-//         }
-//       });
-//       console.log(`Created new product: ${product.id}`);
-//     }
-
-//     // print progress
-//     console.log(`Progress: ${index + 1}/${products.length}`);
-//   }
-//   fs.writeFileSync("products.json", JSON.stringify(products, null, 2));
-// }

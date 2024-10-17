@@ -29,7 +29,7 @@ export default function Rfqs() {
         />
         <Button variant="soff" onClick={() => router.push("/rfqs/new")}>
           Create New RFQ
-          <Icons.packagePlus className="ml-2 h-4 w-4" />
+          <Icons.rfqNew className="ml-2 h-4 w-4" />
         </Button>
       </div>
       <GenericTable<RequestForQuote, { clerkUserId: string }>
