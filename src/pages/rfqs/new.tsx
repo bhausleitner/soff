@@ -82,11 +82,6 @@ export default function NewRFQForm() {
     clerkUserId: clerkUserId ?? ""
   });
 
-  // Fetch all erp products
-  const { data: erpProducts } = api.product.getAllErpProducts.useQuery({
-    clerkUserId: clerkUserId ?? ""
-  });
-
   // Fetch Email Provider
   const { data: emailProvider } = api.user.getEmailProvider.useQuery();
 
@@ -532,15 +527,13 @@ export default function NewRFQForm() {
                       >
                         <TableCell className="pt-4 align-top">
                           <ErpProductSelect
-                            erpProducts={erpProducts ?? []}
-                            selectedErpProductId={rfqProduct.erpProductId ?? 0}
                             onErpProductSelect={(
                               erpProductName,
                               erpProductCode,
                               erpProductId
                             ) => {
                               handleProductChange(rfqProduct.id, {
-                                description: `${erpProductCode} ${erpProductName}`,
+                                description: `[${erpProductCode}] ${erpProductName}`,
                                 erpProductCode: erpProductCode ?? undefined,
                                 erpProductId
                               });

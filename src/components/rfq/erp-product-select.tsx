@@ -1,87 +1,78 @@
 import React, { useState } from "react";
-import { Button } from "~/components/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from "~/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "~/components/ui/popover";
-import { Icons } from "~/components/icons";
-import { type ErpProduct } from "@prisma/client";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "~/components/ui/select";
+import { Input } from "~/components/ui/input";
+import { api } from "~/utils/api";
 
-type ProductDropdownProps = {
-  erpProducts: ErpProduct[];
-  selectedErpProductId: number;
+const ErpProductSelect = ({
+  onErpProductSelect
+}: {
   onErpProductSelect: (
     productName: string,
     productCode: string,
     productId: number
   ) => void;
-};
-
-const ErpProductSelect = ({
-  erpProducts,
-  onErpProductSelect
-}: ProductDropdownProps) => {
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ErpProduct>();
+  const [selected, setSelected] = useState(false);
+
+  const { data: erpProducts, isLoading } =
+    api.product.searchErpProducts.useQuery(
+      { query: searchTerm },
+      { enabled: open }
+    );
+
+  const handleValueChange = (value: string) => {
+    const selectedProduct = erpProducts?.find((p) => p.id.toString() === value);
+    if (selectedProduct) {
+      onErpProductSelect(
+        selectedProduct.productName,
+        selectedProduct.productCode ?? "",
+        selectedProduct.id
+      );
+      setSelected(true);
+    }
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[250px] justify-between"
-        >
-          <span className="truncate">
-            {selectedProduct ? selectedProduct.productName : "Select a product"}
-          </span>
-          <Icons.chevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[450px] p-0" align="start" sideOffset={5}>
-        <Command>
-          <CommandInput placeholder="Search products..." />
-          <CommandList>
-            <CommandEmpty>No products found.</CommandEmpty>
-            <CommandGroup>
-              {erpProducts?.map((erpProduct) => (
-                <CommandItem
-                  key={erpProduct.id}
-                  onSelect={() => {
-                    setSelectedProduct(erpProduct);
-                    onErpProductSelect(
-                      erpProduct.productName,
-                      erpProduct.productCode ?? "",
-                      erpProduct.id
-                    );
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex flex-col items-start">
-                    <p className="w-full truncate">{erpProduct.productName}</p>
-                    {erpProduct.productCode && (
-                      <p className="w-full truncate text-sm text-muted-foreground">
-                        {erpProduct.productCode}
-                      </p>
-                    )}
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="w-[240px]">
+      <Select onValueChange={handleValueChange} onOpenChange={setOpen}>
+        <SelectTrigger className={`text-start ${!selected && "text-gray-400"}`}>
+          <SelectValue placeholder="Select a product" />
+        </SelectTrigger>
+        <SelectContent>
+          <div className="p-2">
+            <Input
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {isLoading ? (
+            <SelectItem value="loading" disabled>
+              Loading...
+            </SelectItem>
+          ) : erpProducts && erpProducts.length > 0 ? (
+            erpProducts.map((product) => (
+              <SelectItem key={product.id} value={product.id.toString()}>
+                {product.productName}{" "}
+                {product.productCode && `(${product.productCode})`}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="no-results" disabled>
+              No products found
+            </SelectItem>
+          )}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
 
