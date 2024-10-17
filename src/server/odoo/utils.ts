@@ -18,6 +18,12 @@ type OdooSupplier = {
   zip: string | false;
 };
 
+type OdooProduct = {
+  id: number;
+  name: string;
+  default_code: string;
+};
+
 const DB = {
   soff: "shoesoff",
   navvis: "prod-navvis"
@@ -35,11 +41,7 @@ const PASSWORD = {
 
 type QuoteWithRelations = Prisma.QuoteGetPayload<{
   include: {
-    lineItems: {
-      include: {
-        part: true;
-      };
-    };
+    lineItems: true;
     supplier: {
       select: {
         organization: {
@@ -112,7 +114,7 @@ export function quoteToPurchaseOrder(quote: QuoteWithRelations): PurchaseOrder {
       0,
       0,
       {
-        product_id: lineItem.partId ?? 1, // Replace with the product's ID
+        product_id: 1, // Replace with the product's ID
         product_qty: lineItem.quantity ?? 10, // Quantity of the product
         price_unit: lineItem.price ?? 100, // Unit price of the product
         name: lineItem.description ?? "Product Description" // Description of the product
@@ -329,3 +331,138 @@ export async function syncSuppliers(
     }
   }
 }
+
+export function getAllProducts(
+  odooUrl: string,
+  uid: number,
+  orgName: string
+): Promise<OdooProduct[]> {
+  const objectClient = xmlrpc.createSecureClient(`${odooUrl}/xmlrpc/2/object`);
+  return new Promise((resolve, reject) => {
+    objectClient.methodCall(
+      "execute_kw",
+      [
+        DB[orgName as keyof typeof DB],
+        uid,
+        PASSWORD[orgName as keyof typeof PASSWORD],
+        "product.product",
+        "search_read",
+        [[]],
+        {
+          fields: ["name", "default_code"],
+          limit: 0
+        }
+      ],
+      (err: any, products: any[]) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(products);
+      }
+    );
+  });
+}
+
+// write to a local json file
+
+// import fs from "fs";
+
+export async function syncProducts(
+  odooUrl: string,
+  odooUid: number,
+  orgName: string,
+  orgId: number
+) {
+  const products = await getAllProducts(odooUrl, odooUid, orgName);
+
+  for (const [index, product] of products.entries()) {
+    const existingProduct = await db.erpProduct.findFirst({
+      where: { productId: product.id, organizationId: orgId }
+    });
+
+    if (existingProduct) {
+      // Check if the product name or code has changed
+      if (
+        existingProduct.productName !== product.name ||
+        existingProduct.productCode !== product.default_code
+      ) {
+        await db.erpProduct.update({
+          where: { id: existingProduct.id },
+          data: {
+            productName: product.name,
+            productCode: product.default_code,
+            organizationId: orgId
+          }
+        });
+        console.log(`Updated product: ${product.id}`);
+      } else {
+        console.log(`No changes for product: ${product.id}`);
+      }
+    } else {
+      await db.erpProduct.create({
+        data: {
+          productId: Number(product.id),
+          productName: String(product.name || ""),
+          productCode: String(product.default_code || ""),
+          organizationId: orgId
+        }
+      });
+      console.log(`Created new product: ${product.id}`);
+    }
+
+    // print progress
+    console.log(`Progress: ${index + 1}/${products.length}`);
+  }
+}
+
+// async function main() {
+//   const odooUrl = "https://odoo.navvis.com";
+//   const orgName = "navvis";
+//   const orgId = 2;
+
+//   const odooUid = await authenticate(odooUrl, orgName);
+
+//   if (!odooUid) {
+//     throw new Error("Authentication failed");
+//   }
+
+//   const products = await getAllProducts(odooUrl, odooUid, orgName);
+
+//   for (const [index, product] of products.entries()) {
+//     const existingProduct = await db.erpProduct.findFirst({
+//       where: { productId: product.id }
+//     });
+
+//     if (existingProduct) {
+//       // Check if the product name or code has changed
+//       if (
+//         existingProduct.productName !== product.name ||
+//         existingProduct.productCode !== product.default_code
+//       ) {
+//         await db.erpProduct.update({
+//           where: { id: existingProduct.id },
+//           data: {
+//             productName: product.name,
+//             productCode: product.default_code
+//           }
+//         });
+//         console.log(`Updated product: ${product.id}`);
+//       } else {
+//         console.log(`No changes for product: ${product.id}`);
+//       }
+//     } else {
+//       await db.erpProduct.create({
+//         data: {
+//           productId: Number(product.id),
+//           productName: String(product.name || ""),
+//           productCode: String(product.default_code || "")
+//         }
+//       });
+//       console.log(`Created new product: ${product.id}`);
+//     }
+
+//     // print progress
+//     console.log(`Progress: ${index + 1}/${products.length}`);
+//   }
+//   fs.writeFileSync("products.json", JSON.stringify(products, null, 2));
+// }

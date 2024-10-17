@@ -91,7 +91,7 @@ model Supplier {
   organizationId   Int?
   organization     Organization?     @relation(fields: [organizationId], references: [id])
   requestForQuotes RequestForQuote[]
-  utcOffset        Float             @default(0) 
+  utcOffset        Float             @default(0)
   erpId            Int?
   street           String?
   street2          String?
@@ -109,16 +109,18 @@ model Supplier {
   @@index([createdAt])
 }
 
-model Part {
-  id               Int               @id @default(autoincrement())
-  partNumber       String?
-  partName         String
-  cadFile          String?
-  lineItems        LineItem[]
-  requestForQuotes RequestForQuote[]
+model ErpProduct {
+  id          Int     @id @default(autoincrement())
+  productId   Int
+  productName String
+  productCode String?
+  organizationId   Int?
+  organization     Organization?     @relation(fields: [organizationId], references: [id])
 
-  @@index([partName])
-  @@index([partNumber])
+  @@index([productId])
+  @@index([productName])
+  @@index([productCode])
+  @@index([organizationId])
 }
 
 model Quote {
@@ -148,7 +150,6 @@ model Quote {
 
 model RequestForQuote {
   id             Int           @id @default(autoincrement())
-  parts          Part[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   suppliers      Supplier[]
@@ -186,7 +187,6 @@ model RfqLineItem {
 
 model LineItem {
   id            Int     @id @default(autoincrement())
-  partId        Int?
   partIdString  String?
   description   String?
   quantity      Int?
@@ -195,12 +195,10 @@ model LineItem {
   quoteId       Int
   rfqLineItemId Int?
 
-  part         Part?         @relation(fields: [partId], references: [id])
   quote        Quote         @relation(fields: [quoteId], references: [id])
   rfqLineItem  RfqLineItem?  @relation(fields: [rfqLineItemId], references: [id])
   pricingTiers PricingTier[]
 
-  @@index([partId])
   @@index([quoteId])
   @@index([rfqLineItemId])
 }
@@ -244,7 +242,8 @@ model Organization {
   suppliers        Supplier[]
   users            User[]
   requestForQuotes RequestForQuote[]
-
+  erpProducts      ErpProduct[]
+  
   @@index([name])
   @@index([emailProvider])
   @@index([erp])

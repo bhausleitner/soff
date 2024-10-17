@@ -519,11 +519,7 @@ export const quoteRouter = createTRPCRouter({
         const quote = await ctx.db.quote.findUnique({
           where: { id: input.quoteId },
           include: {
-            lineItems: {
-              include: {
-                part: true
-              }
-            },
+            lineItems: true,
             supplier: {
               select: {
                 organization: {

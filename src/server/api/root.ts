@@ -6,6 +6,7 @@ import { quoteRouter } from "~/server/api/routers/quote";
 import { userRouter } from "./routers/user";
 import { s3Router } from "./routers/s3";
 import { rfqRouter } from "./routers/rfq";
+import { productRouter } from "./routers/product";
 
 /**
  * This is the primary router for your server.
@@ -13,6 +14,7 @@ import { rfqRouter } from "./routers/rfq";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  product: productRouter,
   post: postRouter,
   supplier: supplierRouter,
   chat: chatRouter,
