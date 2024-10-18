@@ -61,8 +61,7 @@ const ErpProductSelect = ({
           ) : erpProducts && erpProducts.length > 0 ? (
             erpProducts.map((product) => (
               <SelectItem key={product.id} value={product.id.toString()}>
-                {product.productName}{" "}
-                {product.productCode && `(${product.productCode})`}
+                {`[${product.productCode}] ${product.productName}`}
               </SelectItem>
             ))
           ) : (
