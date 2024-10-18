@@ -133,7 +133,7 @@ export default function NewRFQForm() {
           rfqProduct.description && rfqProduct.quantityTiers.length > 0
       )
       .map((rfqProduct) => {
-        let productDetails = `- Product: [${rfqProduct.erpProductCode}] ${rfqProduct.description}\n`;
+        let productDetails = `- Product: ${rfqProduct.description}\n`;
 
         if (rfqProduct.quantityTiers.length === 1) {
           productDetails += `   Quantity: ${rfqProduct.quantityTiers[0]}\n`;
