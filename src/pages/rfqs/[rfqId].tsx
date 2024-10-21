@@ -12,6 +12,17 @@ import {
   TableRow
 } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "~/components/ui/alert-dialog";
 
 import { statusClassMap } from "~/components/common/TableComponent";
 import { cn } from "~/lib/utils";
@@ -25,11 +36,25 @@ import { Tooltip, TooltipContent } from "~/components/ui/tooltip";
 import { formatDate } from "~/utils/time";
 import { Icons } from "~/components/icons";
 import Spinner from "~/components/spinner";
+import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
 
 export default function RfqPage() {
   const router = useRouter();
   const rfqId = parseInt(router.query.rfqId as string);
   const [checkedRows, setCheckedRows] = useState<number[]>([]);
+  const [lineItemToDelete, setLineItemToDelete] = useState<number | null>(null);
+
+  const { data: rfqData, refetch: refetchRfqData } = api.rfq.getRfq.useQuery({
+    rfqId
+  });
+
+  const deleteRfqLineItem = api.rfq.deleteRfqLineItem.useMutation({
+    onSuccess: async () => {
+      await refetchRfqData();
+      toast.info("Deleted RFQ Lineitem!");
+    }
+  });
 
   const handleCheckedRows = (supplierId: number) => {
     setCheckedRows((prev) =>
@@ -39,7 +64,16 @@ export default function RfqPage() {
     );
   };
 
-  const { data: rfqData } = api.rfq.getRfq.useQuery({ rfqId });
+  const handleDeleteLineItem = (lineItemId: number) => {
+    setLineItemToDelete(lineItemId);
+  };
+
+  const confirmDeleteLineItem = () => {
+    if (lineItemToDelete) {
+      deleteRfqLineItem.mutate({ rfqLineItemId: lineItemToDelete });
+      setLineItemToDelete(null);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col space-y-4">
@@ -79,6 +113,7 @@ export default function RfqPage() {
                       <TableHead>Description</TableHead>
                       <TableHead>Quantity</TableHead>
                       <TableHead>Attachments</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -98,6 +133,47 @@ export default function RfqPage() {
                               />
                             ))}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 hover:text-red-600"
+                                onClick={() =>
+                                  handleDeleteLineItem(lineItem.id)
+                                }
+                              >
+                                <Icons.trash className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  <p className="mb-2">
+                                    You&apos;re about to delete this RFQ
+                                    Lineitem:
+                                  </p>
+                                  <p className="font-medium text-gray-700">
+                                    {lineItem.description}
+                                  </p>
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-500 hover:bg-red-600"
+                                  onClick={confirmDeleteLineItem}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </TableCell>
                       </TableRow>
                     ))}
