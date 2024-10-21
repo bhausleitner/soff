@@ -23,6 +23,11 @@ export type RequestForQuoteLineItem = z.infer<
 >;
 
 export const rfqRouter = createTRPCRouter({
+  deleteRfqLineItem: publicProcedure
+    .input(z.object({ rfqLineItemId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.rfqLineItem.delete({ where: { id: input.rfqLineItemId } });
+    }),
   getRfqLineitems: publicProcedure
     .input(
       z.object({
