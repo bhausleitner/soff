@@ -23,20 +23,41 @@ export type RequestForQuoteLineItem = z.infer<
 >;
 
 export const rfqRouter = createTRPCRouter({
-  getRfqFromChatId: publicProcedure
+  getRfqLineitems: publicProcedure
     .input(
       z.object({
-        chatId: z.number()
+        rfqId: z.number()
       })
     )
     .query(async ({ ctx, input }) => {
-      const rfq = await ctx.db.requestForQuote.findFirst({
-        where: { chats: { some: { id: input.chatId } } },
-        include: {
-          lineItems: true
+      const rfqLineItems = await ctx.db.rfqLineItem.findMany({
+        where: { requestForQuoteId: input.rfqId },
+        select: {
+          id: true,
+          description: true
         }
       });
-      return rfq;
+      return rfqLineItems;
+    }),
+  addNewRfqLineItem: publicProcedure
+    .input(
+      z.object({
+        rfqId: z.number(),
+        description: z.string(),
+        quantity: z.number(),
+        fileNames: z.array(z.string())
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const newRfqLineItem = await ctx.db.rfqLineItem.create({
+        data: {
+          description: input.description,
+          quantity: input.quantity,
+          fileNames: input.fileNames,
+          requestForQuoteId: input.rfqId
+        }
+      });
+      return newRfqLineItem;
     }),
   getRfq: publicProcedure
     .input(

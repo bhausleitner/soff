@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Currency } from "@prisma/client";
+import { Currency, type ErpProduct, type RfqLineItem } from "@prisma/client";
 import {
   Table,
   TableBody,
@@ -45,8 +45,18 @@ import {
 import { useUser } from "@clerk/nextjs";
 import AddQuote from "~/components/parsing/add-quote";
 import SupplierSelectionDialog from "~/components/parsing/supplier-select-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "~/components/ui/dialog";
+import ErpProductSelect from "~/components/rfq/erp-product-select";
 
 type PricingTier = ParsedQuoteData["lineItems"][number]["pricingTiers"][number];
+
+type LiteRfqLineItem = Pick<RfqLineItem, "id" | "description">;
 
 const PDFParserPage = () => {
   const user = useUser();
@@ -60,12 +70,19 @@ const PDFParserPage = () => {
     lineItems: [],
     currency: Currency.USD
   });
+  const [rfqLineitems, setRfqLineitems] = useState<LiteRfqLineItem[]>();
   const [isSupplierDialogOpen, setIsSupplierDialogOpen] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(
     null
   );
+  const [isErpProductDialogOpen, setIsErpProductDialogOpen] = useState(false);
+  const [selectedErpProduct, setSelectedErpProduct] = useState<
+    Omit<ErpProduct, "id" | "updatedAt" | "organizationId"> | undefined
+  >();
+  const [addingRfqLineitem, setAddingRfqLineitem] = useState(false);
 
   const createQuoteMutation = api.quote.createQuote.useMutation();
+  const addRfqLineItemMutation = api.rfq.addNewRfqLineItem.useMutation();
 
   const { data: suppliers, isLoading: isLoadingSuppliers } =
     api.supplier.getAllSuppliers.useQuery({
@@ -78,7 +95,7 @@ const PDFParserPage = () => {
   };
 
   const {
-    data: parsedQuoteData,
+    data: rawParsedData,
     isLoading: isParsingQuote,
     refetch: refetchParsing
   } = api.quote.parseQuoteDatafromPdf.useQuery(
@@ -91,6 +108,12 @@ const PDFParserPage = () => {
       refetchOnReconnect: false
     }
   );
+
+  useEffect(() => {
+    if (rawParsedData) {
+      setParsedData(rawParsedData);
+    }
+  }, [rawParsedData]);
 
   const handleRetryParsing = async () => {
     setIsManuallyParsing(true);
@@ -113,10 +136,10 @@ const PDFParserPage = () => {
     });
   };
 
-  const { data: rfq, isLoading: isLoadingRfq } =
-    api.rfq.getRfqFromChatId.useQuery(
+  const { data: rawRfqLineitems, isLoading: isLoadingRfq } =
+    api.rfq.getRfqLineitems.useQuery(
       {
-        chatId: Number(chatId)
+        rfqId: Number(rfqId)
       },
       {
         enabled: !!chatId,
@@ -126,10 +149,10 @@ const PDFParserPage = () => {
     );
 
   useEffect(() => {
-    if (parsedQuoteData) {
-      setParsedData(parsedQuoteData);
+    if (rawRfqLineitems) {
+      setRfqLineitems(rawRfqLineitems);
     }
-  }, [parsedQuoteData]);
+  }, [rawRfqLineitems]);
 
   useEffect(() => {
     if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
@@ -144,11 +167,11 @@ const PDFParserPage = () => {
   }, [isParsingQuote, isLoadingRfq, isManuallyParsing]);
 
   const handleAutoMatch = useCallback(() => {
-    if (!rfq) return;
+    if (!rfqLineitems) return;
 
     setParsedData((prevData) => {
       const newLineItems = prevData.lineItems.map((item) => {
-        const matchedRfqItem = rfq.lineItems.find((rfqItem) =>
+        const matchedRfqItem = rfqLineitems.find((rfqItem) =>
           item.description
             .toLowerCase()
             .includes(rfqItem?.description?.toLowerCase() ?? "")
@@ -163,7 +186,7 @@ const PDFParserPage = () => {
     });
 
     toast.success("Auto-matching completed!");
-  }, [rfq]);
+  }, [rfqLineitems]);
 
   const handleAddLineItem = useCallback(() => {
     setParsedData((prevData) => {
@@ -271,7 +294,7 @@ const PDFParserPage = () => {
         const updatedItem = { ...newLineItems[lineItemIndex] };
         const updatedTiers = [...(updatedItem.pricingTiers ?? [])];
 
-        updatedItem.pricingTiers = sortPricingTiers(updatedTiers); // Apply sorting only on blur
+        updatedItem.pricingTiers = sortPricingTiers(updatedTiers);
         newLineItems[lineItemIndex] =
           updatedItem as ParsedQuoteData["lineItems"][number];
 
@@ -324,21 +347,42 @@ const PDFParserPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getAvailableCategories = useCallback(
+  const getAvailableRfqLineitems = useCallback(
     (currentIndex: number) => {
-      if (!rfq) return [];
+      if (!rfqLineitems) return [];
 
-      const usedCategories = parsedData.lineItems
+      const usedRfqLineitems = parsedData.lineItems
         .filter((_, index) => index !== currentIndex)
         .map((item) => item.rfqLineItemId)
         .filter(Boolean);
 
-      return rfq.lineItems.filter(
-        (lineItem) => !usedCategories.includes(lineItem.id)
+      return rfqLineitems.filter(
+        (lineItem) => !usedRfqLineitems.includes(lineItem.id)
       );
     },
-    [parsedData.lineItems, rfq]
+    [parsedData.lineItems, rfqLineitems]
   );
+
+  const handleAddRfqLineItem = async (index: number) => {
+    setAddingRfqLineitem(true);
+    // make backend call to add rfq lineitem
+    const newRfqLineitem = await addRfqLineItemMutation.mutateAsync({
+      rfqId: Number(rfqId),
+      description: selectedErpProduct?.productName ?? "",
+      quantity: 1,
+      fileNames: []
+    });
+
+    // update rfqLineitem state
+    setRfqLineitems((prev) => [...(prev ?? []), newRfqLineitem]);
+
+    // update the rfq lineitem
+    handleCellEdit(index, "rfqLineItemId", newRfqLineitem.id);
+
+    toast.success("RFQ Lineitem added successfully!");
+    setIsErpProductDialogOpen(false);
+    setAddingRfqLineitem(false);
+  };
 
   const handleAddQuote = () => {
     if (supplierId ?? selectedSupplierId) {
@@ -386,7 +430,7 @@ const PDFParserPage = () => {
 
   const renderTableContent = () => {
     if (isParsingQuote || isLoadingRfq || isManuallyParsing) {
-      const skeletonCount = rfq?.lineItems?.length ?? 3;
+      const skeletonCount = rfqLineitems?.length ?? 3;
       return (
         <TableBody>
           {Array.from({ length: skeletonCount }).map((_, index) => (
@@ -502,19 +546,21 @@ const PDFParserPage = () => {
                   <Select
                     value={item.rfqLineItemId?.toString() ?? "unmatched"}
                     onValueChange={(value) =>
-                      handleCellEdit(
-                        index,
-                        "rfqLineItemId",
-                        value === "unmatched" ? undefined : parseInt(value)
-                      )
+                      value === "add"
+                        ? setIsErpProductDialogOpen(true)
+                        : handleCellEdit(
+                            index,
+                            "rfqLineItemId",
+                            value === "unmatched" ? undefined : parseInt(value)
+                          )
                     }
                   >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] text-start">
                       <SelectValue placeholder="Select a line item" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="unmatched">Unmatched</SelectItem>
-                      {getAvailableCategories(index).map((lineItem) => (
+                      {getAvailableRfqLineitems(index).map((lineItem) => (
                         <SelectItem
                           key={lineItem.id}
                           value={lineItem.id.toString()}
@@ -522,8 +568,55 @@ const PDFParserPage = () => {
                           {lineItem.description}
                         </SelectItem>
                       ))}
+                      <SelectItem value="add">Add</SelectItem>
                     </SelectContent>
                   </Select>
+                  {isErpProductDialogOpen && (
+                    <Dialog
+                      open={isErpProductDialogOpen}
+                      onOpenChange={setIsErpProductDialogOpen}
+                    >
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Select a product</DialogTitle>
+                        </DialogHeader>
+                        <ErpProductSelect
+                          isInsideDialog={true}
+                          onErpProductSelect={(
+                            erpProductName,
+                            erpProductCode,
+                            erpProductId
+                          ) => {
+                            setSelectedErpProduct({
+                              productId: erpProductId,
+                              productName: erpProductName,
+                              productCode: erpProductCode ?? ""
+                            });
+                          }}
+                        />
+                        <DialogFooter>
+                          <Button
+                            variant="outline"
+                            onClick={() => setIsErpProductDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            className="w-40"
+                            variant="soff"
+                            disabled={addingRfqLineitem}
+                            onClick={() => handleAddRfqLineItem(index)}
+                          >
+                            {addingRfqLineitem ? (
+                              <Icons.loaderCircle className="h-4 w-4 animate-spin" />
+                            ) : (
+                              "Add RFQ Lineitem"
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
                 </TableCell>
               )}
               <TableCell className="pl-0">

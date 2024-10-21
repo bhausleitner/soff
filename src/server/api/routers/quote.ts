@@ -48,8 +48,8 @@ export const pricingTierSchema = z.object({
 
 export const lineItemSchema = z.object({
   id: z.number(),
-  partId: z.number().nullable(),
-  partIdString: z.string().nullable(),
+  partId: z.number().nullable().optional(),
+  partIdString: z.string().nullable().optional(),
   quantity: z.number().nullable(),
   price: z.number().nullable(),
   quoteId: z.number(),
@@ -96,51 +96,6 @@ export type Quote = z.infer<typeof quoteSchema>;
 export type LineItem = z.infer<typeof lineItemSchema>;
 
 export const quoteRouter = createTRPCRouter({
-  createRawQuote: publicProcedure
-    .input(
-      z.object({
-        supplierId: z.number(),
-        fileKey: z.string(),
-        parsedData: parsedQuoteSchema
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const newQuote = await ctx.db.quote.create({
-        data: {
-          supplierId: input.supplierId,
-          price: input.parsedData?.lineItems.reduce(
-            (acc: number, item: { unitPrice: number }) => acc + item.unitPrice,
-            0
-          ),
-          status: QuoteStatus.RECEIVED,
-          fileKey: input.fileKey
-        }
-      });
-
-      await Promise.all(
-        input.parsedData.lineItems.map((lineItem) =>
-          ctx.db.lineItem.create({
-            data: {
-              quoteId: newQuote.id,
-              partIdString: lineItem.partId,
-              description: lineItem.description,
-              quantity: lineItem.quantity,
-              price: lineItem.unitPrice,
-              rfqLineItemId: lineItem.rfqLineItemId,
-              pricingTiers: {
-                create: lineItem.pricingTiers.map((tier) => ({
-                  minQuantity: tier.minQuantity,
-                  maxQuantity: tier.maxQuantity,
-                  price: tier?.price
-                }))
-              }
-            }
-          })
-        )
-      );
-
-      return { quoteId: newQuote.id.toString() };
-    }),
   createQuote: publicProcedure
     .input(
       z.object({
@@ -187,6 +142,7 @@ export const quoteRouter = createTRPCRouter({
               ctx.db.lineItem.create({
                 data: {
                   quoteId: newQuote.id,
+                  partIdString: lineItem.partId,
                   description: lineItem.description,
                   quantity: lineItem.quantity,
                   price: lineItem.unitPrice,

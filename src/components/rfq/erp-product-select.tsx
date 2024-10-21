@@ -8,15 +8,18 @@ import {
 } from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
 import { api } from "~/utils/api";
+import { truncateDescription } from "~/utils/string-format";
 
 const ErpProductSelect = ({
-  onErpProductSelect
+  onErpProductSelect,
+  isInsideDialog = false
 }: {
   onErpProductSelect: (
     productName: string,
     productCode: string,
     productId: number
   ) => void;
+  isInsideDialog?: boolean;
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
@@ -41,37 +44,40 @@ const ErpProductSelect = ({
   };
 
   return (
-    <div className="w-[240px]">
-      <Select onValueChange={handleValueChange} onOpenChange={setOpen}>
-        <SelectTrigger className={`text-start ${!selected && "text-gray-400"}`}>
-          <SelectValue placeholder="Select a product" />
-        </SelectTrigger>
-        <SelectContent>
-          <div className="p-2">
-            <Input
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          {isLoading ? (
-            <SelectItem value="loading" disabled>
-              Loading...
+    <Select onValueChange={handleValueChange} onOpenChange={setOpen}>
+      <SelectTrigger
+        className={`w-full text-start ${!selected && "text-gray-400"}`}
+      >
+        <SelectValue placeholder="Select a product" />
+      </SelectTrigger>
+      <SelectContent isInsideDialog={isInsideDialog} className="w-full">
+        <div className="p-2">
+          <Input
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        {isLoading ? (
+          <SelectItem value="loading" disabled>
+            Loading...
+          </SelectItem>
+        ) : erpProducts && erpProducts.length > 0 ? (
+          erpProducts.map((product) => (
+            <SelectItem key={product.id} value={product.id.toString()}>
+              {truncateDescription(
+                `[${product.productCode}] ${product.productName}`,
+                50
+              )}
             </SelectItem>
-          ) : erpProducts && erpProducts.length > 0 ? (
-            erpProducts.map((product) => (
-              <SelectItem key={product.id} value={product.id.toString()}>
-                {`[${product.productCode}] ${product.productName}`}
-              </SelectItem>
-            ))
-          ) : (
-            <SelectItem value="no-results" disabled>
-              No products found
-            </SelectItem>
-          )}
-        </SelectContent>
-      </Select>
-    </div>
+          ))
+        ) : (
+          <SelectItem value="no-results" disabled>
+            No products found
+          </SelectItem>
+        )}
+      </SelectContent>
+    </Select>
   );
 };
 
