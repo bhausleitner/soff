@@ -13,11 +13,31 @@ import ChatBottombar from "~/components/chat/chat-bottombar";
 import ChatTopbar from "~/components/chat/chat-topbar";
 import { ChatList } from "~/components/chat/chat-list";
 import { EmailProvider } from "@prisma/client";
+import { toast } from "sonner";
 
-export default function ChatSheetContent({ chatId }: { chatId: number }) {
-  const { data } = api.chat.getChat.useQuery({
+export default function ChatSheetContent({
+  chatId,
+  refetchChatToggle,
+  resetRefetch
+}: {
+  chatId: number;
+  refetchChatToggle: boolean;
+  resetRefetch: () => void;
+}) {
+  const { data, refetch } = api.chat.getChat.useQuery({
     chatId: chatId
   });
+
+  useEffect(() => {
+    if (refetchChatToggle) {
+      toast.promise(() => refetch(), {
+        loading: "Refreshing chat...",
+        success: "Chat updated successfully",
+        error: "Failed to refresh chat"
+      });
+      resetRefetch();
+    }
+  }, [refetchChatToggle, refetch, resetRefetch]);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
     data?.newChat?.messages ?? []

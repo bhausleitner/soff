@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/icons";
 import {
@@ -19,6 +19,7 @@ export function ViewChatButton({
   subject: string;
   rfqId?: number;
 }) {
+  const [refetchChatToggle, setRefetchChatToggle] = useState(false);
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -33,9 +34,20 @@ export function ViewChatButton({
             <SheetTitle>{subject}</SheetTitle>
             <SheetDescription>Chat #{chatId}</SheetDescription>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => setRefetchChatToggle(!refetchChatToggle)}
+          >
+            <Icons.refresh className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
         </SheetHeader>
         <div className="mt-4 h-[calc(100vh-100px)]">
-          <ChatSheetContent chatId={chatId} />
+          <ChatSheetContent
+            chatId={chatId}
+            refetchChatToggle={refetchChatToggle}
+            resetRefetch={() => setRefetchChatToggle(false)}
+          />
         </div>
       </SheetContent>
     </Sheet>
